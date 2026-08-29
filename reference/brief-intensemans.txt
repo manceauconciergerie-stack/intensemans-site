@@ -1,0 +1,336 @@
+
+
+🌹 BRIEF SITE INTERNET — INTENSÉ’MANS LOVE ROOM
+1. Présentation du projet
+Nous allons créer un site internet complémentaire à notre Love Room INTENSÉ’MANS.
+L’objectif principal du site est de permettre aux clients ayant réservé la Love Room de personnaliser leur séjour en réservant des suppléments.
+Le site doit être à la fois :
+élégant
+romantique
+premium
+sensuel
+moderne
+simple d’utilisation
+parfaitement adapté au téléphone
+Nous voulons donner l’impression d’une expérience haut de gamme, comme dans un boutique-hôtel romantique, et surtout éviter l’aspect “boutique en ligne classique”.
+
+2. IDENTITÉ VISUELLE
+Le logo officiel est celui fourni avec ce brief.
+Logo : INTENSÉ’MANS LOVE ROOM
+L’identité visuelle doit reprendre les codes du logo :
+Couleurs principales
+Noir profond
+Rose poudré / rose champagne
+Blanc cassé / crème
+Quelques touches très discrètes de doré possibles
+Ambiance
+Romantique
+Intime
+Chic
+Sensuelle
+Luxueuse
+Élégante
+Sombre et chaleureuse
+Le site doit rappeler :
+une chambre d’hôtel haut de gamme
+le satin
+les bougies
+le champagne
+les roses
+une ambiance nocturne
+une expérience romantique à deux
+À éviter absolument
+Rose flashy
+Trop de cœurs
+Design enfantin
+Design kitsch
+Trop de rouge vif
+Trop d’éléments décoratifs
+Aspect vulgaire ou pornographique
+L’idée est de rester sexy mais élégant.
+
+3. SLOGAN
+Nom :
+INTENSÉ’MANS
+Sous-titre :
+LOVE ROOM
+Phrase d’accroche possible :
+Votre parenthèse à deux.
+Autres formulations pouvant être utilisées :
+Rendez votre séjour inoubliable.
+ou
+Parce que les plus beaux souvenirs se cachent dans les détails.
+
+4. OBJECTIF DU SITE
+Le site doit permettre aux clients de réserver des extras avant leur arrivée.
+Exemple de parcours :
+Réservation de la Love Room
+ ↓
+ Mail de confirmation
+ ↓
+ Lien vers le site INTENSÉ’MANS
+ ↓
+ Le client découvre les extras
+ ↓
+ Il sélectionne ce qu’il souhaite
+ ↓
+ Il renseigne les informations de son séjour
+ ↓
+ Il paie directement en ligne
+ ↓
+ Nous recevons la commande
+ ↓
+ Nous préparons les extras avant son arrivée
+
+5. INFORMATIONS À DEMANDER LORS DE LA COMMANDE
+Lorsqu’un client commande un supplément, il doit pouvoir renseigner :
+Nom / prénom
+Date du séjour
+Heure d’arrivée
+Numéro de réservation si disponible
+Message personnalisé si nécessaire
+Exemple :
+Date de votre séjour :
+ [ calendrier ]
+Nom de réservation :
+ [ champ ]
+Numéro de réservation :
+ [ champ facultatif ]
+Message personnalisé :
+ [ champ facultatif ]
+Ajouter une phrase rassurante :
+“Vos attentions seront préparées avec soin avant votre arrivée dans la Love Room.”
+
+6. STRUCTURE DU SITE
+PAGE D’ACCUEIL
+Grand visuel immersif de la Love Room.
+Logo INTENSÉ’MANS.
+Texte :
+Votre parenthèse à deux.
+Puis un bouton principal :
+PERSONNALISER MON SÉJOUR ❤️
+
+SECTION — PERSONNALISEZ VOTRE SÉJOUR
+Texte :
+“Parce que les plus beaux souvenirs se cachent dans les détails, personnalisez votre expérience avec nos attentions soigneusement sélectionnées.”
+Afficher les différentes catégories.
+🥂 À DÉGUSTER
+Champagne, vin et planches apéritives.
+🌹 À DÉCORER
+Pétales de roses et décorations romantiques.
+❤️ NOS PACKS
+Des expériences complètes pour profiter pleinement de votre séjour.
+🎁 PETITES ATTENTIONS
+Cadeaux, gourmandises et surprises.
+
+7. PRODUITS À PROPOSER
+🥩 PACK PLANCHE & VIN
+Planche apéritive charcuterie pour 2 personnes + bouteille de vin
+Contenu :
+Sélection de charcuteries
+Fromages
+Accompagnements apéritifs
+Petite touche gourmande
+1 bouteille de vin
+Description :
+“Une planche généreuse à partager à deux, accompagnée d’une bouteille de vin soigneusement sélectionnée. L’idéal pour commencer votre soirée autour d’un moment convivial et gourmand.”
+Prix à définir.
+
+8. 🥂 PACK PLANCHE & CHAMPAGNE
+Planche apéritive charcuterie pour 2 personnes + bouteille de champagne
+Contenu :
+Sélection de charcuteries
+Fromages
+Accompagnements apéritifs
+Petite touche gourmande
+1 bouteille de champagne
+Description :
+“Une planche raffinée à partager à deux, accompagnée d’une bouteille de champagne. Quelques bulles, quelques gourmandises et il ne reste plus qu’à profiter.”
+Prix à définir.
+
+9. ❤️ PACK INTENSE
+L’expérience romantique par excellence.
+Contenu :
+🌹 Pétales de roses
+🍾 1 bouteille de champagne
+🔥 1 sextoy
+🎲 1 jeu de cartes coquin
+Description :
+“Une ambiance romantique, quelques bulles et de quoi pimenter votre soirée… Le Pack Intense rassemble tout ce qu’il faut pour profiter pleinement de votre parenthèse à deux.”
+Ce pack doit être présenté comme le produit phare du site.
+Ajouter un badge :
+BEST-SELLER ❤️
+ou
+NOTRE PACK SIGNATURE
+Prix à définir.
+
+10. 🍾 PACK DOUBLE BULLES
+2 bouteilles de champagne
+Contenu :
+🍾 2 bouteilles de champagne
+Description :
+“Parce qu’une bouteille peut parfois ne pas suffire… Prolongez votre soirée avec deux bouteilles de champagne à déguster à deux.”
+Prix à définir.
+
+11. ÉVOLUTION FUTURE DU SITE
+Le site doit être conçu de façon à pouvoir ajouter facilement de nouveaux produits.
+Nous souhaitons pouvoir ajouter par la suite :
+🌹 DÉCORATION
+Pétales de roses
+Ballons
+Décoration anniversaire
+Décoration romantique
+Décoration personnalisée
+Demande en mariage
+🥂 APÉRITIF
+Différentes planches
+Champagne
+Vin
+Softs
+Cocktails
+Gourmandises
+🎁 CADEAUX
+Chocolats
+Fleurs
+Cadeaux personnalisés
+Petites attentions
+🔥 EXPÉRIENCES
+Pack anniversaire
+Pack Saint-Valentin
+Pack demande en mariage
+Pack Intense
+Packs saisonniers
+
+12. DESIGN DES FICHES PRODUITS
+Chaque produit doit avoir une grande photo très esthétique.
+Éviter les photos classiques de catalogue.
+Les produits doivent idéalement être photographiés directement dans la Love Room, avec :
+lumière tamisée
+champagne
+bougies
+satin
+roses
+ambiance rouge/noire
+éclairage chaleureux
+Chaque fiche doit afficher :
+Nom du produit
+Courte description
+Ce qui est inclus
+Prix
+Date du séjour
+Ajouter à mon séjour
+Le bouton doit plutôt dire :
+AJOUTER À MON SÉJOUR ❤️
+plutôt que simplement “Acheter”.
+
+13. PANIER
+Créer un panier simple et élégant.
+Afficher :
+Les produits sélectionnés
+Quantités
+Prix
+Total
+Date du séjour
+Nom de réservation
+Puis :
+PASSER AU PAIEMENT
+Le paiement doit être simple, sécurisé et adapté au mobile.
+Prévoir les moyens de paiement classiques disponibles via la solution choisie :
+Carte bancaire
+Apple Pay
+Google Pay si disponible
+autres moyens pertinents
+
+14. CONFIRMATION DE COMMANDE
+Après paiement :
+Merci pour votre commande ❤️
+“Votre séjour INTENSÉ’MANS se prépare.”
+“Vos attentions seront préparées avec soin avant votre arrivée.”
+Afficher :
+Numéro de commande
+Date du séjour
+Produits commandés
+Total payé
+De notre côté, nous devons recevoir automatiquement la commande afin de pouvoir préparer les extras.
+
+15. ESPACE ADMINISTRATEUR
+Il faut pouvoir facilement :
+Ajouter un produit
+Modifier un produit
+Modifier le prix
+Ajouter une photo
+Modifier la description
+Activer / désactiver un produit
+Voir les commandes
+Voir la date du séjour
+Voir le nom du client
+Voir les produits commandés
+Voir les messages personnalisés
+Suivre les paiements
+Il serait également intéressant d’avoir une vue des commandes classées par date de séjour, afin de savoir facilement ce qui doit être préparé chaque jour.
+
+16. MENU DU SITE
+Menu principal :
+ACCUEIL
+PERSONNALISEZ VOTRE SÉJOUR
+PACKS & EXPÉRIENCES
+À PROPOS
+CONTACT
+Ajouter éventuellement un bouton permanent :
+❤️ PERSONNALISER MON SÉJOUR
+
+17. FOOTER
+Afficher :
+INTENSÉ’MANS
+ Love Room
+Votre parenthèse à deux.
+Puis :
+Contact
+FAQ
+Mentions légales
+Conditions générales de vente
+Politique de confidentialité
+Politique de remboursement
+Gestion des cookies
+Prévoir également les informations nécessaires concernant les produits soumis à réglementation, notamment les boissons alcoolisées, ainsi que les dispositifs de vérification d’âge/conformité adaptés.
+
+18. VERSION MOBILE
+La majorité des clients consulteront probablement le site depuis leur téléphone.
+Le site doit donc être pensé mobile-first.
+Sur téléphone :
+Logo visible
+Menu simple
+Gros boutons
+Photos pleine largeur
+Produits faciles à sélectionner
+Panier facilement accessible
+Paiement très rapide
+Le bouton “PERSONNALISER MON SÉJOUR” doit être particulièrement visible.
+
+19. STYLE GLOBAL
+Le rendu final doit être :
+INTIME + PREMIUM + ROMANTIQUE + MODERNE + SENSUEL
+Imagine un mélange entre :
+boutique-hôtel 5 étoiles + univers romantique + boutique premium
+Le site doit donner envie au client de se dire :
+“Je veux que tout soit prêt quand j’arrive.”
+L’objectif est également de générer des ventes supplémentaires grâce aux extras.
+Le site ne doit donc pas donner l’impression de vendre simplement une bouteille de champagne ou une planche apéro.
+Il doit vendre une expérience.
+
+20. IDENTITÉ FINALE
+INTENSÉ’MANS
+LOVE ROOM
+Votre parenthèse à deux. ❤️
+Couleurs principales :
+ Noir + rose poudré + crème + touches dorées
+Style :
+ Chic / romantique / sensuel / premium / minimaliste
+Logo :
+ Utiliser le logo fourni avec ce brief comme logo officiel et reprendre ses couleurs et son style graphique pour toute l’identité du site.
+
+OBJECTIF FINAL
+Créer un site qui donne immédiatement envie de réserver des extras et qui soit suffisamment élégant pour être associé à une Love Room haut de gamme.
+Le client doit avoir l’impression de préparer son expérience INTENSÉ’MANS, et non simplement de faire des achats sur une boutique en ligne.
+
+

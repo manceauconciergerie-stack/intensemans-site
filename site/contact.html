@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact — INTENSÉ'MANS Love Room</title>
+<meta name="description" content="Une question sur vos attentions, une demande particulière ou une surprise à préparer ? Écrivez-nous.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="INTENSÉ'MANS Love Room">
+<meta property="og:title" content="Contact — INTENSÉ'MANS Love Room">
+<meta property="og:description" content="Une question sur vos attentions, une demande particulière ou une surprise à préparer ? Écrivez-nous.">
+<meta property="og:image" content="assets/img/lieu/hero-chambre.webp">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#100c0d">
+<link rel="icon" href="assets/img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/tokens.css?v=6a90ad66">
+<link rel="stylesheet" href="assets/css/base.css?v=6a90ad66">
+<link rel="stylesheet" href="assets/css/components.css?v=6a92dcdd">
+</head>
+<body>
+
+<a class="im-skip" href="#contenu">Aller au contenu</a>
+
+<header class="im-header">
+  <div class="im-header__inner">
+    <a class="im-brand" href="index.html">
+      <img src="assets/img/logo.png" alt="" width="42" height="42">
+      <span class="im-brand__txt">
+        <span class="im-brand__name">INTENSÉ'MANS</span>
+        <span class="im-brand__sub">Love Room</span>
+      </span>
+    </a>
+    <nav class="im-nav" data-nav aria-label="Navigation principale">
+      <ul>
+        <li><a href="index.html">La boutique</a></li>
+        <li><a href="index.html#packs">Packs</a></li>
+        <li><a href="a-propos.html">À propos</a></li>
+        <li><a href="contact.html" aria-current="page">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="im-header__actions">
+      <a class="im-cartlink" href="commander.html">
+        <span>Mon séjour</span>
+        <span class="im-cartlink__count" data-cart-count data-empty="true">0</span>
+      </a>
+      <button class="im-burger" data-burger type="button" aria-expanded="false" aria-label="Ouvrir le menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="contenu">
+
+  <section class="im-section im-glow">
+    <div class="im-shell">
+      <div class="im-head">
+        <span class="im-eyebrow">Contact</span>
+        <h1>Une question, <span class="im-italic">une idée à préparer ?</span></h1>
+        <div class="im-flourish"><span aria-hidden="true">❤︎</span></div>
+        <p class="im-lead">
+          Pour une demande particulière, une mise en scène sur mesure ou une commande
+          de dernière minute : écrivez-nous, on trouve une solution.
+        </p>
+      </div>
+
+      <div class="im-cart">
+        <form class="im-form" novalidate>
+          <div class="im-form__row">
+            <div class="im-field">
+              <label for="c-name">Votre nom</label>
+              <input id="c-name" name="name" type="text" autocomplete="name" placeholder="Prénom et nom">
+            </div>
+            <div class="im-field">
+              <label for="c-email">Votre e-mail</label>
+              <input id="c-email" name="email" type="email" autocomplete="email" placeholder="pour vous répondre">
+            </div>
+          </div>
+          <div class="im-form__row">
+            <div class="im-field">
+              <label for="c-date">Date de votre séjour</label>
+              <input id="c-date" name="date" type="date">
+            </div>
+            <div class="im-field">
+              <label for="c-subject">Votre demande</label>
+              <select id="c-subject" name="subject">
+                <option>Une question sur les attentions</option>
+                <option>Une demande sur mesure</option>
+                <option>Une surprise à préparer</option>
+                <option>Une commande de dernière minute</option>
+                <option>Autre</option>
+              </select>
+            </div>
+          </div>
+          <div class="im-field">
+            <label for="c-message">Votre message</label>
+            <textarea id="c-message" name="message" placeholder="Dites-nous tout."></textarea>
+          </div>
+          <p class="im-field__help">Prototype : ce formulaire n’envoie encore rien.</p>
+          <button class="im-btn im-btn--primary" type="submit">Envoyer <span aria-hidden="true">❤︎</span></button>
+        </form>
+
+        <aside class="im-summary">
+          <h2>Nous joindre</h2>
+          <div class="im-summary__row"><span class="im-quiet">Réponse</span><span>Sous 24 h</span></div>
+          <div class="im-summary__row"><span class="im-quiet">Commandes</span><span>Jusqu’à 18 h la veille</span></div>
+          <div class="im-summary__row"><span class="im-quiet">Lieu</span><span>Le Mans</span></div>
+          <p class="im-summary__legal">
+            Pour une demande urgente concernant un séjour du jour, précisez-le en objet :
+            nous traitons ces messages en priorité.
+          </p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="im-footer">
+  <div class="im-shell">
+    <div class="im-footer__grid">
+      <div class="im-footer__brand">
+        <img src="assets/img/logo.png" alt="" width="62" height="62">
+        <p class="im-brand__name" style="font-size:1.2rem">INTENSÉ'MANS</p>
+        <p class="im-brand__sub">Love Room</p>
+        <p class="im-footer__tag">Votre parenthèse à deux.</p>
+      </div>
+      <div class="im-footer__links">
+        <div>
+          <h3>La boutique</h3>
+          <ul>
+            <li><a href="index.html#packs">Nos packs</a></li>
+            <li><a href="index.html#deguster">À déguster</a></li>
+            <li><a href="index.html#decorer">À décorer</a></li>
+            <li><a href="index.html#attentions">Petites attentions</a></li>
+            <li><a href="contact.html">Une demande sur mesure</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Informations</h3>
+          <ul>
+            <li><a href="a-propos.html">À propos</a></li>
+            <li><a href="#">Mentions légales</a></li>
+            <li><a href="#">Conditions générales de vente</a></li>
+            <li><a href="#">Confidentialité et cookies</a></li>
+            <li><a href="#">Remboursement</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <p class="im-alcool">
+      La vente d’alcool est interdite aux mineurs de moins de 18 ans (art. L.3342-1 du Code de la santé publique).
+      En commandant un produit contenant de l’alcool, vous certifiez avoir 18 ans ou plus.
+      L’abus d’alcool est dangereux pour la santé, à consommer avec modération.
+    </p>
+    <div class="im-footer__legal">
+      <span>© <span id="im-year">2026</span> INTENSÉ'MANS Love Room · Le Mans</span>
+      <span>Réservé aux adultes · Séjours pour deux personnes</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/products-images.js?v=6a92db94"></script>
+<script src="assets/js/products.js?v=6a90b6b8"></script>
+<script src="assets/js/cart.js?v=6a8df747"></script>
+<script src="assets/js/orders.js?v=6a8e133f"></script>
+<script src="assets/js/app.js?v=6a92df1f"></script>
+<script>document.getElementById('im-year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

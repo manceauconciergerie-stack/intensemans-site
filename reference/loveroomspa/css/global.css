@@ -1,0 +1,492 @@
+:root {
+  --lrs-night: #07080a;
+  --lrs-graphite: #101217;
+  --lrs-pearl: #f2eee7;
+  --lrs-silver: #b9bec7;
+  --lrs-steel: #777e88;
+  --lrs-page-x: clamp(22px, 5.4vw, 104px);
+  --lrs-header-height: 78px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--lrs-header-height);
+}
+
+body {
+  min-width: 0;
+  overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+:where(a, button, summary):focus-visible {
+  outline: 3px solid var(--lrs-silver);
+  outline-offset: 4px;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+.lrs-site-header {
+  position: sticky;
+  z-index: 100;
+  top: 0;
+  min-height: var(--lrs-header-height);
+  padding: 10px var(--lrs-page-x);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(7, 8, 10, 0.94);
+  backdrop-filter: blur(14px);
+}
+
+.lrs-site-header .wp-block-site-logo img {
+  width: 150px;
+  height: auto;
+}
+
+.lrs-primary-navigation {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+}
+
+.lrs-primary-navigation .wp-block-navigation__container {
+  gap: clamp(12px, 1.3vw, 24px);
+}
+
+.lrs-primary-navigation .wp-block-navigation-item__content {
+  white-space: nowrap;
+}
+
+/* The native Woo account page is not part of the approved customer journey yet. */
+.lrs-site-header > .wp-block-woocommerce-customer-account {
+  display: none !important;
+}
+
+.lrs-site-header .wp-block-woocommerce-mini-cart {
+  display: none !important;
+}
+
+.lrs-primary-navigation .lrs-menu-booking {
+  display: none;
+}
+
+.lrs-site-footer {
+  padding: clamp(60px, 8vw, 110px) var(--lrs-page-x) 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  background: var(--lrs-night);
+}
+
+.lrs-site-footer .wp-block-columns {
+  gap: clamp(30px, 6vw, 100px);
+}
+
+.lrs-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
+}
+
+.lrs-error {
+  min-height: 65vh;
+  padding-top: clamp(100px, 12vw, 180px);
+  padding-bottom: clamp(100px, 12vw, 180px);
+}
+
+.lrs-celestial {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.lrs-celestial::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 8% 18%, rgba(255, 255, 255, 0.85) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 23% 71%, rgba(255, 255, 255, 0.52) 0 0.8px, transparent 1.4px),
+    radial-gradient(circle at 47% 29%, rgba(255, 255, 255, 0.68) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 69% 82%, rgba(255, 255, 255, 0.45) 0 0.8px, transparent 1.4px),
+    radial-gradient(circle at 91% 37%, rgba(255, 255, 255, 0.75) 0 1px, transparent 1.5px);
+  content: "";
+  opacity: 0.5;
+}
+
+.lrs-celestial[data-celestial-variant="2"]::before {
+  background-image:
+    radial-gradient(circle at 13% 74%, rgba(255, 255, 255, 0.56) 0 0.8px, transparent 1.4px),
+    radial-gradient(circle at 31% 16%, rgba(255, 255, 255, 0.82) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 58% 63%, rgba(255, 255, 255, 0.48) 0 0.8px, transparent 1.4px),
+    radial-gradient(circle at 77% 27%, rgba(255, 255, 255, 0.72) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 94% 88%, rgba(255, 255, 255, 0.58) 0 0.8px, transparent 1.4px);
+}
+
+.lrs-celestial[data-celestial-variant="3"]::before {
+  background-image:
+    radial-gradient(circle at 5% 46%, rgba(255, 255, 255, 0.7) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 27% 91%, rgba(255, 255, 255, 0.48) 0 0.8px, transparent 1.4px),
+    radial-gradient(circle at 44% 12%, rgba(255, 255, 255, 0.78) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 73% 69%, rgba(255, 255, 255, 0.52) 0 0.8px, transparent 1.4px),
+    radial-gradient(circle at 88% 33%, rgba(255, 255, 255, 0.8) 0 1px, transparent 1.5px);
+}
+
+.lrs-celestial[data-celestial-variant="4"]::before {
+  background-image:
+    radial-gradient(circle at 11% 84%, rgba(255, 255, 255, 0.5) 0 0.8px, transparent 1.4px),
+    radial-gradient(circle at 36% 37%, rgba(255, 255, 255, 0.76) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 52% 7%, rgba(255, 255, 255, 0.58) 0 0.8px, transparent 1.4px),
+    radial-gradient(circle at 81% 58%, rgba(255, 255, 255, 0.84) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 97% 21%, rgba(255, 255, 255, 0.46) 0 0.8px, transparent 1.4px);
+}
+
+.lrs-celestial::after {
+  position: absolute;
+  z-index: 0;
+  top: var(--lrs-shooting-top, 22%);
+  left: -180px;
+  width: 150px;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.76), transparent);
+  content: "";
+  opacity: 0;
+  transform: rotate(-16deg);
+  animation: lrs-shooting-star 14s var(--lrs-shooting-delay, -4s) linear infinite;
+}
+
+.lrs-celestial[data-celestial-variant="2"] {
+  --lrs-shooting-top: 63%;
+  --lrs-shooting-delay: -10s;
+}
+
+.lrs-celestial[data-celestial-variant="3"] {
+  --lrs-shooting-top: 34%;
+  --lrs-shooting-delay: -7s;
+}
+
+.lrs-celestial[data-celestial-variant="4"] {
+  --lrs-shooting-top: 76%;
+  --lrs-shooting-delay: -12s;
+}
+
+.lrs-celestial > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes lrs-shooting-star {
+  0%,
+  68% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(-16deg);
+  }
+
+  72% {
+    opacity: 0.72;
+  }
+
+  88% {
+    opacity: 0;
+    transform: translate3d(120vw, -24vw, 0) rotate(-16deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(120vw, -24vw, 0) rotate(-16deg);
+  }
+}
+
+@media (max-width: 820px) {
+  :root {
+    --lrs-header-height: 68px;
+  }
+
+  .lrs-site-header {
+    padding-right: 18px;
+    padding-left: 18px;
+    backdrop-filter: none;
+  }
+
+  .lrs-site-header .wp-block-site-logo img {
+    width: 124px;
+  }
+
+  .lrs-site-header .lrs-header-cta {
+    display: none !important;
+  }
+
+  .lrs-primary-navigation .wp-block-navigation__responsive-container:not(.is-menu-open):not([data-lrs-menu-open="true"]) {
+    display: none !important;
+  }
+
+  .lrs-primary-navigation .wp-block-navigation__responsive-container-open {
+    display: flex !important;
+  }
+
+  .wp-block-navigation__responsive-container-open,
+  .wp-block-navigation__responsive-container-close {
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) {
+    overflow-y: auto;
+    padding: 0;
+    color: var(--lrs-pearl) !important;
+    background:
+      radial-gradient(circle at 92% 8%, rgba(216, 200, 187, 0.13), transparent 28%),
+      var(--lrs-night) !important;
+  }
+
+  .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .wp-block-navigation__responsive-container-content {
+    width: 100%;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    padding: 108px 22px 30px;
+    box-sizing: border-box;
+  }
+
+  .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .wp-block-navigation__responsive-container-content::before {
+    position: absolute;
+    top: 24px;
+    left: 22px;
+    width: 132px;
+    height: 53px;
+    background: url('../images/logo-love-room-spa.png') left center / contain no-repeat;
+    content: '';
+    opacity: 0.9;
+  }
+
+  .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .wp-block-navigation__responsive-container-close {
+    position: fixed;
+    z-index: 2;
+    top: 22px;
+    right: 20px;
+    border: 1px solid rgba(242, 238, 231, 0.25);
+    color: var(--lrs-pearl);
+  }
+
+  .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .wp-block-navigation__container {
+    width: 100%;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    gap: 0;
+    font-family: var(--wp--preset--font-family--jost);
+    font-size: inherit;
+    line-height: 1.2;
+  }
+
+  .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .wp-block-navigation-item {
+    width: 100%;
+    position: relative;
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr);
+    align-items: center !important;
+    justify-content: stretch !important;
+    min-height: 66px;
+    border-top: 1px solid rgba(242, 238, 231, 0.14);
+    text-align: left;
+  }
+
+  .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .wp-block-navigation-item::before {
+    grid-row: 1 / 3;
+    color: rgba(242, 238, 231, 0.4);
+    content: var(--lrs-menu-index, '');
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+  }
+
+  .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .wp-block-navigation-item__content {
+    display: block;
+    width: 100%;
+    padding: 11px 0 10px;
+    color: var(--lrs-pearl) !important;
+    font-family: var(--wp--preset--font-family--cormorant);
+    font-size: clamp(1.5rem, 7vw, 2rem);
+    line-height: 0.98;
+    white-space: normal;
+  }
+
+  .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .wp-block-navigation-item__content::after {
+    display: block;
+    margin-top: 5px;
+    color: rgba(242, 238, 231, 0.48);
+    content: attr(data-lrs-menu-description);
+    font-family: var(--wp--preset--font-family--jost);
+    font-size: 9px;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    line-height: 1.35;
+    text-transform: uppercase;
+  }
+
+  .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .lrs-menu-booking {
+    display: block;
+    min-height: 0;
+    margin-top: 18px;
+    border: 0;
+  }
+
+  .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .lrs-menu-booking::before {
+    display: none;
+  }
+
+  .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .lrs-menu-booking .wp-block-navigation-item__content {
+    padding: 17px 18px;
+    color: var(--lrs-night) !important;
+    background: var(--lrs-pearl);
+    font-family: var(--wp--preset--font-family--jost);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .lrs-menu-booking .wp-block-navigation-item__content::after {
+    display: none;
+  }
+
+  .lrs-site-footer .wp-block-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lrs-site-footer .wp-block-column:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .lrs-celestial::after {
+    display: none;
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .lrs-site-header {
+    background: var(--lrs-night);
+    backdrop-filter: none;
+  }
+}
+
+/*
+ * V10 design polish — header and mobile navigation.
+ * This final layer deliberately wins over Gutenberg's responsive menu rules.
+ */
+@media (min-width: 821px) {
+  .lrs-site-header {
+    min-height: 82px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .lrs-site-header .wp-block-site-logo img {
+    width: clamp(150px, 8.2vw, 164px);
+  }
+
+  .lrs-primary-navigation {
+    font-size: 0.75rem;
+    letter-spacing: 0.075em;
+  }
+
+  .lrs-primary-navigation .wp-block-navigation__container {
+    gap: clamp(18px, 1.45vw, 28px);
+  }
+
+  .lrs-site-header .lrs-header-cta .wp-block-button__link {
+    min-width: 136px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 18px;
+  }
+}
+
+@media (max-width: 820px) {
+  body .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) {
+    overscroll-behavior: contain;
+  }
+
+  body .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .wp-block-navigation__responsive-container-content {
+    min-height: 100%;
+    padding: 104px 18px 22px !important;
+  }
+
+  body .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .wp-block-navigation__responsive-container-content::before {
+    top: 22px;
+    left: 18px;
+    width: 128px;
+    height: 52px;
+  }
+
+  body .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .wp-block-navigation__responsive-container-close {
+    top: 20px;
+    right: 18px;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+  }
+
+  body .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .wp-block-navigation__container {
+    display: block !important;
+  }
+
+  body .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .wp-block-navigation-item {
+    min-height: 58px;
+    display: grid !important;
+    grid-template-columns: 32px minmax(0, 1fr);
+    grid-template-rows: auto;
+    align-items: center !important;
+  }
+
+  body .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .wp-block-navigation-item::before {
+    grid-row: 1;
+    align-self: center;
+    padding-top: 2px;
+    font-size: 8px;
+  }
+
+  body .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .wp-block-navigation-item__content {
+    grid-column: 2;
+    padding: 9px 0 8px;
+    font-size: clamp(1.34rem, 6.4vw, 1.68rem);
+    line-height: 0.96;
+  }
+
+  body .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .wp-block-navigation-item__content::after {
+    margin-top: 4px;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+  }
+
+  body .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .lrs-menu-booking {
+    margin-top: 14px;
+  }
+
+  body .wp-block-navigation__responsive-container:is(.is-menu-open, [data-lrs-menu-open="true"]) .lrs-menu-booking .wp-block-navigation-item__content {
+    grid-column: 1 / -1;
+    padding: 17px 18px;
+  }
+}

@@ -1,0 +1,15 @@
+# Secrets — ne doivent JAMAIS partir sur le dépôt
+.env
+.env.*
+!.env.example
+
+# Dépendances
+node_modules/
+__pycache__/
+*.pyc
+
+# Vercel
+.vercel/
+
+# macOS
+.DS_Store

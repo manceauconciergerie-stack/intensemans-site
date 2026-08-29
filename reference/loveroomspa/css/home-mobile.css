@@ -1,0 +1,1781 @@
+/*
+ * Mobile fidelity layer for the Home.
+ * Loaded after home.css so the editable Gutenberg structure follows
+ * prototype-v10 instead of the former intrinsic-height placeholders.
+ */
+@media (max-width: 820px), (max-width: 960px) and (max-height: 600px) {
+  .lrs-home {
+    --lrs-page-x: 22px;
+  }
+
+  .lrs-home :is(
+    .lrs-home-conviction,
+    .lrs-home-suite,
+    .lrs-spa-atmosphere,
+    .lrs-home-comparison,
+    .lrs-booking-section,
+    .lrs-home-options,
+    .lrs-paris-section,
+    .lrs-access-section,
+    .lrs-occasion-section,
+    .lrs-reviews-section,
+    .lrs-gift-section,
+    .lrs-faq-section,
+    .lrs-final-cta
+  ) {
+    content-visibility: visible !important;
+    contain-intrinsic-size: none !important;
+  }
+
+  .lrs-home .lrs-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Conviction and the three moments of the evening. */
+  .lrs-home .lrs-home-conviction {
+    min-height: 0;
+    padding: 0;
+    color: var(--lrs-pearl);
+    background: var(--lrs-night);
+  }
+
+  .lrs-home .lrs-evening-intro {
+    display: block;
+    padding: 16px var(--lrs-page-x) 42px;
+    color: #17181b;
+    background: var(--lrs-pearl);
+  }
+
+  .lrs-home .lrs-evening-intro > * {
+    width: 100%;
+    max-width: none !important;
+  }
+
+  .lrs-home .lrs-evening-intro .lrs-eyebrow {
+    margin: 0;
+    color: #59616b;
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .lrs-home .lrs-evening-intro > h2 {
+    margin: 8px 0 0 !important;
+    color: #6f7076;
+    font-size: clamp(27px, 7.6vw, 32px) !important;
+    font-weight: 400;
+    line-height: 0.96;
+    letter-spacing: -0.025em;
+  }
+
+  .lrs-home .lrs-evening-intro .lrs-home-intro-columns {
+    display: block !important;
+    margin: 25px 0 0 !important;
+    color: #606269;
+    font-size: 16px;
+    line-height: 1.72;
+  }
+
+  .lrs-home .lrs-evening-intro .lrs-home-intro-columns > .wp-block-column {
+    width: 100%;
+    margin: 0;
+  }
+
+  .lrs-home .lrs-evening-intro .lrs-home-intro-columns p {
+    max-width: none;
+    margin: 0;
+  }
+
+  .lrs-home .lrs-evening-intro .lrs-home-intro-columns p + p {
+    margin-top: 16px;
+  }
+
+  .lrs-home .lrs-evening-intro .lrs-line-link {
+    width: auto !important;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    margin: 24px 0 0;
+    color: #17181b;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.055em;
+  }
+
+  .lrs-home .lrs-home-conviction .lrs-home-quote {
+    width: 100%;
+    margin: 0 !important;
+    padding: 80px var(--lrs-page-x);
+    border: 0;
+    border-top: 1px solid var(--lrs-border);
+    border-bottom: 1px solid var(--lrs-border);
+    color: var(--lrs-pearl);
+    background:
+      radial-gradient(circle at 50% 50%, rgba(185, 190, 199, 0.08), transparent 42%),
+      #0b0c0f;
+    font-family: var(--wp--preset--font-family--cormorant);
+    font-size: clamp(39px, 11vw, 55px);
+    font-style: italic;
+    font-weight: 350;
+    line-height: 1;
+    text-align: center;
+  }
+
+  .lrs-home .lrs-home-conviction .lrs-home-quote::before,
+  .lrs-home .lrs-home-conviction .lrs-home-quote::after {
+    display: none;
+  }
+
+  .lrs-home .lrs-evening-flow,
+  .lrs-home .lrs-evening-moments {
+    position: static;
+    display: block;
+    overflow: visible;
+    background: var(--lrs-night);
+  }
+
+  .lrs-home .lrs-evening-stage {
+    display: none;
+  }
+
+  .lrs-home .lrs-home-conviction .lrs-evening-moment {
+    position: relative;
+    min-height: 190px;
+    height: auto;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-content: center;
+    column-gap: 13px;
+    margin: 0;
+    padding: 18px var(--lrs-page-x);
+    border: 0;
+    border-bottom: 1px solid var(--lrs-border);
+    color: var(--lrs-pearl);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .lrs-home .lrs-home-conviction .lrs-evening-moment:is(:first-child, :nth-child(2)) {
+    min-height: 421px;
+    padding-top: 238px;
+  }
+
+  .lrs-home .lrs-evening-moment .lrs-evening-mobile-image {
+    display: none;
+  }
+
+  .lrs-home .lrs-evening-moment:is(:first-child, :nth-child(2)) .lrs-evening-mobile-image {
+    position: absolute;
+    inset: 0 0 auto;
+    width: 100%;
+    height: 220px;
+    display: block !important;
+    margin: 0;
+    overflow: hidden;
+    grid-area: auto !important;
+    bottom: auto !important;
+  }
+
+  .lrs-home .lrs-evening-moment:is(:first-child, :nth-child(2)) .lrs-evening-mobile-image::after {
+    position: absolute;
+    inset: 45% 0 0;
+    background: linear-gradient(180deg, transparent, rgba(5, 6, 8, 0.88));
+    content: "";
+    pointer-events: none;
+  }
+
+  .lrs-home .lrs-evening-mobile-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 47%;
+    filter: brightness(1.03) saturate(0.92) contrast(1.02);
+  }
+
+  .lrs-home .lrs-home-conviction .lrs-evening-moment time {
+    grid-column: 1;
+    margin: 0;
+    color: #d8c8bb;
+    font-family: var(--wp--preset--font-family--cormorant);
+    font-size: 17px;
+    font-style: italic;
+    line-height: 1;
+  }
+
+  .lrs-home .lrs-home-conviction .lrs-evening-moment .lrs-card-kicker {
+    grid-column: 2;
+    align-self: center;
+    margin: 0 !important;
+    color: var(--lrs-pearl);
+    font-size: 9px;
+    line-height: 1.35;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .lrs-home .lrs-home-conviction .lrs-evening-moment h3,
+  .lrs-home .lrs-home-conviction .lrs-evening-moment > p:not(.lrs-card-kicker),
+  .lrs-home .lrs-home-conviction .lrs-evening-moment ul {
+    grid-column: 1 / -1;
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  .lrs-home .lrs-home-conviction .lrs-evening-moment h3 {
+    margin-top: 13px;
+    color: #c9c5c6;
+    font-size: clamp(29px, 8.3vw, 38px);
+    font-weight: 350;
+    line-height: 0.96;
+    letter-spacing: -0.025em;
+  }
+
+  .lrs-home .lrs-home-conviction .lrs-evening-moment > p:not(.lrs-card-kicker) {
+    max-width: none;
+    margin-top: 8px;
+    color: inherit;
+    font-size: 13px;
+    line-height: 1.42;
+  }
+
+  .lrs-home .lrs-home-conviction .lrs-evening-moment ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 14px;
+    margin-top: 11px;
+    padding: 0;
+    border: 0;
+  }
+
+  .lrs-home .lrs-home-conviction .lrs-evening-moment li {
+    padding: 0 0 0 11px;
+    font-size: 9px;
+    line-height: 1.4;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Suite: compact heading and horizontal gallery. */
+  .lrs-home .lrs-home-suite {
+    min-height: 0;
+    padding: 72px var(--lrs-page-x);
+  }
+
+  .lrs-home .lrs-suite-heading {
+    display: block;
+  }
+
+  .lrs-home .lrs-suite-heading h2 {
+    margin: 19px 0 0 !important;
+    color: #c9c5c6;
+    font-size: clamp(39px, 11vw, 49px);
+    line-height: 1.07;
+    letter-spacing: -0.025em;
+  }
+
+  .lrs-home .lrs-suite-heading .lrs-section-lead {
+    max-width: none !important;
+    margin: 27px 0 0 !important;
+    font-size: 14px;
+    line-height: 1.72;
+  }
+
+  .lrs-home .lrs-suite-heading::after {
+    height: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 30px;
+    color: rgba(242, 238, 231, 0.72);
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 17px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    content: "3 espaces à découvrir  →";
+  }
+
+  .lrs-home .lrs-suite-gallery {
+    position: relative;
+    width: 100%;
+    height: 245.7px;
+    display: grid !important;
+    grid-template-columns: none;
+    grid-template-rows: 1fr;
+    grid-auto-flow: column;
+    grid-auto-columns: min(84vw, 350px);
+    gap: 10px;
+    margin: 12px 0 0 !important;
+    padding: 0;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: inline mandatory;
+  }
+
+  .lrs-home .lrs-suite-gallery > .wp-block-column,
+  .lrs-home .lrs-suite-gallery > .wp-block-column:nth-child(n) {
+    width: auto;
+    min-width: 0;
+    height: 245.7px;
+    flex: none !important;
+    margin: 0;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    scroll-snap-align: start;
+  }
+
+  .lrs-home .lrs-suite-gallery figure,
+  .lrs-home .lrs-suite-gallery img {
+    width: 100%;
+    height: 100%;
+  }
+
+  .lrs-home .lrs-suite-gallery img {
+    object-fit: cover;
+  }
+
+  .lrs-home .lrs-essentials {
+    min-height: 168px;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 26px 0 0 !important;
+    border: 0;
+  }
+
+  .lrs-home .lrs-essentials p {
+    min-height: 56px;
+    margin: 0;
+    padding: 10px 8px;
+    border: 1px solid var(--lrs-border) !important;
+    font-size: 10px;
+    line-height: 1.45;
+  }
+
+  .lrs-home #suite > .lrs-line-link {
+    min-height: 44px;
+    align-items: center;
+    margin-top: 28px;
+  }
+
+  /* Chromotherapy. */
+  .lrs-home .lrs-spa-atmosphere {
+    min-height: 680px !important;
+    height: 680px;
+    align-items: flex-start;
+    padding: 76px var(--lrs-page-x) 94px;
+  }
+
+  .lrs-home .lrs-spa-atmosphere > .wp-block-cover__image-background {
+    object-position: 60% 52%;
+  }
+
+  .lrs-home .lrs-spa-atmosphere > .wp-block-cover__background {
+    background:
+      linear-gradient(180deg, rgba(4, 5, 8, 0.9) 0%, rgba(4, 5, 8, 0.48) 44%, rgba(4, 5, 8, 0.78) 100%),
+      linear-gradient(90deg, rgba(4, 5, 8, 0.55), transparent 80%),
+      radial-gradient(circle at 72% 72%, rgba(var(--lrs-spa-rgb), 0.3), transparent 38%);
+  }
+
+  .lrs-home .lrs-spa-atmosphere .wp-block-cover__inner-container {
+    width: 100%;
+    max-width: none;
+    margin: 0 !important;
+    padding: 0;
+    text-align: left;
+  }
+
+  .lrs-home .lrs-spa-atmosphere .lrs-eyebrow {
+    max-width: 300px;
+    margin: 0 0 21px;
+    color: rgba(242, 238, 231, 0.68);
+  }
+
+  .lrs-home .lrs-spa-atmosphere h2 {
+    width: 100%;
+    margin: 0 !important;
+    color: #c9c5c6;
+    font-size: clamp(39px, 11vw, 49px);
+    line-height: 1.07;
+  }
+
+  .lrs-home .lrs-spa-atmosphere .lrs-section-lead {
+    max-width: 330px;
+    margin: 22px 0 0 !important;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .lrs-home .lrs-spa-atmosphere .lrs-colour-chips {
+    right: var(--lrs-page-x);
+    bottom: 94px;
+    left: var(--lrs-page-x);
+    width: auto;
+    padding-top: 28px;
+  }
+
+  .lrs-home .lrs-spa-atmosphere .lrs-colour-choice {
+    height: 56px;
+    min-height: 56px;
+  }
+
+  /* Hotel versus a fully private suite. */
+  .lrs-home .lrs-home-comparison {
+    min-height: 0;
+    display: block;
+    padding: 93px var(--lrs-page-x) 0;
+    overflow: hidden;
+  }
+
+  .lrs-home .lrs-home-comparison > * {
+    width: 100%;
+    max-width: none !important;
+  }
+
+  .lrs-home .lrs-comparison-intro {
+    padding: 0;
+  }
+
+  .lrs-home .lrs-comparison-intro .lrs-eyebrow {
+    margin: 32px 0 24px;
+  }
+
+  .lrs-home .lrs-comparison-intro h2 {
+    margin: 0;
+    color: #c9c5c6;
+    font-size: clamp(39px, 11vw, 49px);
+    line-height: 1.07;
+  }
+
+  .lrs-home .lrs-comparison-intro .lrs-section-lead {
+    margin: 32px 0 0;
+    color: rgba(242, 238, 231, 0.64);
+    font-size: 17px;
+    line-height: 1.75;
+  }
+
+  .lrs-home .lrs-comparison-intro .lrs-line-link {
+    min-height: 44px;
+    align-items: center;
+    margin: 32px 0 0;
+  }
+
+  .lrs-home .lrs-comparison-panels {
+    width: 100%;
+    display: grid !important;
+    grid-template-columns: 1fr;
+    margin: 60px 0 0;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+  }
+
+  .lrs-home .lrs-home-comparison .lrs-comparison-card,
+  .lrs-home .lrs-home-comparison .lrs-comparison-card.is-private {
+    min-height: 0;
+    display: flex;
+    padding: 48px 28px;
+  }
+
+  .lrs-home .lrs-home-comparison .lrs-comparison-card + .lrs-comparison-card {
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+    border-left: 0;
+  }
+
+  .lrs-home .lrs-home-comparison .lrs-comparison-card h3 {
+    min-height: 0;
+    margin: 25px 0 38px;
+    font-size: 29px;
+    line-height: 1.02;
+  }
+
+  .lrs-home .lrs-home-comparison .lrs-comparison-quote {
+    width: calc(100% + 2 * var(--lrs-page-x));
+    margin: 0 calc(var(--lrs-page-x) * -1) !important;
+    padding: 90px var(--lrs-page-x);
+    font-family: var(--wp--preset--font-family--cormorant);
+    font-size: clamp(40px, 12vw, 56px);
+    line-height: 1;
+  }
+
+  /* Direct booking; the local fallback remains truthful. */
+  .lrs-home .lrs-booking-section {
+    min-height: 0;
+    padding: 72px var(--lrs-page-x);
+  }
+
+  .lrs-home .lrs-booking-layout {
+    display: block !important;
+    margin: 0;
+  }
+
+  .lrs-home .lrs-booking-layout > .wp-block-column {
+    width: 100%;
+    max-width: none;
+  }
+
+  .lrs-home .lrs-booking-layout > .wp-block-column:first-child {
+    min-height: 403px;
+  }
+
+  .lrs-home .lrs-booking-section .lrs-eyebrow {
+    margin: 0 0 27px;
+  }
+
+  .lrs-home .lrs-booking-section h2 {
+    margin: 0;
+    color: #6f7076;
+    font-size: clamp(39px, 11vw, 49px);
+    line-height: 1.07;
+    letter-spacing: -0.025em;
+  }
+
+  .lrs-home .lrs-booking-layout > .wp-block-column:first-child > p:not(.lrs-eyebrow) {
+    margin-top: 28px;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  .lrs-home .lrs-from-price {
+    margin-top: 44px;
+    padding-top: 25px;
+  }
+
+  .lrs-home .lrs-from-price strong {
+    font-size: 46px;
+    line-height: 1;
+  }
+
+  .lrs-home .lrs-booking-engine {
+    width: calc(100% + 2 * var(--lrs-page-x));
+    height: 759px;
+    min-height: 759px;
+    margin: 65px calc(var(--lrs-page-x) * -1) 0;
+    padding: 34px var(--lrs-page-x);
+    color: var(--lrs-pearl);
+    background:
+      radial-gradient(circle at 75% 18%, rgba(185, 190, 199, 0.08), transparent 34%),
+      #101217;
+  }
+
+  .lrs-home .lrs-booking-shell--fallback {
+    height: 100%;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0;
+    color: var(--lrs-pearl);
+  }
+
+  .lrs-home .lrs-booking-fallback__title {
+    width: 100%;
+    padding-bottom: 28px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+    color: var(--lrs-pearl);
+    font-size: 28px;
+  }
+
+  .lrs-home .lrs-booking-fallback__copy {
+    max-width: 32ch;
+    margin-top: 28px;
+    color: rgba(242, 238, 231, 0.66);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .lrs-home .lrs-booking-shell--fallback .wp-element-button {
+    width: 100%;
+    min-height: 56px;
+    justify-content: center;
+    margin-top: 38px;
+    color: var(--lrs-night);
+    background: var(--lrs-pearl);
+  }
+
+  /* Options in the same two-by-two mosaic as the prototype. */
+  .lrs-home .lrs-home-options {
+    min-height: 0;
+    padding: 72px var(--lrs-page-x);
+  }
+
+  .lrs-home .lrs-options-main {
+    display: block;
+  }
+
+  .lrs-home .lrs-options-heading {
+    position: static;
+    margin: 0 0 34px;
+  }
+
+  .lrs-home .lrs-options-heading h2 {
+    margin: 19px 0 0;
+    color: #c9c5c6;
+    font-size: clamp(39px, 11vw, 49px);
+    line-height: 1.07;
+  }
+
+  .lrs-home .lrs-options-heading .lrs-section-lead {
+    max-width: none;
+    margin: 20px 0 0;
+    color: rgba(242, 238, 231, 0.58);
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  .lrs-home .lrs-option-grid {
+    width: 100%;
+    height: auto;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .lrs-home .lrs-option-card {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    padding: 0;
+    counter-increment: lrs-mobile-option;
+  }
+
+  .lrs-home .lrs-option-card:nth-child(n + 3) {
+    height: auto;
+    aspect-ratio: 2 / 3;
+  }
+
+  .lrs-home .lrs-option-grid {
+    counter-reset: lrs-mobile-option;
+  }
+
+  .lrs-home .lrs-option-card::before {
+    position: absolute;
+    z-index: 3;
+    top: 16px;
+    left: 16px;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    content: counter(lrs-mobile-option, decimal-leading-zero);
+  }
+
+  .lrs-home .lrs-option-card::after {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(0deg, rgba(5, 6, 8, 0.9), transparent 62%);
+    content: "";
+    pointer-events: none;
+  }
+
+  .lrs-home .lrs-option-card figure {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+  }
+
+  .lrs-home .lrs-option-card figure,
+  .lrs-home .lrs-option-card img {
+    width: 100%;
+    height: 100%;
+  }
+
+  .lrs-home .lrs-option-card img {
+    object-fit: cover;
+    filter: brightness(0.78) saturate(0.82);
+  }
+
+  .lrs-home .lrs-option-card h3 {
+    position: absolute;
+    z-index: 3;
+    right: 16px;
+    bottom: 32px;
+    left: 16px;
+    margin: 0;
+    font-size: clamp(21px, 6vw, 27px);
+    line-height: 1.04;
+  }
+
+  .lrs-home .lrs-option-card > p:not(.lrs-line-link) {
+    display: none;
+  }
+
+  .lrs-home .lrs-option-card > .lrs-line-link {
+    position: absolute;
+    z-index: 4;
+    inset: 0;
+    width: 100% !important;
+    height: 100%;
+    margin: 0;
+  }
+
+  .lrs-home .lrs-option-card > .lrs-line-link a {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: hidden;
+    font-size: 0;
+    text-indent: -9999px;
+  }
+
+  .lrs-home .lrs-option-card > .lrs-line-link::after {
+    position: absolute;
+    right: 39px;
+    bottom: 19px;
+    z-index: 5;
+    width: auto;
+    height: auto;
+    border: 0;
+    color: rgba(242, 238, 231, 0.82);
+    background: none;
+    content: "Découvrir";
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    line-height: 1;
+    text-transform: uppercase;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.72);
+    pointer-events: none;
+  }
+
+  .lrs-home .lrs-option-card > .lrs-line-link::before {
+    position: absolute;
+    right: 17px;
+    bottom: 17px;
+    z-index: 5;
+    width: 14px;
+    height: 12px;
+    background-color: rgba(242, 238, 231, 0.82);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 13'%3E%3Cpath d='M1 12 13 0M6 0h7v7' fill='none' stroke='%23000' stroke-width='1.15' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 13'%3E%3Cpath d='M1 12 13 0M6 0h7v7' fill='none' stroke='%23000' stroke-width='1.15' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    content: "";
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.64));
+    pointer-events: none;
+  }
+
+  /* Paris to Vernon. */
+  .lrs-home .lrs-paris-section {
+    min-height: 0;
+    display: block;
+    padding: 92px var(--lrs-page-x);
+    overflow: hidden;
+  }
+
+  .lrs-home .lrs-paris-section .lrs-journey {
+    width: 100%;
+    min-height: 350px;
+    height: 350px;
+    display: grid !important;
+    grid-template-columns: auto minmax(70px, 1fr) auto;
+    grid-template-rows: 1fr auto;
+    align-items: center;
+    gap: 14px;
+    margin: 0;
+    padding: 30px 22px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background:
+      linear-gradient(rgba(7, 8, 10, 0.45), rgba(7, 8, 10, 0.82)),
+      radial-gradient(circle at 50% 50%, rgba(216, 200, 187, 0.16), transparent 38%);
+  }
+
+  .lrs-home .lrs-journey > p {
+    margin: 0;
+  }
+
+  .lrs-home .lrs-journey > p:first-of-type {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .lrs-home .lrs-journey > p:last-of-type {
+    grid-column: 3;
+    grid-row: 1;
+    text-align: right;
+  }
+
+  .lrs-home .lrs-journey > hr {
+    grid-column: 2;
+    grid-row: 1;
+    width: auto !important;
+    max-width: none !important;
+    justify-self: stretch;
+    height: 30px;
+    margin: 0;
+    border: 0;
+    background:
+      linear-gradient(rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.22)) center 9px / 100% 1px no-repeat,
+      linear-gradient(rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.22)) center 21px / 100% 1px no-repeat;
+  }
+
+  .lrs-home .lrs-journey > hr:nth-of-type(2) {
+    display: none;
+  }
+
+  .lrs-home .lrs-journey > p:nth-of-type(2) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: center;
+    width: auto;
+    min-width: 100px;
+    text-align: center;
+  }
+
+  .lrs-home .lrs-journey > p:first-of-type strong,
+  .lrs-home .lrs-journey > p:last-of-type strong {
+    color: var(--lrs-pearl);
+    font-family: var(--wp--preset--font-family--cormorant);
+    font-size: clamp(31px, 9vw, 48px);
+    font-style: italic;
+    font-weight: 350;
+    line-height: 0.72;
+  }
+
+  .lrs-home .lrs-journey > p small {
+    color: var(--lrs-steel);
+    font-size: 7px;
+    line-height: 1.35;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+  }
+
+  .lrs-home .lrs-journey > p:nth-of-type(2) > strong {
+    display: block;
+    color: var(--lrs-pearl);
+    font-family: var(--wp--preset--font-family--cormorant);
+    font-size: 72px;
+    font-weight: 350;
+    line-height: 0.72;
+    letter-spacing: -0.065em;
+    white-space: nowrap;
+  }
+
+  .lrs-home .lrs-journey > p:nth-of-type(2) > br {
+    display: block;
+  }
+
+  .lrs-home .lrs-journey > p:nth-of-type(2) > small {
+    display: block;
+    margin-top: 24px;
+    text-align: center;
+  }
+
+  .lrs-home .lrs-paris-copy {
+    margin-top: 70px;
+  }
+
+  .lrs-home .lrs-paris-copy .lrs-eyebrow {
+    margin: 0 0 25px;
+    color: var(--lrs-silver);
+  }
+
+  .lrs-home .lrs-paris-copy h2 {
+    margin: 0;
+    color: #c9c5c6;
+    font-size: clamp(39px, 11vw, 49px);
+    line-height: 1.07;
+  }
+
+  .lrs-home .lrs-paris-copy .lrs-section-lead {
+    margin: 30px 0 0;
+    color: rgba(242, 238, 231, 0.64);
+    font-size: 17px;
+    line-height: 1.75;
+  }
+
+  .lrs-home .lrs-paris-copy .lrs-line-link {
+    min-height: 44px;
+    align-items: center;
+    margin: 30px 0 0;
+  }
+
+  /* Vernon, Giverny and the Seine. */
+  .lrs-home .lrs-access-section {
+    min-height: 0;
+    padding: 0;
+  }
+
+  .lrs-home .lrs-access-section > .wp-block-columns {
+    display: block !important;
+    margin: 0;
+  }
+
+  .lrs-home .lrs-access-section > .wp-block-columns > .wp-block-column {
+    width: 100%;
+    max-width: none;
+  }
+
+  .lrs-home .lrs-access-section > .wp-block-columns > .wp-block-column:first-child {
+    position: relative;
+    min-height: 422px;
+    margin: 0;
+    padding: 0 0 162px;
+    background: linear-gradient(180deg, #d7d4cd, #8d8983);
+  }
+
+  .lrs-home .lrs-access-section .wp-block-column:first-child figure,
+  .lrs-home .lrs-access-section .wp-block-column:first-child img {
+    width: 100%;
+    height: 260px;
+    margin: 0;
+  }
+
+  .lrs-home .lrs-access-section .wp-block-column:first-child img {
+    object-fit: cover;
+  }
+
+  .lrs-home .lrs-access-section .wp-block-column:first-child figcaption {
+    position: absolute;
+    right: 34px;
+    bottom: 30px;
+    left: 34px;
+    color: var(--lrs-pearl);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.13em;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  .lrs-home .lrs-access-section > .wp-block-columns > .wp-block-column:last-child {
+    min-height: 503px;
+    margin: 0;
+    padding: 70px var(--lrs-page-x);
+  }
+
+  .lrs-home .lrs-access-section .lrs-eyebrow {
+    margin: 0 0 25px;
+    color: #59616b;
+  }
+
+  .lrs-home .lrs-access-section h2 {
+    margin: 19px 0 0;
+    color: #6f7076;
+    font-size: clamp(39px, 11vw, 49px);
+    line-height: 1.07;
+  }
+
+  .lrs-home .lrs-access-section .wp-block-column:last-child > p:not(.lrs-eyebrow, .lrs-line-link) {
+    margin: 31px 0 0;
+    color: #606269;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .lrs-home .lrs-access-section .lrs-line-link {
+    width: auto !important;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    margin: 29px 0 0;
+  }
+
+  /* Occasions. */
+  .lrs-home .lrs-occasion-section {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin: 0;
+    padding: 72px var(--lrs-page-x) 86px;
+    color: var(--lrs-pearl);
+    background: var(--lrs-night);
+  }
+
+  .lrs-home .lrs-occasion-heading {
+    width: 100% !important;
+    max-width: none !important;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    padding-bottom: 20px;
+  }
+
+  .lrs-home .lrs-occasion-heading .lrs-eyebrow {
+    margin: 0 0 10px;
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .lrs-home .lrs-occasion-heading h2 {
+    max-width: 300px;
+    margin: 0;
+    color: var(--lrs-pearl);
+    font-size: 24px;
+    line-height: 1.02;
+  }
+
+  .lrs-home .lrs-occasion-heading > p:last-child {
+    max-width: 320px;
+    margin: 8px 0 0;
+    color: rgba(242, 238, 231, 0.54);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .lrs-home .lrs-occasion-grid {
+    width: 100% !important;
+    max-width: none !important;
+    display: grid !important;
+    grid-template-columns: 1fr;
+    margin: 0;
+  }
+
+  .lrs-home .lrs-occasion-grid > .wp-block-column {
+    min-height: 88px;
+    padding: 18px 16px;
+  }
+
+  /* Verified Google reviews. */
+  .lrs-home .lrs-reviews-section {
+    min-height: 0;
+    padding: 0;
+    color: #17181b;
+    background: var(--lrs-pearl);
+  }
+
+  .lrs-home .lrs-reviews-section > .wp-block-columns {
+    display: block !important;
+    margin: 0;
+  }
+
+  .lrs-home .lrs-review-visual {
+    position: relative;
+    min-height: 470px;
+    margin: 0;
+    padding: 70px var(--lrs-page-x);
+  }
+
+  .lrs-home .lrs-review-visual > figure,
+  .lrs-home .lrs-review-visual > figure img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+  }
+
+  .lrs-home .lrs-review-visual > figure img {
+    object-fit: cover;
+    filter: brightness(0.7) saturate(0.8);
+  }
+
+  .lrs-home .lrs-score-card {
+    position: absolute;
+    z-index: 2;
+    right: var(--lrs-page-x);
+    bottom: 22px;
+    left: var(--lrs-page-x);
+    width: auto;
+    min-height: 226px;
+    margin: 0;
+    padding: 22px;
+    color: var(--lrs-pearl);
+    background: rgba(7, 8, 10, 0.7);
+    backdrop-filter: blur(8px);
+  }
+
+  .lrs-home .lrs-score-card h3 {
+    color: var(--lrs-pearl);
+    font-size: clamp(64px, 20vw, 84px);
+  }
+
+  .lrs-home .lrs-reviews-copy {
+    min-height: 0;
+    margin: 0;
+    padding: 70px 65px;
+    color: #17181b;
+  }
+
+  .lrs-home .lrs-reviews-copy .lrs-eyebrow {
+    margin: 0 0 25px;
+    color: #59616b;
+  }
+
+  .lrs-home .lrs-reviews-copy h2 {
+    max-width: 260px;
+    margin: 19px 0 0;
+    color: #6f7076;
+    font-size: clamp(39px, 11vw, 49px);
+    line-height: 1.07;
+    letter-spacing: -0.025em;
+  }
+
+  .lrs-home .lrs-reviews-copy > p:not(.lrs-eyebrow, .lrs-line-link) {
+    margin: 30px 0 0;
+    color: #5e6066;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  .lrs-home .lrs-reviews-copy .lrs-line-link {
+    width: auto !important;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    margin: 0;
+    color: #17181b;
+  }
+
+  /* Gift card. */
+  .lrs-home .lrs-gift-section {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: start;
+    gap: 28px;
+    padding: 70px var(--lrs-page-x);
+    color: var(--lrs-pearl);
+    background: #17191e;
+  }
+
+  .lrs-home .lrs-gift-mark {
+    width: 98px;
+    height: 98px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    text-align: center;
+    margin: 0 !important;
+  }
+
+  .lrs-home .lrs-gift-mark p {
+    margin: 0;
+    color: var(--lrs-pearl);
+    font-size: 9px;
+    line-height: 1.5;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .lrs-home .lrs-gift-mark strong {
+    display: block;
+    margin-top: 6px;
+    font-family: var(--wp--preset--font-family--cormorant);
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .lrs-home .lrs-gift-copy {
+    width: 100%;
+    text-align: left;
+  }
+
+  .lrs-home .lrs-gift-copy .lrs-eyebrow {
+    margin: 0 0 19px;
+    color: var(--lrs-silver);
+    text-align: left;
+  }
+
+  .lrs-home .lrs-gift-copy h2 {
+    margin: 0;
+    color: #c9c5c6;
+    font-size: clamp(39px, 11vw, 49px);
+    line-height: 1.07;
+    text-align: left;
+  }
+
+  .lrs-home .lrs-gift-copy .lrs-section-lead {
+    display: block;
+    margin: 20px 0 0;
+    color: rgba(242, 238, 231, 0.58);
+    font-size: 14px;
+    line-height: 1.65;
+    text-align: left;
+  }
+
+  .lrs-home .lrs-gift-section > .wp-block-buttons {
+    width: 100%;
+    margin: 12px 0 0;
+  }
+
+  .lrs-home .lrs-gift-section .wp-block-button,
+  .lrs-home .lrs-gift-section .wp-block-button__link {
+    width: 100%;
+  }
+
+  .lrs-home .lrs-gift-section .wp-block-button__link {
+    min-height: 54px;
+    justify-content: center;
+    color: var(--lrs-pearl);
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.42);
+  }
+
+  /* FAQ. */
+  .lrs-home .lrs-faq-section {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 72px var(--lrs-page-x);
+  }
+
+  .lrs-home .lrs-faq-heading {
+    position: static;
+  }
+
+  .lrs-home .lrs-faq-heading .lrs-eyebrow {
+    margin: 0 0 25px;
+  }
+
+  .lrs-home .lrs-faq-heading h2 {
+    margin: 0;
+    color: #c9c5c6;
+    font-size: clamp(39px, 11vw, 49px);
+    line-height: 1.07;
+  }
+
+  .lrs-home .lrs-faq-heading .lrs-section-lead {
+    margin: 30px 0 0;
+    color: rgba(242, 238, 231, 0.64);
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  .lrs-home .lrs-faq-list {
+    width: 100%;
+  }
+
+  .lrs-home .lrs-faq-list > details {
+    margin: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+  }
+
+  .lrs-home .lrs-faq-list > details:last-child {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  }
+
+  .lrs-home .lrs-faq-list summary {
+    position: relative;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    padding: 23px 54px 23px 0;
+    color: var(--lrs-pearl);
+    font-family: var(--wp--preset--font-family--cormorant);
+    font-size: 21px;
+    font-weight: 400;
+    line-height: 1.15;
+    list-style: none;
+  }
+
+  .lrs-home .lrs-faq-list summary::marker,
+  .lrs-home .lrs-faq-list summary::-webkit-details-marker {
+    display: none;
+    content: "";
+  }
+
+  .lrs-home .lrs-faq-list summary::before {
+    display: none;
+  }
+
+  .lrs-home .lrs-faq-list summary::after {
+    position: absolute;
+    right: 8px;
+    content: "+";
+  }
+
+  .lrs-home .lrs-faq-list details[open] summary::after {
+    content: "−";
+  }
+
+  .lrs-home .lrs-faq-list details p {
+    max-width: none;
+    margin: -4px 0 28px;
+    color: rgba(242, 238, 231, 0.64);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* Final conversion block. */
+  .lrs-home .lrs-final-cta {
+    min-height: 0 !important;
+    height: auto;
+    padding: 0;
+  }
+
+  .lrs-home .lrs-final-cta > .wp-block-cover__image-background {
+    display: block !important;
+    object-position: 50% 50%;
+  }
+
+  .lrs-home .lrs-final-cta > .wp-block-cover__background {
+    background:
+      linear-gradient(180deg, rgba(7, 8, 10, 0.55), rgba(7, 8, 10, 0.72)),
+      linear-gradient(90deg, rgba(7, 8, 10, 0.25), transparent);
+  }
+
+  .lrs-home .lrs-final-cta > .wp-block-cover__inner-container {
+    width: 100%;
+    max-width: none;
+    margin: 0 !important;
+    padding: 90px 24px;
+  }
+
+  .lrs-home .lrs-final-cta .lrs-eyebrow {
+    margin: 0 auto 25px;
+    text-align: center;
+  }
+
+  .lrs-home .lrs-final-cta h2 {
+    margin: 0;
+    color: var(--lrs-pearl);
+    font-size: clamp(44px, 12vw, 58px);
+    line-height: 0.96;
+    text-align: center;
+  }
+
+  .lrs-home .lrs-final-cta .lrs-section-lead {
+    max-width: 340px;
+    margin: 28px auto 0;
+    color: rgba(242, 238, 231, 0.76);
+    font-size: 16px;
+    line-height: 1.72;
+    text-align: center;
+  }
+
+  .lrs-home .lrs-final-cta .lrs-final-actions {
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 14px !important;
+    margin: 48px 0 0;
+  }
+
+  .lrs-home .lrs-final-cta .lrs-final-actions > * {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  .lrs-home .lrs-final-cta .wp-block-button,
+  .lrs-home .lrs-final-cta .wp-block-button__link {
+    width: 100% !important;
+  }
+
+  .lrs-home .lrs-final-cta .wp-block-button__link {
+    min-height: 56px;
+    justify-content: center;
+  }
+
+  .lrs-home .lrs-final-cta .wp-block-button:first-child .wp-block-button__link {
+    color: var(--lrs-night);
+    background: var(--lrs-pearl);
+  }
+
+  .lrs-home .lrs-final-cta .lrs-final-contact,
+  .lrs-home .lrs-final-cta .lrs-final-share {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+    font-size: 13px;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  /* Footer rhythm and reading order. */
+  .lrs-site-footer {
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 45px;
+    padding: 60px var(--lrs-page-x) 35px;
+  }
+
+  .lrs-site-footer > .wp-block-columns {
+    display: contents !important;
+    margin: 0;
+  }
+
+  .lrs-site-footer > .wp-block-columns > .wp-block-column:first-child {
+    grid-column: auto;
+  }
+
+  .lrs-site-footer > .wp-block-columns > .wp-block-column:nth-child(2) {
+    margin-top: 42px;
+  }
+
+  .lrs-site-footer > .wp-block-columns > .wp-block-column:nth-child(3),
+  .lrs-site-footer > .lrs-footer-seo,
+  .lrs-site-footer > p {
+    margin-top: 45px;
+  }
+
+  .lrs-site-footer .wp-block-site-logo,
+  .lrs-site-footer .custom-logo-link,
+  .lrs-site-footer .custom-logo {
+    width: 180px;
+    height: auto;
+    margin: 0;
+  }
+
+  .lrs-site-footer .wp-block-column:first-child > p {
+    margin-top: 15px;
+    color: rgba(242, 238, 231, 0.58);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .lrs-site-footer nav,
+  .lrs-site-footer nav ul {
+    display: grid !important;
+    gap: 9px;
+  }
+
+  .lrs-site-footer .wp-block-navigation__container,
+  .lrs-site-footer .wp-block-navigation-item,
+  .lrs-site-footer .wp-block-navigation-item__content,
+  .lrs-site-footer nav li,
+  .lrs-site-footer nav a,
+  .lrs-site-footer .wp-block-column:last-child a {
+    width: 100% !important;
+    min-height: 44px;
+    display: flex !important;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  .lrs-site-footer .wp-block-column:last-child {
+    display: grid !important;
+    align-content: start;
+    gap: 9px;
+  }
+
+  .lrs-site-footer .wp-block-column:last-child > p {
+    margin: 0;
+  }
+
+  .lrs-site-footer > .lrs-footer-seo {
+    width: 100%;
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 9px 18px;
+    padding-top: 29px;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .lrs-site-footer > .lrs-footer-seo .wp-block-navigation__container {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 9px 28px;
+  }
+
+  .lrs-site-footer > .lrs-footer-seo .wp-block-navigation-item {
+    width: auto !important;
+  }
+
+  .lrs-site-footer > .lrs-footer-seo a {
+    width: auto !important;
+    min-height: 44px;
+    display: inline-flex !important;
+    font-size: 11px;
+  }
+
+  .lrs-site-footer > p {
+    margin: 45px 0 0;
+    font-size: 9px !important;
+    line-height: 1.7 !important;
+  }
+}
+
+@media (min-width: 400px) and (max-width: 820px) {
+  .lrs-home .lrs-home-suite {
+    padding-bottom: 86px;
+  }
+
+  .lrs-home .lrs-access-section > .wp-block-columns > .wp-block-column:last-child {
+    min-height: 531px;
+  }
+
+  .lrs-home .lrs-reviews-section .lrs-reviews-copy h2 {
+    max-width: 300px;
+    letter-spacing: -0.025em;
+  }
+}
+
+/* V10 design polish — remove prototype fixed heights from direct booking. */
+@media (max-width: 820px), (max-width: 960px) and (max-height: 600px) {
+  .lrs-home #reserver.lrs-booking-section {
+    min-height: 0 !important;
+    padding: 72px var(--lrs-page-x) 0;
+  }
+
+  .lrs-home #reserver .lrs-booking-layout {
+    display: block !important;
+    margin: 0;
+  }
+
+  .lrs-home #reserver .lrs-booking-layout > .wp-block-column:first-child {
+    min-height: 0 !important;
+  }
+
+  .lrs-home #reserver .lrs-booking-section h2,
+  .lrs-home #reserver h2 {
+    color: #17191e;
+  }
+
+  .lrs-home #reserver .lrs-booking-engine {
+    box-sizing: border-box;
+    width: calc(100% + 2 * var(--lrs-page-x)) !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 48px calc(var(--lrs-page-x) * -1) 0 !important;
+    padding: 30px var(--lrs-page-x) 34px !important;
+    overflow: visible;
+    border: 0;
+    border-top: 1px solid rgba(242, 238, 231, 0.14);
+    border-bottom: 1px solid rgba(242, 238, 231, 0.14);
+    color: var(--lrs-pearl);
+    background:
+      radial-gradient(circle at 92% 0%, rgba(205, 181, 142, 0.1), transparent 31%),
+      linear-gradient(145deg, #111318 0%, #090a0d 74%);
+  }
+
+  .lrs-home #reserver .lrs-booking-engine::before {
+    display: block;
+    margin-bottom: 22px;
+    color: rgba(242, 238, 231, 0.62);
+    content: "Votre séjour";
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .lrs-home #reserver .lrs-booking-shell,
+  .lrs-home #reserver .mphb-booking-form--direct-booking {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .lrs-home #reserver .mphb-booking-form--direct-booking {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1px;
+    margin: 0;
+    border: 1px solid rgba(242, 238, 231, 0.17);
+    background: rgba(242, 238, 231, 0.17);
+  }
+
+  .lrs-home #reserver .mphb-booking-form--direct-booking > p {
+    min-width: 0;
+    margin: 0;
+    padding: 16px 17px;
+    color: rgba(242, 238, 231, 0.58);
+    background: #0d0f13;
+  }
+
+  .lrs-home #reserver .mphb-booking-form--direct-booking > .mphb-required-fields-tip {
+    padding-top: 14px;
+    padding-bottom: 14px;
+    color: rgba(242, 238, 231, 0.62);
+    font-size: 10px;
+    line-height: 1.5;
+  }
+
+  .lrs-home #reserver .mphb-booking-form--direct-booking label {
+    display: block;
+    color: rgba(242, 238, 231, 0.62);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+  }
+
+  .lrs-home #reserver .mphb-booking-form--direct-booking br {
+    display: none;
+  }
+
+  .lrs-home #reserver .mphb-booking-form--direct-booking :where(input[type="text"], select) {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+    margin-top: 9px;
+    padding: 10px 12px;
+    border: 1px solid rgba(242, 238, 231, 0.24);
+    border-radius: 0;
+    color: var(--lrs-pearl);
+    background: rgba(7, 8, 10, 0.84);
+    font-size: 16px;
+  }
+
+  .lrs-home #reserver .mphb-booking-form--direct-booking .mphb-reserve-btn-wrapper {
+    padding: 0;
+  }
+
+  .lrs-home #reserver .mphb-booking-form--direct-booking :where(.mphb-reserve-btn, .mphb-confirm-reservation) {
+    width: 100%;
+    min-height: 58px;
+    margin: 0;
+    padding: 15px 17px;
+    border: 0;
+    border-radius: 0;
+    color: #111318;
+    background: var(--lrs-pearl);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+  }
+
+  .lrs-home #reserver .mphb-booking-form--direct-booking :where(.mphb-reserve-room-section, .mphb-errors-wrapper) {
+    width: 100%;
+    margin: 0;
+    padding: 17px;
+    color: var(--lrs-pearl);
+    background: #0d0f13;
+  }
+
+  .lrs-home #reserver .mphb-booking-form--direct-booking .mphb-hide {
+    display: none;
+  }
+}
+
+/* Tablet: two balanced field columns, while phones keep the single-column rhythm. */
+@media (min-width: 600px) and (max-width: 820px) {
+  .lrs-home #reserver .lrs-booking-engine {
+    padding: 32px 30px 36px !important;
+  }
+
+  .lrs-home #reserver .mphb-booking-form--direct-booking {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lrs-home #reserver .mphb-booking-form--direct-booking > .mphb-required-fields-tip,
+  .lrs-home #reserver .mphb-booking-form--direct-booking :where(.mphb-reserve-room-section, .mphb-errors-wrapper) {
+    grid-column: 1 / -1;
+  }
+
+  .lrs-home #reserver .mphb-booking-form--direct-booking .mphb-reserve-btn-wrapper {
+    display: flex;
+  }
+
+  .lrs-home #reserver .mphb-booking-form--direct-booking :where(.mphb-reserve-btn, .mphb-confirm-reservation) {
+    min-height: 100%;
+  }
+}
+
+/* V10.5. Densité mobile et suppression du panneau gris sous l'image de Vernon. */
+@media (max-width: 820px) {
+  .lrs-home .lrs-home-suite,
+  .lrs-home .lrs-home-comparison,
+  .lrs-home .lrs-home-options,
+  .lrs-home .lrs-paris-section,
+  .lrs-home .lrs-occasion-section,
+  .lrs-home .lrs-gift-section,
+  .lrs-home .lrs-faq-section {
+    padding-top: 58px !important;
+    padding-bottom: 58px !important;
+  }
+
+  .lrs-home #suite > .lrs-line-link,
+  .lrs-home .lrs-paris-copy .lrs-line-link {
+    margin-top: 20px !important;
+  }
+
+  .lrs-home .lrs-spa-atmosphere {
+    min-height: 560px !important;
+    padding-top: 58px !important;
+    padding-bottom: 58px !important;
+  }
+
+  .lrs-home .lrs-paris-copy {
+    margin-top: 44px;
+  }
+
+  .lrs-home .lrs-access-section > .wp-block-columns > .wp-block-column:first-child {
+    min-height: 0;
+    padding: 0;
+    background: #080a0e;
+  }
+
+  .lrs-home .lrs-access-section .wp-block-column:first-child figure,
+  .lrs-home .lrs-access-section .wp-block-column:first-child img {
+    height: 300px;
+  }
+
+  .lrs-home .lrs-access-section .wp-block-column:first-child figure {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .lrs-home .lrs-access-section .wp-block-column:first-child img {
+    filter: brightness(1.08) saturate(0.88) contrast(1.02);
+  }
+
+  .lrs-home .lrs-access-section .wp-block-column:first-child figcaption {
+    right: 22px;
+    bottom: 18px;
+    left: 22px;
+    padding: 0;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.82);
+  }
+
+  .lrs-home .lrs-access-section > .wp-block-columns > .wp-block-column:last-child {
+    min-height: 0;
+    padding-top: 54px;
+    padding-bottom: 58px;
+  }
+}
+
+/*
+ * Les sections situées à plus de deux écrans du héros n'ont pas besoin de
+ * participer au premier calcul de mise en page. Les hauteurs de repli suivent
+ * leur rendu mobile réel afin de conserver une barre de défilement stable au
+ * premier passage. Safari antérieur à content-visibility ignore ce bloc.
+ */
+@media (max-width: 820px) {
+  @supports (content-visibility: auto) {
+    .lrs-home :is(
+      #suite,
+      #comparatif,
+      #reserver,
+      #options,
+      #depuis-paris,
+      #acces,
+      #avis,
+      #faq
+    ) {
+      content-visibility: auto !important;
+      contain-intrinsic-size: auto 1100px !important;
+    }
+
+    .lrs-home #comparatif {
+      contain-intrinsic-size: auto 2030px !important;
+    }
+
+    .lrs-home #reserver {
+      contain-intrinsic-size: auto 1240px !important;
+    }
+
+    .lrs-home :is(#options, #depuis-paris) {
+      contain-intrinsic-size: auto 940px !important;
+    }
+
+    .lrs-home #acces {
+      contain-intrinsic-size: auto 825px !important;
+    }
+
+    .lrs-home #avis {
+      contain-intrinsic-size: auto 1090px !important;
+    }
+
+    .lrs-home #faq {
+      contain-intrinsic-size: auto 1340px !important;
+    }
+  }
+}

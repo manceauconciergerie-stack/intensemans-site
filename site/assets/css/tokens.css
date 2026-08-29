@@ -1,0 +1,104 @@
+/* ============================================================
+   INTENSÉ'MANS — Jetons de design
+   ------------------------------------------------------------
+   Registre sombre. Le brief donne quatre couleurs : noir profond,
+   rose poudré, blanc cassé, crème. Le fond porte le noir, le
+   crème porte le texte, le rose est le seul accent.
+
+   Les noms sont neutres (bg / fg) : basculer clair ↔ sombre ne
+   touche que ce fichier.
+
+   Leçon des versions précédentes : le noir absolu sur toute la
+   page ne donne aucun relief. Ici quatre degrés de fond, tous
+   teintés chaud, pour que les surfaces se distinguent.
+   ============================================================ */
+
+:root {
+  /* --- Fonds : quatre degrés d'une même famille chaude.
+     Jamais #000 : sans écart avec les surfaces, tout se confond. --- */
+  --im-bg:      #100c0d;
+  --im-bg-2:    #181314;
+  --im-bg-3:    #221b1c;
+  --im-bg-4:    #2d2425;
+  --im-bg-deep: #0a0708;   /* pied de page, voile du hero */
+
+  /* --- Texte : le crème du logo, décliné. --- */
+  --im-fg:       #f6ece4;
+  --im-fg-soft:  #ddcfc6;
+  --im-fg-muted: #a2938c;
+
+  /* --- Accent unique : le rose du logo.
+     `rose` pour les aplats, `rose-ink` pour tout ce qui est lu. --- */
+  --im-rose:      #d98b88;
+  --im-rose-ink:  #e5a7a4;
+  --im-rose-veil: rgba(217, 139, 136, 0.16);
+  /* Texte posé SUR un aplat rose ou laiton : le seul sombre-sur-clair. */
+  --im-on-accent: #16100f;
+
+  /* --- Laiton. `brass` porte du texte, `brass-line` les filets. --- */
+  --im-brass:      #d0ae72;
+  --im-brass-line: #8d7342;
+  --im-brass-deep: #a5854a;   /* fin du dégradé du bouton doré */
+
+  /* --- États. Désaturés pour tenir dans la palette chaude. --- */
+  --im-danger:  #e69490;
+  --im-success: #86c39c;
+  --im-info:    #9ab6d0;
+
+  /* --- Traits : du crème dilué, jamais du gris froid. --- */
+  --im-rule:   rgba(246, 236, 228, 0.14);
+  --im-rule-2: rgba(246, 236, 228, 0.28);
+
+  /* --- Verre dépoli : en-tête, filtre, barre de panier. --- */
+  --im-glass:   rgba(16, 12, 13, 0.86);
+  --im-glass-2: rgba(24, 19, 20, 0.9);
+  /* Liseré clair sur l'arête haute : simule la réfraction du verre. */
+  --im-edge:    rgba(255, 255, 255, 0.07);
+
+  /* --- Ombres. Sur fond sombre elles portent peu : on s'appuie
+     surtout sur les degrés de fond et les filets. --- */
+  --im-shadow-sm: 0 2px 8px -3px rgba(0, 0, 0, 0.7);
+  --im-shadow:    0 20px 38px -24px rgba(0, 0, 0, 0.85);
+  --im-shadow-lg: 0 38px 68px -34px rgba(0, 0, 0, 0.9);
+
+  /* --- Typographie --- */
+  --im-display: "Cormorant Garamond", Cormorant, Didot, Georgia, serif;
+  --im-sans:    "Jost", "Helvetica Neue", Arial, sans-serif;
+
+  --im-fs-display: clamp(2.5rem, 6.4vw, 4.8rem);
+  --im-fs-h2:      clamp(1.85rem, 4vw, 3rem);
+  --im-fs-h3:      clamp(1.3rem, 2.2vw, 1.7rem);
+  --im-fs-body:    clamp(1rem, 1.05vw, 1.1rem);
+  --im-fs-small:   0.88rem;
+
+  /* --- Rythme --- */
+  --im-page-x:    clamp(20px, 5.4vw, 96px);
+  --im-section-y: clamp(72px, 10vw, 140px);
+  --im-gap:       clamp(18px, 2.4vw, 34px);
+  --im-header-h:  74px;
+  --im-cartbar-h: 76px;
+
+  /* --- Rayons : variés, pas uniformes. --- */
+  --im-r-xs: 2px;
+  --im-r-sm: 4px;
+  --im-r-md: 8px;
+  --im-r-lg: 14px;
+
+  /* --- Mouvement --- */
+  --im-ease:   cubic-bezier(0.22, 0.61, 0.36, 1);
+  --im-spring: cubic-bezier(0.24, 1.4, 0.4, 1);
+
+  --im-maxw: 1280px;
+
+  /* --- Échelle des plans --- */
+  --z-base: 1;
+  --z-sticky: 60;
+  --z-catnav: 70;
+  --z-cartbar: 80;
+  --z-header: 90;
+  --z-toast: 120;
+}
+
+@media (max-width: 640px) {
+  :root { --im-header-h: 64px; }
+}

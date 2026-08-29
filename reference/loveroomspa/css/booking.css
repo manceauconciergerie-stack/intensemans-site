@@ -1,0 +1,788 @@
+/* Tunnel MotoPress — intégration Love Room Spa V10. */
+
+.lrs-booking-page {
+  --lrs-booking-border: rgba(242, 238, 231, 0.18);
+  --lrs-booking-muted: #b9bec7;
+  --lrs-booking-accent: #b9bec7;
+  --lrs-booking-accent-strong: #d9dee6;
+  --lrs-booking-accent-soft: rgba(185, 190, 199, 0.12);
+  --lrs-booking-card: rgba(16, 18, 23, 0.92);
+  --lrs-booking-field: rgba(7, 8, 10, 0.92);
+}
+
+.lrs-booking-page .lrs-main {
+  min-height: 68vh;
+  padding: clamp(56px, 8vw, 112px) var(--lrs-page-x) clamp(72px, 10vw, 144px);
+  background:
+    radial-gradient(circle at 88% 4%, rgba(57, 83, 119, 0.18), transparent 32rem),
+    radial-gradient(circle at 8% 48%, rgba(185, 190, 199, 0.08), transparent 28rem),
+    var(--lrs-night);
+}
+
+.lrs-booking-page .lrs-main > .wp-block-post-content {
+  width: min(100%, 1120px);
+  margin-inline: auto;
+}
+
+.lrs-booking-page .lrs-main h1 {
+  max-width: 840px;
+  margin: 0 0 clamp(18px, 3vw, 32px);
+  font-size: clamp(3rem, 7vw, 6.5rem);
+  line-height: 0.9;
+  text-wrap: balance;
+}
+
+.lrs-booking-page .lrs-booking-lead {
+  max-width: 700px;
+  margin: -8px 0 clamp(30px, 5vw, 54px);
+  color: var(--lrs-booking-muted);
+  font-size: clamp(1rem, 1.5vw, 1.18rem);
+}
+
+/* Trois étapes réelles : dates, finalisation, confirmation. */
+.lrs-booking-page .lrs-booking-progress {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0 0 clamp(40px, 6vw, 72px);
+  padding: 0;
+  border-top: 1px solid var(--lrs-booking-border);
+  list-style: none;
+  counter-reset: booking-step;
+}
+
+.lrs-booking-page .lrs-booking-progress li {
+  position: relative;
+  padding: 18px 12px 0 34px;
+  color: #858b94;
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  counter-increment: booking-step;
+}
+
+.lrs-booking-page .lrs-booking-progress li::before {
+  position: absolute;
+  top: 14px;
+  left: 0;
+  color: inherit;
+  font-family: var(--wp--preset--font-family--cormorant);
+  font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  content: "0" counter(booking-step);
+}
+
+.lrs-booking-page .lrs-booking-progress li::after {
+  position: absolute;
+  top: -2px;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: transparent;
+  content: "";
+}
+
+.lrs-booking-page .lrs-booking-progress li.is-complete,
+.lrs-booking-page .lrs-booking-progress li.is-current {
+  color: var(--lrs-pearl);
+}
+
+.lrs-booking-page .lrs-booking-progress li.is-complete::after,
+.lrs-booking-page .lrs-booking-progress li.is-current::after {
+  background: var(--lrs-booking-accent);
+}
+
+.lrs-booking-page :where(.mphb-booking-form, .mphb-reservation-cart, .mphb_sc_checkout-form) {
+  color: var(--lrs-pearl);
+}
+
+.lrs-booking-page :where(input, select, textarea):not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="hidden"]) {
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 14px;
+  border: 1px solid rgba(242, 238, 231, 0.3);
+  border-radius: 0;
+  color: var(--lrs-pearl);
+  background: var(--lrs-booking-field);
+  font: inherit;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.lrs-booking-page textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.lrs-booking-page :where(input, select, textarea, button, a):focus-visible {
+  outline: 3px solid var(--lrs-booking-accent) !important;
+  outline-offset: 3px;
+}
+
+.lrs-booking-page label {
+  display: inline-block;
+  margin-bottom: 7px;
+  color: var(--lrs-booking-muted);
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lrs-booking-page abbr[title] {
+  color: var(--lrs-booking-accent);
+  text-decoration: none;
+}
+
+.lrs-booking-page :where(.button, button, input[type="submit"]) {
+  min-height: 54px;
+  padding: 14px 24px;
+  border: 1px solid var(--lrs-booking-accent);
+  border-radius: 0;
+  color: var(--lrs-night);
+  background: var(--lrs-booking-accent);
+  font-family: var(--wp--preset--font-family--jost);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  touch-action: manipulation;
+  cursor: pointer;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  transition: border-color 160ms ease, color 160ms ease, background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.lrs-booking-page :where(.button, button, input[type="submit"]):not(:disabled):hover {
+  border-color: var(--lrs-booking-accent-strong);
+  color: var(--lrs-night);
+  background: var(--lrs-booking-accent-strong);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+  transform: translateY(-1px);
+}
+
+.lrs-booking-page :where(.button, button, input[type="submit"]):not(:disabled):active {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(1px);
+}
+
+.lrs-booking-page :where(button, input[type="submit"]):disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* Étape 1 — formulaire direct de la suite unique. */
+.lrs-booking-page .lrs-booking-shell {
+  margin-top: 12px;
+}
+
+.lrs-booking-page .mphb-booking-form--direct-booking {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(190px, auto);
+  gap: 18px;
+  align-items: end;
+  padding: clamp(24px, 4vw, 42px);
+  border: 1px solid var(--lrs-booking-border);
+  background: var(--lrs-booking-card);
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.25);
+}
+
+.lrs-booking-page .mphb-booking-form--direct-booking > p {
+  margin: 0;
+}
+
+.lrs-booking-page .mphb-booking-form--direct-booking > .mphb-required-fields-tip {
+  display: none;
+}
+
+.lrs-booking-page .mphb-booking-form--direct-booking .mphb-reserve-btn-wrapper {
+  min-width: 190px;
+}
+
+.lrs-booking-page .mphb-booking-form--direct-booking .mphb-reserve-btn {
+  width: 100%;
+}
+
+.lrs-booking-page .mphb-booking-form--direct-booking .mphb-reserve-room-section,
+.lrs-booking-page .mphb-booking-form--direct-booking > .mphb-errors-wrapper {
+  grid-column: 1 / -1;
+}
+
+.lrs-booking-page .mphb-booking-form--direct-booking .mphb-reserve-room-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px 24px;
+  align-items: center;
+  margin-top: 8px;
+  padding-top: 24px;
+  border-top: 1px solid var(--lrs-booking-border);
+}
+
+.lrs-booking-page .mphb-booking-form--direct-booking .mphb-reserve-room-section.mphb-hide {
+  display: none;
+}
+
+.lrs-booking-page .mphb-booking-form--direct-booking .mphb-rooms-quantity-wrapper {
+  grid-column: 1;
+  margin: 0;
+  color: var(--lrs-booking-muted);
+}
+
+.lrs-booking-page .mphb-booking-form--direct-booking .mphb-period-price {
+  grid-column: 1;
+  margin: 0;
+  color: var(--lrs-booking-muted);
+}
+
+.lrs-booking-page .mphb-booking-form--direct-booking .mphb-period-price strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--lrs-booking-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lrs-booking-page .mphb-price {
+  color: var(--lrs-pearl);
+  font-family: var(--wp--preset--font-family--cormorant);
+  font-size: 1.35em;
+  font-weight: 650;
+}
+
+.lrs-booking-page .mphb-booking-form--direct-booking .mphb-confirm-reservation {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  min-width: 230px;
+}
+
+.lrs-booking-page :where(.mphb-errors-wrapper, .mphb-error, .mphb-validation-error) {
+  color: #ffd9dd;
+}
+
+.lrs-booking-page .mphb-errors-wrapper:not(.mphb-hide),
+.lrs-booking-page .mphb-validation-error,
+.lrs-booking-page .lrs-direct-date-error {
+  padding: 14px 16px;
+  border-left: 3px solid #d56f78;
+  background: rgba(213, 111, 120, 0.1);
+}
+
+.lrs-booking-page .lrs-direct-date-error {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #ffd9dd;
+}
+
+.lrs-booking-page .lrs-availability-message {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: center;
+}
+
+.lrs-booking-page .lrs-availability-message__details {
+  color: var(--lrs-booking-muted);
+}
+
+.lrs-booking-page .lrs-change-dates-button {
+  min-height: 40px;
+  margin-left: auto;
+  padding: 8px 14px;
+  color: var(--lrs-pearl);
+  border-color: var(--lrs-booking-border);
+  background: transparent;
+  box-shadow: none;
+}
+
+.lrs-booking-page :where(.lrs-change-dates-button, #mphb_apply_coupon) {
+  border-color: rgba(185, 190, 199, 0.62);
+  color: var(--lrs-pearl);
+  background: transparent;
+  box-shadow: none;
+}
+
+.lrs-booking-page :where(.lrs-change-dates-button, #mphb_apply_coupon):not(:disabled):hover {
+  border-color: var(--lrs-booking-accent);
+  color: var(--lrs-pearl);
+  background: var(--lrs-booking-accent-soft);
+  box-shadow: none;
+}
+
+/* Ancienne page de résultats : conservée comme repli technique. */
+.lrs-booking-page .mphb_sc_search_results-info {
+  color: var(--lrs-booking-muted);
+}
+
+.lrs-booking-page .mphb-room-type,
+.lrs-booking-page .mphb-reservation-cart {
+  margin-bottom: 24px;
+  padding: clamp(24px, 4vw, 42px);
+  border: 1px solid var(--lrs-booking-border);
+  background: var(--lrs-booking-card);
+}
+
+/* Étape 2 — saisie à gauche, récapitulatif dynamique à droite. */
+.lrs-booking-page .mphb_sc_checkout-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(310px, 360px);
+  gap: 24px 32px;
+  align-items: start;
+  max-width: 1120px;
+}
+
+.lrs-booking-page .mphb_sc_checkout-form > :not(.lrs-checkout-summary) {
+  grid-column: 1;
+}
+
+.lrs-booking-page .mphb-checkout-section,
+.lrs-booking-page .lrs-checkout-stay {
+  margin: 0;
+  padding: clamp(24px, 3vw, 36px);
+  border: 1px solid var(--lrs-booking-border);
+  background: var(--lrs-booking-card);
+}
+
+.lrs-booking-page .mphb-checkout-section > :first-child,
+.lrs-booking-page .lrs-checkout-stay > :first-child {
+  margin-top: 0;
+}
+
+.lrs-booking-page .mphb-checkout-section > :last-child,
+.lrs-booking-page .lrs-checkout-stay > :last-child {
+  margin-bottom: 0;
+}
+
+.lrs-booking-page .lrs-checkout-summary {
+  position: sticky;
+  top: 24px;
+  grid-column: 2;
+  grid-row: 1 / span 20;
+  display: grid;
+  gap: 16px;
+}
+
+.lrs-booking-page .lrs-checkout-stay h2,
+.lrs-booking-page :where(.mphb-booking-details-title, .mphb-customer-details-title, .mphb-price-breakdown-title, .mphb-gateway-chooser-title),
+.lrs-booking-page .lrs-checkout-room-heading h3,
+.lrs-booking-page .mphb-services-details-title {
+  margin: 0 0 22px;
+  font-family: var(--wp--preset--font-family--cormorant);
+  font-size: clamp(1.65rem, 3vw, 2.35rem);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.lrs-booking-page .lrs-checkout-eyebrow {
+  margin: 0 0 8px;
+  color: var(--lrs-booking-accent);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.lrs-booking-page .lrs-checkout-stay dl {
+  display: grid;
+  gap: 14px;
+  margin: 24px 0;
+}
+
+.lrs-booking-page .lrs-checkout-stay dl > div {
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  gap: 12px;
+}
+
+.lrs-booking-page .lrs-checkout-stay dt {
+  color: var(--lrs-booking-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.lrs-booking-page .lrs-checkout-stay dd {
+  margin: 0;
+}
+
+.lrs-booking-page .lrs-change-dates {
+  color: var(--lrs-pearl);
+  text-underline-offset: 4px;
+}
+
+.lrs-booking-page .mphb-customer-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.lrs-booking-page .mphb-customer-details > :where(h3, .mphb-required-fields-tip, .mphb-customer-note) {
+  grid-column: 1 / -1;
+}
+
+.lrs-booking-page .mphb-customer-details > p {
+  margin: 0;
+}
+
+.lrs-booking-page .mphb-booking-details .mphb-room-details {
+  margin: 0;
+}
+
+.lrs-booking-page .lrs-checkout-room-heading {
+  margin-bottom: 28px;
+}
+
+.lrs-booking-page .lrs-checkout-room-heading h3 {
+  margin-bottom: 0;
+}
+
+.lrs-booking-page .mphb-services-details {
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 1px solid var(--lrs-booking-border);
+}
+
+.lrs-booking-page .lrs-services-intro {
+  margin: -10px 0 22px;
+  color: var(--lrs-booking-muted);
+}
+
+.lrs-booking-page .mphb_checkout-services-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Dans le récapitulatif tarifaire, les attentions restent lisibles sur une seule colonne. */
+.lrs-booking-page .lrs-checkout-summary .mphb_checkout-services-list {
+  grid-template-columns: 1fr;
+}
+
+.lrs-booking-page .lrs-service-card {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--lrs-booking-border);
+  background: rgba(255, 255, 255, 0.025);
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.lrs-booking-page .lrs-service-card.is-selected {
+  border-color: var(--lrs-booking-accent);
+  background: var(--lrs-booking-accent-soft);
+}
+
+.lrs-booking-page .lrs-service-card__label {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  margin: 0;
+  color: var(--lrs-pearl);
+  font-size: 0.9rem;
+  letter-spacing: 0;
+  text-transform: none;
+  cursor: pointer;
+}
+
+.lrs-booking-page input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  accent-color: var(--lrs-booking-accent);
+}
+
+.lrs-booking-page .lrs-service-card__body,
+.lrs-booking-page .lrs-service-card__topline {
+  display: grid;
+  gap: 8px;
+}
+
+.lrs-booking-page .lrs-service-card__topline {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.lrs-booking-page .lrs-service-card__price {
+  white-space: nowrap;
+}
+
+.lrs-booking-page .lrs-service-card__description {
+  color: var(--lrs-booking-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.lrs-booking-page .lrs-service-card__state {
+  color: var(--lrs-booking-accent);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lrs-booking-page .lrs-service-card__quantity {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 14px 0 0 32px;
+}
+
+.lrs-booking-page .lrs-service-card__quantity :where(input, select) {
+  width: 76px !important;
+  min-height: 40px !important;
+}
+
+.lrs-booking-page #mphb-coupon-details {
+  padding: 0;
+}
+
+.lrs-booking-page .lrs-coupon-disclosure > summary {
+  padding: 22px 26px;
+  color: var(--lrs-pearl);
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.lrs-booking-page .lrs-coupon-disclosure__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px 16px;
+  align-items: end;
+  padding: 0 26px 26px;
+}
+
+.lrs-booking-page .lrs-coupon-disclosure__body > p {
+  margin: 0;
+}
+
+.lrs-booking-page .mphb-price-breakdown {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.lrs-booking-page .mphb-price-breakdown :where(th, td) {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--lrs-booking-border);
+  text-align: left;
+}
+
+.lrs-booking-page .mphb-price-breakdown .mphb-table-price-column,
+.lrs-booking-page .mphb-price-breakdown :where(th, td):last-child {
+  text-align: right;
+}
+
+.lrs-booking-page .mphb-total-price {
+  margin: 0;
+  padding: 22px 26px;
+  border: 1px solid rgba(185, 190, 199, 0.5);
+  color: var(--lrs-booking-muted);
+  background: var(--lrs-booking-accent-soft);
+}
+
+.lrs-booking-page .mphb-total-price output {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.lrs-booking-page .mphb-total-price-field {
+  color: var(--lrs-pearl);
+  font-family: var(--wp--preset--font-family--cormorant);
+  font-size: 1.45rem;
+}
+
+.lrs-booking-page .mphb_sc_checkout-submit-wrapper,
+.lrs-booking-page .lrs-test-payment-notice {
+  margin: 0;
+}
+
+.lrs-booking-page .lrs-test-payment-notice {
+  padding: 13px 16px;
+  border-left: 3px solid var(--lrs-booking-accent);
+  color: var(--lrs-booking-muted);
+  background: var(--lrs-booking-accent-soft);
+  font-size: 0.86rem;
+}
+
+.lrs-booking-page .mphb_sc_checkout-submit-wrapper input[type="submit"] {
+  width: 100%;
+  min-height: 58px;
+}
+
+/* Calendrier MotoPress. */
+.datepick-popup {
+  /* MotoPress ajoute le popup directement sous <body>. Il doit donc depasser
+     les deux overlays de reservation (global: 1200, accueil: 2500). */
+  z-index: 3000 !important;
+}
+
+.datepick-popup .datepick {
+  overflow: hidden;
+  border: 1px solid rgba(185, 190, 199, 0.55);
+  border-radius: 0;
+  color: var(--lrs-pearl);
+  background: #101217;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  font-family: var(--wp--preset--font-family--jost);
+}
+
+.datepick-popup .datepick-nav,
+.datepick-popup .datepick-ctrl,
+.datepick-popup .datepick-month-header {
+  color: var(--lrs-pearl);
+  background: #0b0d11;
+}
+
+.datepick-popup .datepick-month td .datepick-highlight,
+.datepick-popup .datepick-month td a:hover,
+.datepick-popup .datepick-month td .datepick-selected {
+  color: var(--lrs-night);
+  background: var(--lrs-booking-accent);
+}
+
+/* Contraste AA et cibles tactiles pour les calendriers intégrés et popup. */
+.mphb-calendar {
+  min-height: 276px;
+}
+
+.datepick .datepick-month th,
+.datepick .datepick-month td .mphb-past-date {
+  color: #555a60 !important;
+  background: #dbdbdc !important;
+}
+
+.mphb-calendar .datepick .datepick-month td span.mphb-past-date,
+.datepick-popup .datepick .datepick-month td span.mphb-past-date {
+  color: #555a60 !important;
+  background: #dbdbdc !important;
+  opacity: 1 !important;
+}
+
+.datepick .datepick-month-header select.datepick-month-year {
+  min-height: 32px;
+  padding: 4px 6px;
+}
+
+.datepick .datepick-nav a {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+}
+
+@media (max-width: 680px) {
+  /* MotoPress affiche deux mois cote a cote par defaut. Sur telephone, le
+     popup debordait du viewport et certains jours passaient hors de la zone
+     tactile. Un seul mois reste affiche, sur toute la largeur disponible. */
+  .datepick-popup {
+    right: 10px !important;
+    left: 10px !important;
+    width: auto !important;
+    max-width: calc(100vw - 20px);
+  }
+
+  .datepick-popup .datepick {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .datepick-popup .datepick-month {
+    float: none;
+    width: 100% !important;
+  }
+
+  .datepick-popup .datepick-month-row .datepick-month:not(:first-child) {
+    display: none;
+  }
+}
+
+@media (max-width: 960px) {
+  .lrs-booking-page .mphb-booking-form--direct-booking {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lrs-booking-page .mphb-booking-form--direct-booking .mphb-capacity-wrapper,
+  .lrs-booking-page .mphb-booking-form--direct-booking .mphb-reserve-btn-wrapper {
+    grid-column: auto;
+  }
+
+  .lrs-booking-page .mphb_sc_checkout-form {
+    grid-template-columns: 1fr;
+  }
+
+  .lrs-booking-page .lrs-checkout-summary,
+  .lrs-booking-page .mphb_sc_checkout-form > :not(.lrs-checkout-summary) {
+    position: static;
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .lrs-booking-page .lrs-checkout-summary {
+    order: -1;
+  }
+}
+
+@media (max-width: 680px) {
+  .lrs-booking-page .lrs-main {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .lrs-booking-page .mphb-booking-form--direct-booking,
+  .lrs-booking-page .mphb-booking-form--direct-booking .mphb-reserve-room-section,
+  .lrs-booking-page .mphb-customer-details,
+  .lrs-booking-page .mphb_checkout-services-list,
+  .lrs-booking-page .lrs-coupon-disclosure__body {
+    grid-template-columns: 1fr;
+  }
+
+  .lrs-booking-page .mphb-booking-form--direct-booking .mphb-confirm-reservation,
+  .lrs-booking-page .mphb-booking-form--direct-booking .mphb-period-price,
+  .lrs-booking-page .mphb-booking-form--direct-booking .mphb-rooms-quantity-wrapper {
+    grid-column: 1;
+    grid-row: auto;
+    width: 100%;
+  }
+
+  .lrs-booking-page .mphb-customer-details > :where(h3, .mphb-required-fields-tip, .mphb-customer-note) {
+    grid-column: auto;
+  }
+
+  .lrs-booking-page .lrs-change-dates-button {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 440px) {
+  .lrs-booking-page .lrs-booking-progress li {
+    padding-left: 24px;
+    font-size: 0.58rem;
+    letter-spacing: 0.06em;
+  }
+
+  .lrs-booking-page .lrs-booking-progress li::before {
+    font-size: 0.95rem;
+  }
+
+  .lrs-booking-page .mphb-checkout-section,
+  .lrs-booking-page .lrs-checkout-stay,
+  .lrs-booking-page .mphb-booking-form--direct-booking {
+    padding: 22px 18px;
+  }
+
+  .lrs-booking-page .lrs-checkout-stay dl > div {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lrs-booking-page *,
+  .lrs-booking-page *::before,
+  .lrs-booking-page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

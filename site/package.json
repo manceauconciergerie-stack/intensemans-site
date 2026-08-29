@@ -1,0 +1,12 @@
+{
+  "name": "intensemans-loveroom",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Boutique d'attentions pré-arrivée — INTENSÉ'MANS Love Room",
+  "dependencies": {
+    "@upstash/redis": "^1.38.3",
+    "resend": "^6.25.0",
+    "stripe": "^22.6.0"
+  }
+}
