@@ -19,7 +19,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/tokens.css?v=6a90ad66">
 <link rel="stylesheet" href="assets/css/base.css?v=6a90ad66">
-<link rel="stylesheet" href="assets/css/components.css?v=6a92dcdd">
+<link rel="stylesheet" href="assets/css/components.css?v=6a92e2f1">
 </head>
 <body>
 
@@ -114,23 +114,23 @@
                 <p class="im-field__help">Facultatif. C’est ici que se préparent les surprises.</p>
               </div>
 
-              <fieldset style="border:0;padding:0;margin:0">
-                <legend class="im-eyebrow" style="margin-bottom:14px">Paiement</legend>
-                <div class="im-pay">
-                  <label><input type="radio" name="payment" value="carte" checked><span>Carte bancaire</span></label>
-                  <label><input type="radio" name="payment" value="applepay"><span>Apple Pay</span></label>
-                  <label><input type="radio" name="payment" value="googlepay"><span>Google Pay</span></label>
-                </div>
-                <p class="im-field__help" style="margin-top:12px">
-                  Prototype : aucun paiement réel n’est déclenché.
-                </p>
-              </fieldset>
+              <div class="im-field im-field--check" data-required data-adult-field hidden>
+                <label for="f-adult">
+                  <input id="f-adult" name="adult" type="checkbox">
+                  <span>Je certifie avoir 18 ans ou plus <span class="im-req" aria-hidden="true">*</span></span>
+                </label>
+                <p class="im-field__help">Votre commande contient de l’alcool ou un article réservé aux adultes.</p>
+                <p class="im-field__err" hidden>Cette confirmation est obligatoire.</p>
+              </div>
 
               <p class="im-note">
                 <span aria-hidden="true">✦</span>
-                <span>En validant, vous confirmez avoir 18 ans ou plus pour les produits
-                contenant de l’alcool. Commande à passer avant 18 h la veille de votre séjour.</span>
+                <span>Le paiement se fait sur la page sécurisée de Stripe : carte bancaire,
+                Apple&nbsp;Pay ou Google&nbsp;Pay. Commande à passer avant 18 h la veille de
+                votre séjour.</span>
               </p>
+
+              <p class="im-field__err im-pay-error" data-pay-error hidden role="alert"></p>
 
               <button class="im-btn im-btn--primary" type="submit">
                 Payer <span data-submit-total>—</span> <span aria-hidden="true">❤︎</span>
@@ -190,11 +190,11 @@
   </div>
 </footer>
 
-<script src="assets/js/products-images.js?v=6a92db94"></script>
+<script src="assets/js/products-images.js?v=6a92e13d"></script>
 <script src="assets/js/products.js?v=6a90b6b8"></script>
-<script src="assets/js/cart.js?v=6a8df747"></script>
-<script src="assets/js/orders.js?v=6a8e133f"></script>
-<script src="assets/js/app.js?v=6a92df1f"></script>
+<script src="assets/js/cart.js?v=6a92e29f"></script>
+<script src="assets/js/orders.js?v=6a92e21a"></script>
+<script src="assets/js/app.js?v=6a92e286"></script>
 <script>document.getElementById('im-year').textContent = new Date().getFullYear();</script>
 </body>
 </html>

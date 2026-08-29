@@ -147,18 +147,6 @@ const IMCart = (() => {
 
     clear() {
       return write(blank());
-    },
-
-    /* Numéro de commande lisible, généré à la validation. */
-    newOrderRef() {
-      const d = new Date();
-      const stamp = [
-        String(d.getFullYear()).slice(2),
-        String(d.getMonth() + 1).padStart(2, '0'),
-        String(d.getDate()).padStart(2, '0')
-      ].join('');
-      const rnd = String(Math.floor(Math.random() * 9000) + 1000);
-      return `IM-${stamp}-${rnd}`;
     }
   };
 

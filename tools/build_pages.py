@@ -253,23 +253,23 @@ page(
                 <p class="im-field__help">Facultatif. C’est ici que se préparent les surprises.</p>
               </div>
 
-              <fieldset style="border:0;padding:0;margin:0">
-                <legend class="im-eyebrow" style="margin-bottom:14px">Paiement</legend>
-                <div class="im-pay">
-                  <label><input type="radio" name="payment" value="carte" checked><span>Carte bancaire</span></label>
-                  <label><input type="radio" name="payment" value="applepay"><span>Apple Pay</span></label>
-                  <label><input type="radio" name="payment" value="googlepay"><span>Google Pay</span></label>
-                </div>
-                <p class="im-field__help" style="margin-top:12px">
-                  Prototype : aucun paiement réel n’est déclenché.
-                </p>
-              </fieldset>
+              <div class="im-field im-field--check" data-required data-adult-field hidden>
+                <label for="f-adult">
+                  <input id="f-adult" name="adult" type="checkbox">
+                  <span>Je certifie avoir 18 ans ou plus <span class="im-req" aria-hidden="true">*</span></span>
+                </label>
+                <p class="im-field__help">Votre commande contient de l’alcool ou un article réservé aux adultes.</p>
+                <p class="im-field__err" hidden>Cette confirmation est obligatoire.</p>
+              </div>
 
               <p class="im-note">
                 <span aria-hidden="true">✦</span>
-                <span>En validant, vous confirmez avoir 18 ans ou plus pour les produits
-                contenant de l’alcool. Commande à passer avant 18 h la veille de votre séjour.</span>
+                <span>Le paiement se fait sur la page sécurisée de Stripe : carte bancaire,
+                Apple&nbsp;Pay ou Google&nbsp;Pay. Commande à passer avant 18 h la veille de
+                votre séjour.</span>
               </p>
+
+              <p class="im-field__err im-pay-error" data-pay-error hidden role="alert"></p>
 
               <button class="im-btn im-btn--primary" type="submit">
                 Payer <span data-submit-total>—</span> <span aria-hidden="true">❤︎</span>
@@ -311,9 +311,8 @@ page(
 
       <p class="im-note" style="max-width:560px;margin-top:26px">
         <span aria-hidden="true">✦</span>
-        <span>Prototype : les commandes vivent dans le navigateur. Cinq exemples sont
-        posés à la première ouverture, et toute commande passée depuis la boutique
-        apparaît ici immédiatement.</span>
+        <span>Une commande n’apparaît ici qu’une fois le paiement encaissé. Le même
+        tableau s’affiche depuis n’importe quel appareil : téléphone, ordinateur.</span>
       </p>
     </div>
   </section>

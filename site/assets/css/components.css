@@ -1150,25 +1150,47 @@
 .im-field[data-invalid="true"] input,
 .im-field[data-invalid="true"] select { border-color: var(--im-danger); }
 
-.im-pay { display: grid; grid-template-columns: repeat(auto-fit, minmax(146px, 1fr)); gap: 12px; }
-.im-pay label {
+/* Case à cocher : même cadre que les champs, le rose marque l'accord. */
+.im-field--check > label {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
   padding: 15px;
   border: 1px solid var(--im-rule-2);
   border-radius: var(--im-r-sm);
   background: var(--im-bg);
   font-size: 0.9rem;
+  letter-spacing: normal;
+  text-transform: none;
   color: var(--im-fg-soft);
   cursor: pointer;
   transition: border-color 0.3s var(--im-ease), background 0.3s var(--im-ease);
 }
-.im-pay label:hover { border-color: var(--im-fg-muted); }
-.im-pay input { accent-color: var(--im-rose-ink); }
-.im-pay label:has(input:checked) { border-color: var(--im-rose-ink); background: var(--im-rose-veil); color: var(--im-fg); }
+.im-field--check > label:hover { border-color: var(--im-fg-muted); }
+.im-field--check input {
+  width: auto;
+  flex: none;
+  accent-color: var(--im-rose-ink);
+  cursor: pointer;
+}
+.im-field--check > label:has(input:checked) {
+  border-color: var(--im-rose-ink);
+  background: var(--im-rose-veil);
+  color: var(--im-fg);
+}
+.im-field--check[data-invalid="true"] > label { border-color: var(--im-danger); }
+
+/* Échec du départ vers le paiement : à lire avant d'atteindre le bouton. */
+.im-pay-error {
+  padding: 13px 16px;
+  border-left: 2px solid var(--im-danger);
+  background: var(--im-glass);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
 
 .im-form > .im-btn { justify-self: start; }
+.im-form > .im-btn[data-busy] { opacity: 0.6; cursor: progress; }
 @media (max-width: 560px) { .im-form > .im-btn { justify-self: stretch; width: 100%; } }
 
 /* ============================================================
@@ -1820,11 +1842,13 @@ h2 [aria-hidden="true"] {
 .im-tour {
   position: relative;
   height: 260vh;
-  /* Valeurs sans unité, lues par le script. */
-  --tour-x: 20;   /* décalage horizontal, en vw */
-  --tour-y: 14;   /* décalage vertical, en vh */
-  --tour-w: 36;   /* largeur de carte, en vw */
-  --tour-h: 24;   /* hauteur de carte, en vh */
+  /* Valeurs sans unité, lues par le script. Cartes en portrait :
+     on doit reconnaître le balnéo, la douche et le lit d'un coup d'œil,
+     ce que le format paysage ne permettait pas. */
+  --tour-x: 13;   /* décalage horizontal, en vw */
+  --tour-y: 22;   /* décalage vertical, en vh */
+  --tour-w: 20;   /* largeur de carte, en vw */
+  --tour-h: 40;   /* hauteur de carte, en vh — environ 4:5 */
 }
 
 .im-tour__stage {
@@ -1848,6 +1872,11 @@ h2 [aria-hidden="true"] {
   will-change: transform, opacity;
 }
 .im-tour__card img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Les deux cadrages de la carte finale se superposent ; le panoramique
+   monte en opacité pendant que la carte s'ouvre. */
+.im-tour__shot { position: absolute; inset: 0; }
+.im-tour__shot[data-tour-wide] { opacity: 0; }
 
 .im-tour__card[data-tour-card="tl"]   { z-index: 10; }
 .im-tour__card[data-tour-card="br"]   { z-index: 20; }
@@ -1883,10 +1912,10 @@ h2 [aria-hidden="true"] {
 }
 
 @media (max-width: 1000px) {
-  .im-tour { --tour-x: 21; --tour-y: 13; --tour-w: 52; --tour-h: 22; }
+  .im-tour { --tour-x: 17; --tour-y: 25; --tour-w: 30; --tour-h: 46; }
 }
 @media (max-width: 640px) {
-  .im-tour { height: 220vh; --tour-x: 17; --tour-y: 12; --tour-w: 64; --tour-h: 20; }
+  .im-tour { height: 220vh; --tour-x: 25; --tour-y: 17; --tour-w: 46; --tour-h: 27; }
 }
 
 /* Sans animation, ou si le script ne tourne pas : les quatre photos
@@ -1906,7 +1935,7 @@ h2 [aria-hidden="true"] {
   position: static;
   width: 100%;
   height: auto;
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 4 / 5;
   transform: none !important;
   opacity: 1 !important;
 }

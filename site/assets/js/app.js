@@ -524,6 +524,7 @@
     const card = (k) => $(`[data-tour-card="${k}"]`, section);
     const tl = card('tl'), br = card('br'), bl = card('bl'), hero = card('hero');
     const caption = $('.im-tour__caption', section);
+    const wide = $('[data-tour-wide]', section);
     if (!tl || !br || !bl || !hero) return;
 
     /* Sans le script ou sans animation, la grille statique prend le
@@ -569,6 +570,8 @@
       const o = track(p, [0.75, 0.85], [1, 0]).toFixed(3);
       tl.style.opacity = br.style.opacity = bl.style.opacity = o;
 
+      /* Le cadrage panoramique remplace le portrait pendant l'ouverture. */
+      if (wide) wide.style.opacity = track(p, [0.68, 0.86], [0, 1]).toFixed(3);
       if (caption) caption.style.opacity = track(p, [0.88, 0.97], [0, 1]).toFixed(3);
     };
 
@@ -953,6 +956,19 @@
     const submitTotal = $('[data-submit-total]', host);
     if (submitTotal) submitTotal.textContent = IM.euro(IMCart.total());
 
+    /* La majorité n'est demandée que si elle est due : cocher une
+       case sans objet apprend au client à cocher sans lire. */
+    const adultField = $('[data-adult-field]', host);
+    if (adultField) {
+      const due = IMCart.hasAlcohol() || IMCart.hasAdult();
+      adultField.hidden = !due;
+      if (!due) {
+        const box = $('[name="adult"]', adultField);
+        if (box) box.checked = false;
+        adultField.setAttribute('data-invalid', 'false');
+      }
+    }
+
     renderSuggestions();
   }
 
@@ -1006,14 +1022,30 @@
       if (field && saved[k]) field.value = saved[k];
     });
 
-    form.addEventListener('submit', (e) => {
+    const submit = $('button[type="submit"]', form);
+    const errBox = $('[data-pay-error]', form);
+
+    const fail = (message) => {
+      if (errBox) {
+        errBox.textContent = message;
+        errBox.hidden = false;
+      }
+      if (submit) {
+        submit.disabled = false;
+        submit.removeAttribute('data-busy');
+      }
+    };
+
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!IMCart.lines().length) return;
+      if (submit && submit.disabled) return;
 
       let ok = true;
       $$('[data-required]', form).forEach((field) => {
+        if (field.hidden) return;
         const input = $('input, select, textarea', field);
-        const valid = input.value.trim() !== '';
+        const valid = input.type === 'checkbox' ? input.checked : input.value.trim() !== '';
         field.setAttribute('data-invalid', String(!valid));
         const err = $('.im-field__err', field);
         if (err) err.hidden = valid;
@@ -1028,32 +1060,50 @@
       });
       IMCart.saveStay(data);
 
-      /* Prototype : on simule le retour du paiement.
-         En production, c'est ici que part la session Stripe. */
-      const ref = IMCart.newOrderRef();
+      if (errBox) errBox.hidden = true;
+      if (submit) {
+        submit.disabled = true;
+        submit.setAttribute('data-busy', 'true');
+      }
+
+      const adultBox = $('[name="adult"]', form);
+      const payload = {
+        stay: data,
+        adult: Boolean(adultBox && adultBox.checked),
+        items: IMCart.lines().map((l) => ({ id: l.product.id, qty: l.qty }))
+      };
+
+      let result;
+      try {
+        const res = await fetch('/api/create-checkout-session', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        result = await res.json().catch(() => ({}));
+        if (!res.ok || !result.url) {
+          fail(result.error || 'Le paiement n’a pas pu être ouvert. Réessayez dans un instant.');
+          return;
+        }
+      } catch (err) {
+        fail('Connexion impossible. Vérifiez votre réseau, puis réessayez.');
+        return;
+      }
+
+      /* Le récapitulatif est posé avant de partir chez Stripe : au
+         retour, la confirmation l'affiche sans interroger le serveur.
+         Ce qui fait foi pour le paiement, c'est le webhook — jamais
+         ce que le navigateur rapporte. */
       try {
         sessionStorage.setItem('im_order', JSON.stringify({
-          ref,
+          ref: result.ref,
           stay: data,
           lines: IMCart.lines().map((l) => ({ name: l.product.name, qty: l.qty, total: l.total })),
-          total: IMCart.total(),
-          payment: (form.querySelector('[name="payment"]:checked') || {}).value || 'carte'
+          total: IMCart.total()
         }));
       } catch (err) { /* rien de bloquant */ }
 
-      /* La commande entre au registre : elle apparaît aussitôt sur
-         le tableau de préparation de l'hôte. */
-      if (typeof IMOrders !== 'undefined') {
-        IMOrders.add({
-          ref,
-          stay: data,
-          lines: IMCart.lines().map((l) => ({ name: l.product.name, qty: l.qty, total: l.total })),
-          total: IMCart.total(),
-          payment: (form.querySelector('[name="payment"]:checked') || {}).value || 'carte'
-        });
-      }
-
-      location.href = 'confirmation.html';
+      location.href = result.url;
     });
   }
 
@@ -1172,10 +1222,53 @@
       </section>`;
   }
 
+  /* Le tableau expose des noms, des numéros de réservation et des
+     messages personnels : il demande le mot de passe de l'hôte, gardé
+     ensuite sur l'appareil. */
+  function renderBoardGate(message) {
+    const host = $('[data-render="board"]');
+    if (!host) return;
+    host.innerHTML = `
+      <section class="im-notif">
+        <header class="im-notif__head"><h2 class="im-notif__title">Accès réservé</h2></header>
+        <form class="im-form" data-board-gate style="padding:22px">
+          <div class="im-field">
+            <label for="f-secret">Mot de passe</label>
+            <input id="f-secret" name="secret" type="password" autocomplete="current-password" required>
+            ${message ? `<p class="im-field__err">${esc(message)}</p>` : ''}
+          </div>
+          <button class="im-btn im-btn--primary" type="submit">Ouvrir le tableau</button>
+        </form>
+      </section>`;
+    $('[name="secret"]', host).focus();
+  }
+
+  function loadBoard() {
+    IMOrders.load()
+      .then(renderBoard)
+      .catch((err) => {
+        if (err.code === 401) {
+          IMOrders.forgetSecret();
+          renderBoardGate(IMOrders.hasSecret() ? 'Mot de passe refusé.' : '');
+        } else {
+          renderBoardGate('Impossible de joindre le serveur. Réessayez.');
+        }
+      });
+  }
+
   function initBoard() {
     if (!$('[data-render="board"]')) return;
-    IMOrders.seedOnce();
-    renderBoard();
+
+    if (!IMOrders.hasSecret()) renderBoardGate('');
+    else loadBoard();
+
+    document.addEventListener('submit', (e) => {
+      const gate = e.target.closest('[data-board-gate]');
+      if (!gate) return;
+      e.preventDefault();
+      IMOrders.setSecret($('[name="secret"]', gate).value);
+      loadBoard();
+    });
 
     document.addEventListener('click', (e) => {
       const toggle = e.target.closest('[data-board-toggle]');
@@ -1184,20 +1277,19 @@
         e.stopPropagation();
         const ref = toggle.getAttribute('data-board-toggle');
         const order = IMOrders.all().find((o) => o.ref === ref);
-        IMOrders.setPrepared(ref, !(order && order.prepared));
+        IMOrders.setPrepared(ref, !(order && order.prepared)).then(renderBoard).catch(loadBoard);
         renderBoard();
         return;
       }
 
       if (e.target.closest('[data-board-all]')) {
-        IMOrders.markAllPrepared();
+        IMOrders.markAllPrepared().then(renderBoard).catch(loadBoard);
         renderBoard();
         return;
       }
 
       if (e.target.closest('[data-board-archive]')) {
-        IMOrders.archivePrepared();
-        renderBoard();
+        IMOrders.archivePrepared().then(renderBoard).catch(loadBoard);
         return;
       }
 
@@ -1218,16 +1310,27 @@
     const host = $('[data-render="confirmation"]');
     if (!host) return;
 
+    /* Seul Stripe redirige ici, et seulement après un paiement
+       réussi : c'est la référence dans l'URL qui atteste du passage.
+       Sans elle, on n'affiche rien et surtout on ne vide pas le
+       panier — sinon un retour arrière depuis la page de paiement
+       effacerait la sélection sans que rien n'ait été payé. */
+    const paidRef = new URLSearchParams(location.search).get('ref');
+
     let order = null;
     try { order = JSON.parse(sessionStorage.getItem('im_order') || 'null'); } catch (e) { order = null; }
+    if (order && paidRef && order.ref !== paidRef) order = null;
 
-    if (!order) {
+    if (!paidRef || !order) {
       host.innerHTML = `
         <div class="im-empty">
-          <h2>Aucune commande à afficher</h2>
-          <p class="im-quiet">Cette page s’affiche après le paiement de vos attentions.</p>
+          <h2>${paidRef ? 'Votre commande est bien enregistrée' : 'Aucune commande à afficher'}</h2>
+          <p class="im-quiet">${paidRef
+            ? `Le détail n’est plus disponible sur cet appareil, mais tout est transmis. Référence ${esc(paidRef)}.`
+            : 'Cette page s’affiche après le paiement de vos attentions.'}</p>
           <a class="im-btn im-btn--primary" href="index.html">Voir les attentions <span aria-hidden="true">❤︎</span></a>
         </div>`;
+      if (paidRef) IMCart.clear();
       return;
     }
 
@@ -1236,8 +1339,6 @@
           weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
         })
       : '—';
-
-    const payLabels = { carte: 'Carte bancaire', applepay: 'Apple Pay', googlepay: 'Google Pay' };
 
     host.innerHTML = `
       <div class="im-head im-head--center">
@@ -1285,13 +1386,10 @@
           <span>Total payé</span>
           <span class="im-price">${IM.euro(order.total)}</span>
         </div>
-        <div class="im-summary__row">
-          <span class="im-quiet">Moyen de paiement</span>
-          <span>${esc(payLabels[order.payment] || 'Carte bancaire')}</span>
-        </div>
         <p class="im-summary__legal">
-          Un récapitulatif vous a été envoyé par e-mail. Une question sur votre commande ?
-          Répondez simplement à cet e-mail, nous vous répondons avant votre arrivée.
+          Votre reçu de paiement vous est envoyé par e-mail. Une question sur votre
+          commande ? Écrivez-nous en rappelant votre numéro, nous vous répondons
+          avant votre arrivée.
         </p>
       </div>`;
 

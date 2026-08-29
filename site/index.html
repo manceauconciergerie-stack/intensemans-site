@@ -18,7 +18,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/tokens.css?v=6a90ad66">
 <link rel="stylesheet" href="assets/css/base.css?v=6a90ad66">
-<link rel="stylesheet" href="assets/css/components.css?v=6a92dcdd">
+<link rel="stylesheet" href="assets/css/components.css?v=6a92e2f1">
 </head>
 <body>
 
@@ -122,25 +122,31 @@
       <figure class="im-tour__card" data-tour-card="tl">
         <img src="assets/img/lieu/tour-douche.webp"
              alt="La douche à l'italienne, colonne noire sur mur en marbre"
-             width="900" height="600" loading="lazy" decoding="async">
+             width="720" height="900" loading="lazy" decoding="async">
       </figure>
       <figure class="im-tour__card" data-tour-card="br">
-        <img src="assets/img/lieu/tour-vasque.webp"
-             alt="Le miroir rond rétroéclairé et l'applique de la salle de bain"
-             width="676" height="451" loading="lazy" decoding="async">
+        <img src="assets/img/lieu/tour-salon.webp"
+             alt="Le coin salon de la chambre : fauteuils bouclette et tables basses dorées"
+             width="620" height="775" loading="lazy" decoding="async">
       </figure>
       <figure class="im-tour__card" data-tour-card="bl">
-        <img src="assets/img/lieu/tour-jacuzzi.webp"
-             alt="Le jacuzzi deux places devant le mur en pierre ardoise"
-             width="900" height="600" loading="lazy" decoding="async">
+        <img src="assets/img/lieu/tour-balneo.webp"
+             alt="Le balnéo deux places devant le mur en pierre ardoise"
+             width="980" height="1225" loading="lazy" decoding="async">
       </figure>
       <figure class="im-tour__card" data-tour-card="hero">
-        <img src="assets/img/lieu/hero-chambre.webp"
-             alt="La chambre : murs noirs, rideau de velours rouge et enseigne lumineuse"
+        <!-- Deux cadrages : le portrait tant que la carte est petite, le
+             panoramique quand elle s'ouvre en plein écran. Sans ça, on
+             verrait une bande verticale étroite du lit. -->
+        <img class="im-tour__shot" src="assets/img/lieu/tour-lit.webp"
+             alt="Le lit king size, tête de lit capitonnée et enseigne lumineuse love"
+             width="700" height="875" loading="lazy" decoding="async">
+        <img class="im-tour__shot" data-tour-wide src="assets/img/lieu/hero-chambre.webp"
+             alt="" aria-hidden="true"
              width="2048" height="1152" loading="lazy" decoding="async">
         <figcaption class="im-tour__caption">
           <p>Et derrière la porte, la chambre qui vous attend.</p>
-          <span>Le Mans · Jacuzzi privatif · Arrivée autonome</span>
+          <span>Balnéo deux places · Douche à l’italienne · Lit king size</span>
         </figcaption>
       </figure>
     </div>
@@ -258,11 +264,11 @@
   </div>
 </footer>
 
-<script src="assets/js/products-images.js?v=6a92db94"></script>
+<script src="assets/js/products-images.js?v=6a92e13d"></script>
 <script src="assets/js/products.js?v=6a90b6b8"></script>
-<script src="assets/js/cart.js?v=6a8df747"></script>
-<script src="assets/js/orders.js?v=6a8e133f"></script>
-<script src="assets/js/app.js?v=6a92df1f"></script>
+<script src="assets/js/cart.js?v=6a92e29f"></script>
+<script src="assets/js/orders.js?v=6a92e21a"></script>
+<script src="assets/js/app.js?v=6a92e286"></script>
 <script>document.getElementById('im-year').textContent = new Date().getFullYear();</script>
 </body>
 </html>
