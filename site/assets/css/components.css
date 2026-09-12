@@ -159,6 +159,13 @@
 
 @media (max-width: 1000px) {
   .im-burger { display: grid; }
+
+  /* La nav passe en `position: fixed` ci-dessous : elle quitte le flux
+     et son `margin-left: auto` ne pousse donc plus rien. Sans ce relais,
+     le logo et les actions se massent à gauche et laissent un tiers de
+     la barre vide à droite. */
+  .im-header__actions { margin-left: auto; }
+
   .im-nav {
     position: fixed;
     inset: var(--im-header-h) 0 auto;
@@ -273,6 +280,17 @@
   box-shadow: var(--im-shadow-sm);
 }
 .im-badge--signature { border-left-color: var(--im-brass); color: var(--im-brass); }
+.im-badge--brass { border-left-color: var(--im-brass); color: var(--im-brass); }
+
+/* Le prix, et la valeur des mêmes articles pris séparément. Le
+   barré fait le travail : aucune formule commerciale à écrire. */
+.im-card__prix { display: flex; flex-direction: column; gap: 2px; }
+.im-card__valeur {
+  font-size: 0.72rem;
+  color: var(--im-fg-muted);
+  letter-spacing: 0.01em;
+}
+.im-card__valeur s { text-decoration-thickness: 1px; }
 
 /* ============================================================
    4. PLACEHOLDERS PHOTO
@@ -384,7 +402,16 @@
   translate: 12rem -22rem;
   background: radial-gradient(50% 50% at 50% 50%, rgba(217, 139, 136, 0.13) 0%, rgba(217, 139, 136, 0.04) 80%, transparent 100%);
 }
-@media (max-width: 900px) { .im-hero__rays { display: none; } }
+/* Les rais étaient purement et simplement masqués sous 900 px, sans
+   nécessité : `.im-hero` a `overflow: hidden`, ils ne peuvent pas
+   déborder. Remis à l'échelle du téléphone, ils gardent la lueur
+   derrière le logo — c'est elle qui donne sa profondeur au hero. */
+@media (max-width: 900px) {
+  .im-hero__rays span { rotate: -34deg; }
+  .im-hero__rays span:nth-child(1) { width: 22rem; height: 46rem; translate: -4rem -14rem; }
+  .im-hero__rays span:nth-child(2) { width: 9rem;  height: 46rem; translate: 3rem  -17rem; }
+  .im-hero__rays span:nth-child(3) { width: 8rem;  height: 46rem; translate: 9rem  -15rem; }
+}
 
 .im-hero__inner { text-align: center; }
 
@@ -572,7 +599,12 @@
   font-weight: 500;
   color: var(--im-rose-ink);
   opacity: 0;
-  transition: transform 0.85s var(--im-spring), opacity 0.5s var(--im-ease);
+  /* La glissade d'origine, restaurée à l'identique à la demande de
+     l'utilisateur après plusieurs tentatives de retouche (fondu,
+     courbes plus lentes) toutes moins bonnes que ceci. Sa phase vive
+     expédie le mot hors du cadre qui le rogne ; sa queue lente se
+     joue hors champ. NE PLUS Y TOUCHER. */
+  transition: transform 1.05s cubic-bezier(0.33, 1.06, 0.4, 1), opacity 0.62s var(--im-ease);
   will-change: transform, opacity;
 }
 .im-rotator span[data-pos="next"]     { transform: translateY(115%); }
@@ -591,8 +623,13 @@
    ============================================================ */
 
 .im-assure {
-  display: grid;
-  grid-template-columns: 1.25fr 1fr 1fr 1fr;
+  /* Flex et non grid, pour la même raison que la synthèse du tableau
+     de bord : `auto-fit` ne replie que les COLONNES vides, jamais la
+     cellule manquante en bout de ligne. Quatre items sur trois
+     colonnes laissaient un trou, qui se lit comme un bloc oublié.
+     En flex, la dernière ligne étale simplement ce qu'elle a. */
+  display: flex;
+  flex-wrap: wrap;
   gap: 1px;
   margin: 0;
   border: 1px solid var(--im-rule);
@@ -601,6 +638,10 @@
   overflow: hidden;
 }
 .im-assure > div {
+  /* 260 et non 210 : à 210, quatre blocs se rangeaient en 3 + 1 sur
+     une tablette, et le solitaire s'étirait sur toute la largeur en
+     face de trois colonnes étroites. À 260, on passe de 4 à 2 + 2. */
+  flex: 1 1 260px;
   padding: clamp(20px, 2.6vw, 30px) clamp(18px, 2.2vw, 26px);
   background: var(--im-bg);
 }
@@ -613,8 +654,6 @@
 }
 .im-assure dd { margin: 0; font-size: 0.92rem; line-height: 1.55; color: var(--im-fg-muted); }
 
-@media (max-width: 900px) { .im-assure { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 520px) { .im-assure { grid-template-columns: 1fr; } }
 
 /* ============================================================
    8. FILTRE DE CATÉGORIES
@@ -1147,8 +1186,229 @@
 .im-field input::placeholder, .im-field textarea::placeholder { color: var(--im-fg-muted); }
 .im-field__help { font-size: 0.8rem; line-height: 1.5; color: var(--im-fg-muted); }
 .im-field__err { font-size: 0.8rem; color: var(--im-danger); }
+
+/* Confirmation, pas erreur : « le lien vient de partir » ne doit pas
+   s'afficher dans le rouge réservé aux refus. */
+.im-field__note { font-size: 0.8rem; color: var(--im-fg-soft); }
 .im-field[data-invalid="true"] input,
 .im-field[data-invalid="true"] select { border-color: var(--im-danger); }
+
+/* ============================================================
+   CALENDRIER DE RÉSERVATION
+   Deux mois côte à côte, un seul sous 780 px. Le rose marque les
+   deux bornes du séjour, un voile plus discret les nuits entre.
+   ============================================================ */
+
+.im-cal {
+  border: 1px solid var(--im-rule-2);
+  border-radius: var(--im-r-md);
+  background: var(--im-bg-2);
+  padding: clamp(18px, 2.6vw, 30px);
+}
+
+.im-cal__note {
+  margin-bottom: 18px;
+  padding: 11px 15px;
+  border-left: 2px solid var(--im-brass);
+  background: var(--im-glass);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--im-fg-soft);
+}
+
+.im-cal__mois-lot {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(20px, 3.4vw, 46px);
+}
+
+.im-cal__fleche {
+  position: absolute;
+  top: -4px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--im-rule-2);
+  border-radius: 50%;
+  background: var(--im-bg);
+  color: var(--im-fg-soft);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.3s var(--im-ease), color 0.3s var(--im-ease);
+}
+.im-cal__fleche--prec { left: 0; }
+.im-cal__fleche--suiv { right: 0; }
+.im-cal__fleche:hover:not(:disabled) { border-color: var(--im-rose-ink); color: var(--im-fg); }
+.im-cal__fleche:disabled { opacity: 0.3; cursor: default; }
+
+.im-cal__titre {
+  margin-bottom: 14px;
+  font-family: var(--im-display);
+  font-size: 1.12rem;
+  text-align: center;
+  color: var(--im-fg);
+  text-transform: capitalize;
+}
+
+.im-cal__grille { width: 100%; border-collapse: collapse; }
+.im-cal__grille th {
+  padding-bottom: 8px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--im-fg-muted);
+}
+.im-cal__grille th abbr { text-decoration: none; border: 0; }
+.im-cal__grille td { padding: 1px; }
+
+.im-cal__jour {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  width: 100%;
+  aspect-ratio: 1;
+  min-height: 44px;
+  border: 0;
+  border-radius: var(--im-r-sm);
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  color: var(--im-fg-soft);
+  cursor: pointer;
+  transition: background 0.2s var(--im-ease), color 0.2s var(--im-ease),
+              transform 0.15s var(--im-ease);
+}
+
+/* Le prix sous le chiffre : c'est ce qu'on vient chercher dans un
+   calendrier de réservation. Discret, il ne doit pas voler la date. */
+.im-cal__prix {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--im-fg-muted);
+}
+.im-cal__jour[data-bord] .im-cal__prix { color: inherit; opacity: 0.72; }
+.im-cal__jour[data-plage="true"] .im-cal__prix { color: var(--im-fg-soft); }
+/* Le survol d'un jour ne doit jamais l'emporter sur un jour choisi.
+
+   Il le faisait pourtant : `.im-cal__jour:hover:not(:disabled)` pèse
+   trois pseudo-classes, contre deux pour `[data-plage]` et
+   `[data-bord]` qui marquent la sélection. Le survol gagnait donc et
+   repeignait la nuit choisie en gris neutre au lieu du rose. Sur un
+   téléphone, où `:hover` reste collé après le tap, la date qu'on
+   venait de choisir cessait d'avoir l'air choisie. */
+@media (hover: hover) {
+  .im-cal__jour:hover:not(:disabled):not([data-plage="true"]):not([data-bord]) {
+    background: var(--im-glass-2);
+    color: var(--im-fg);
+  }
+}
+.im-cal__jour:disabled {
+  color: var(--im-fg-muted);
+  text-decoration: line-through;
+  cursor: default;
+  opacity: 0.45;
+}
+.im-cal__jour[data-plage="true"] { background: var(--im-rose-veil); color: var(--im-fg); }
+.im-cal__jour[data-bord] {
+  background: var(--im-rose-ink);
+  color: var(--im-bg);
+  font-weight: 600;
+}
+
+.im-cal__aide {
+  margin-top: 22px;
+  font-size: 0.88rem;
+  color: var(--im-fg-muted);
+}
+
+.im-cal__choix {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid var(--im-rule);
+}
+.im-cal__dates { font-family: var(--im-display); font-size: 1.15rem; color: var(--im-fg); }
+.im-cal__nuits { margin-top: 4px; font-size: 0.85rem; color: var(--im-fg-muted); }
+
+/* Deuxième étape : les coordonnées, une fois les dates arrêtées. */
+.im-cal__form { margin-top: 4px; }
+.im-cal__recap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 18px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--im-rule);
+}
+.im-cal__changer {
+  border: 0;
+  background: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 0.82rem;
+  color: var(--im-fg-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.im-cal__changer:hover { color: var(--im-fg); }
+
+.im-cal__total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  padding-top: 18px;
+  border-top: 1px solid var(--im-rule);
+  font-size: 0.9rem;
+  color: var(--im-fg-muted);
+}
+.im-cal__total .im-price { font-size: 1.3rem; color: var(--im-fg); }
+
+@media (max-width: 780px) {
+  .im-cal__mois-lot { grid-template-columns: 1fr; }
+  .im-cal__mois-lot .im-cal__mois:last-child { display: none; }
+  .im-cal__choix > * { width: 100%; }
+  .im-cal__choix .im-btn { justify-content: center; }
+}
+
+/* Page de réservation */
+.im-resa__photo { margin: clamp(28px, 4vw, 46px) 0; }
+.im-resa__photo img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--im-r-md);
+  box-shadow: var(--im-shadow);
+}
+.im-resa__points {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: clamp(16px, 2.4vw, 28px);
+  margin-top: clamp(30px, 4vw, 48px);
+  list-style: none;
+}
+.im-resa__points li { padding-top: 14px; border-top: 1px solid var(--im-rule); }
+.im-resa__points strong {
+  display: block;
+  margin-bottom: 5px;
+  font-family: var(--im-display);
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--im-fg);
+}
+.im-resa__points span { font-size: 0.87rem; color: var(--im-fg-muted); }
 
 /* Case à cocher : même cadre que les champs, le rose marque l'accord. */
 .im-field--check > label {
@@ -1168,8 +1428,11 @@
 }
 .im-field--check > label:hover { border-color: var(--im-fg-muted); }
 .im-field--check input {
-  width: auto;
   flex: none;
+  width: 19px;
+  height: 19px;
+  min-height: 0;
+  padding: 0;
   accent-color: var(--im-rose-ink);
   cursor: pointer;
 }
@@ -1211,27 +1474,6 @@
 .im-steps li + li::before { content: ""; width: 22px; height: 1px; background: var(--im-rule-2); }
 .im-steps [aria-current="step"] { color: var(--im-rose-ink); font-weight: 500; }
 .im-steps [data-done="true"] { color: var(--im-fg); }
-
-/* ============================================================
-   17. QUESTIONS FRÉQUENTES
-   Liste en deux colonnes plutôt qu'un accordéon : tout est lisible
-   d'un coup d'œil, rien à déplier.
-   ============================================================ */
-
-.im-faq {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: clamp(26px, 3.4vw, 48px) clamp(30px, 4vw, 70px);
-}
-.im-faq > div { max-width: 46ch; }
-.im-faq h3 {
-  margin-bottom: 8px;
-  font-family: var(--im-display);
-  font-size: 1.24rem;
-  font-weight: 500;
-  color: var(--im-fg);
-}
-.im-faq__body p { font-size: 0.95rem; line-height: 1.62; color: var(--im-fg-muted); }
 
 /* ============================================================
    18. BARRE DE PANIER
@@ -1419,6 +1661,25 @@ body[data-has-cartbar="true"] { padding-bottom: calc(var(--im-cartbar-h) + 14px)
 
 .im-notif__body { min-width: 0; flex: 1; }
 .im-notif__source { margin: 0 0 3px; font-size: 0.78rem; color: var(--im-fg-muted); }
+
+/* Deux origines cohabitent désormais dans le tableau : une nuit
+   réservée sur le site, ou des attentions pour un séjour déjà pris
+   ailleurs. Elles ne se préparent pas pareil, elles doivent donc se
+   distinguer sans avoir à déplier la ligne. */
+.im-notif__tag {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 7px;
+  border: 1px solid var(--im-rose-veil);
+  border-radius: 999px;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--im-rose-ink);
+  vertical-align: 1px;
+}
+.im-notif__tag[data-ton="neutre"] { border-color: var(--im-rule-2); color: var(--im-fg-muted); }
+.im-notif__tag[data-ton="urgent"] { border-color: var(--im-danger); color: var(--im-danger); }
 .im-notif__line { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .im-notif__name {
   min-width: 0; margin: 0;
@@ -1830,113 +2091,452 @@ h2 [aria-hidden="true"] {
 }
 
 /* ============================================================
-   23. VISITE AU DÉFILEMENT
+   23. CE QUI EST COMPRIS
    ------------------------------------------------------------
-   Portage du composant scroll-choreography : quatre photos du lieu
-   qui se croisent, s'empilent au centre, puis la chambre s'ouvre
-   en plein écran. Le ressort de framer-motion est remplacé par un
-   lissage par interpolation dans une boucle d'animation.
-   Les décalages sont des variables : une seule règle par palier.
+   Portage natif du composant « stack interactor » : le menu
+   numéroté à gauche, la photo découpée par un masque à droite.
+   L'actif est en plein, les autres en contour. Les formes du
+   masque entrent en décalé, respirent, puis se retirent — le tout
+   en animation CSS, sans GSAP ni aucune bibliothèque.
    ============================================================ */
 
-.im-tour {
-  position: relative;
-  height: 260vh;
-  /* Valeurs sans unité, lues par le script. Cartes en portrait :
-     on doit reconnaître le balnéo, la douche et le lit d'un coup d'œil,
-     ce que le format paysage ne permettait pas. */
-  --tour-x: 13;   /* décalage horizontal, en vw */
-  --tour-y: 22;   /* décalage vertical, en vh */
-  --tour-w: 20;   /* largeur de carte, en vw */
-  --tour-h: 40;   /* hauteur de carte, en vh — environ 4:5 */
+.im-atouts {
+  /* Le halo décoratif fait 118 % de son parent et le déborde : sur une
+     tablette, il poussait la page 20 px au-delà de l'écran et créait
+     une barre de défilement horizontale. On le rogne ici. `clip`
+     plutôt que `hidden` : pas de conteneur de défilement créé. */
+  overflow-x: clip;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: clamp(32px, 5vw, 80px);
+  max-width: var(--im-maxw);
+  margin-inline: auto;
+  padding: clamp(56px, 8vw, 110px) var(--im-page-x);
+}
+@media (max-width: 900px) {
+  .im-atouts { grid-template-columns: 1fr; gap: clamp(32px, 7vw, 48px); }
 }
 
-.im-tour__stage {
-  position: sticky;
-  top: 0;
+/* --- Le menu --- */
+
+.im-atouts__menu ul {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(22px, 3.4vw, 46px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.im-atouts__menu button {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(14px, 1.6vw, 24px);
+  width: 100%;
+  padding: 0;
+  text-align: left;
+}
+
+.im-atout__num {
+  margin-top: 0.5em;
+  font-size: clamp(1rem, 1.5vw, 1.35rem);
+  font-weight: 600;
+  color: var(--im-fg-muted);
+  transition: color 0.5s var(--im-ease), transform 0.5s var(--im-ease);
+}
+
+/* Le nom : plein quand l'atout est actif, en contour sinon. Le
+   contour passe par -webkit-text-stroke, seule propriété largement
+   suivie ; `color: transparent` évide alors la lettre. */
+.im-atout__nom {
+  font-size: clamp(2rem, 5.2vw, 3.6rem);
+  font-weight: 600;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: transparent;
+  -webkit-text-stroke: 1.4px var(--im-rule-2);
+  opacity: 0.55;
+  transition: color 0.6s var(--im-ease), opacity 0.6s var(--im-ease),
+              transform 0.6s var(--im-ease), -webkit-text-stroke-color 0.6s var(--im-ease);
+}
+
+.im-atouts__menu button[aria-pressed="true"] .im-atout__num {
+  color: var(--im-brass);
+  transform: scale(1.1);
+}
+.im-atouts__menu button[aria-pressed="true"] .im-atout__nom {
+  color: var(--im-fg);
+  -webkit-text-stroke-color: transparent;
+  opacity: 1;
+  transform: translateX(10px);
+}
+
+/* Au survol d'un inactif, le contour s'éclaire : on sent que c'est
+   cliquable avant même d'avoir basculé dessus.
+
+   Deux garde-fous, tous les deux nécessaires :
+
+   `[aria-pressed="false"]` — sans lui, la règle s'appliquait AUSSI à
+   l'atout actif et y écrasait son `-webkit-text-stroke-color:
+   transparent`. On obtenait des lettres pleines crème portant un
+   contour brun de 1,4 px, qui rongeait chaque jambage.
+
+   `@media (hover: hover)` — sur un écran tactile, `:hover` reste
+   collé après le tap. Le défaut n'était donc pas fugace sur
+   téléphone, il était définitif jusqu'au rechargement. */
+@media (hover: hover) {
+  .im-atouts__menu button[aria-pressed="false"]:hover .im-atout__nom {
+    opacity: 0.85;
+    -webkit-text-stroke-color: var(--im-brass-line);
+  }
+}
+.im-atouts__menu button[aria-pressed="false"]:focus-visible .im-atout__nom {
+  opacity: 0.85;
+  -webkit-text-stroke-color: var(--im-brass-line);
+}
+
+.im-atouts__note {
+  margin: clamp(28px, 3.4vw, 44px) 0 0;
+  font-size: 0.9rem;
+  color: var(--im-fg-muted);
+}
+/* Sur sa propre ligne : accolé à la phrase, le lien se lisait comme
+   la fin de celle-ci et ne s'offrait pas au clic. */
+.im-atouts__lien {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--im-rose-ink);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+  transition: color .25s var(--im-ease);
+}
+.im-atouts__lien:hover { color: var(--im-fg); }
+
+/* --- La photo découpée --- */
+
+.im-atouts__vue {
+  position: relative;
   display: grid;
   place-items: center;
-  height: 100dvh;
-  overflow: hidden;
 }
-
-.im-tour__card {
+.im-atouts__halo {
   position: absolute;
-  margin: 0;
-  width: calc(var(--tour-w) * 1vw);
-  height: calc(var(--tour-h) * 1vh);
-  overflow: hidden;
-  border-radius: var(--im-r-lg);
-  background: var(--im-bg-2);
-  box-shadow: var(--im-shadow-lg);
-  will-change: transform, opacity;
-}
-.im-tour__card img { width: 100%; height: 100%; object-fit: cover; }
-
-/* Les deux cadrages de la carte finale se superposent ; le panoramique
-   monte en opacité pendant que la carte s'ouvre. */
-.im-tour__shot { position: absolute; inset: 0; }
-.im-tour__shot[data-tour-wide] { opacity: 0; }
-
-.im-tour__card[data-tour-card="tl"]   { z-index: 10; }
-.im-tour__card[data-tour-card="br"]   { z-index: 20; }
-.im-tour__card[data-tour-card="bl"]   { z-index: 30; }
-.im-tour__card[data-tour-card="hero"] { z-index: 40; will-change: transform, width, height; }
-
-/* Légende de la dernière image, révélée quand la chambre est ouverte. */
-.im-tour__caption {
-  position: absolute;
-  z-index: 2;
-  inset: auto 0 0;
-  padding: clamp(28px, 6vw, 64px) var(--im-page-x) clamp(30px, 6vw, 60px);
-  background: linear-gradient(180deg, transparent, rgba(6, 4, 5, 0.9));
-  opacity: 0;
+  width: 118%; height: 118%;
+  border-radius: 50%;
+  background: rgba(208, 174, 114, 0.07);
+  filter: blur(110px);
   pointer-events: none;
 }
-.im-tour__caption p {
-  max-width: 34ch;
-  margin: 0;
-  font-family: var(--im-display);
-  font-style: italic;
-  font-size: clamp(1.3rem, 2.6vw, 2rem);
-  color: var(--im-fg);
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
+.im-atouts__vue svg {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  height: auto;
 }
-.im-tour__caption span {
-  display: block;
-  margin-top: 8px;
+
+/* Chaque forme du masque part de rien, s'ouvre en décalé, respire,
+   se referme, puis marque une pause avant de recommencer. Les
+   pourcentages découpent un cycle de 6,2 s. */
+.im-path {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0);
+  animation: im-atout-masque 6.2s infinite;
+}
+@keyframes im-atout-masque {
+  0%              { transform: scale(0);    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+  13%             { transform: scale(1);    animation-timing-function: ease-in-out; }
+  37%             { transform: scale(1.05); animation-timing-function: ease-in-out; }
+  61%             { transform: scale(1);    animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
+  74%, 100%       { transform: scale(0); }
+}
+
+/* Le décalage d'entrée, forme par forme. Neuf valeurs couvrent le
+   plus grand des trois masques. */
+.im-path:nth-child(1) { animation-delay: 0.00s; }
+.im-path:nth-child(2) { animation-delay: 0.14s; }
+.im-path:nth-child(3) { animation-delay: 0.07s; }
+.im-path:nth-child(4) { animation-delay: 0.24s; }
+.im-path:nth-child(5) { animation-delay: 0.04s; }
+.im-path:nth-child(6) { animation-delay: 0.19s; }
+.im-path:nth-child(7) { animation-delay: 0.11s; }
+.im-path:nth-child(8) { animation-delay: 0.28s; }
+.im-path:nth-child(9) { animation-delay: 0.16s; }
+
+/* Sans animation : le masque reste ouvert, la photo est simplement
+   visible. C'est l'état utile, pas un repli dégradé. */
+@media (prefers-reduced-motion: reduce) {
+  .im-path { transform: scale(1); animation: none; }
+  .im-atout__num, .im-atout__nom { transition: none; }
+}
+
+
+/* ============================================================
+   Pages légales
+   ------------------------------------------------------------
+   Du texte long qu'on lit rarement mais qui doit rester lisible :
+   colonne étroite, interlignage large, hiérarchie franche. Aucun
+   effet décoratif, ce n'est pas une page de vente.
+   ============================================================ */
+.im-legal { max-width: 72ch; }
+.im-legal > * + * { margin-top: 18px; }
+
+.im-legal h2 {
+  font-family: var(--im-display);
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  line-height: 1.24;
+  margin-top: 52px;
+  padding-top: 26px;
+  border-top: 1px solid var(--im-rule);
+}
+.im-legal > h2:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+
+.im-legal h3 {
   font-family: var(--im-sans);
-  font-style: normal;
   font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--im-brass);
+  margin-top: 32px;
+}
+
+.im-legal p,
+.im-legal li,
+.im-legal dd { color: var(--im-fg-soft); line-height: 1.72; }
+
+.im-legal ul { padding-left: 1.1em; }
+.im-legal li + li { margin-top: 9px; }
+.im-legal li::marker { color: var(--im-rose); }
+
+.im-legal dl > div { padding: 12px 0; border-bottom: 1px solid var(--im-rule); }
+.im-legal dd { margin-inline-start: 0; }   /* le retrait par défaut du navigateur casse l'alignement de la colonne */
+.im-legal dt {
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--im-fg-muted);
+  margin-bottom: 4px;
+}
+
+.im-legal a { color: var(--im-rose-ink); }
+
+/* Sommaire en tête de page : ces documents se consultent en
+   diagonale, pour retrouver un point précis. */
+.im-legal__toc {
+  padding: 20px 24px;
+  border: 1px solid var(--im-rule);
+  border-radius: var(--im-r-lg);
+  background: var(--im-bg-2);
+}
+.im-legal__toc ul { list-style: none; padding-left: 0; }
+.im-legal__toc li + li { margin-top: 7px; }
+
+/* Date de dernière mise à jour, discrète mais obligatoire. */
+.im-legal__stamp {
+  font-size: 0.82rem;
+  color: var(--im-fg-muted);
+  letter-spacing: 0.04em;
+}
+
+/* ------------------------------------------------------------
+   Trou à combler. Volontairement CRIARD : ces mentions sont
+   fausses tant qu'elles ne sont pas remplacées, et une page
+   légale fausse est pire que pas de page du tout.
+   ------------------------------------------------------------ */
+.im-todo {
+  display: inline;
+  background: rgba(230, 148, 144, 0.16);
+  border-bottom: 2px dashed var(--im-danger);
+  color: var(--im-danger);
+  font-family: var(--im-sans);
+  font-size: 0.86em;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* Bandeau d'avertissement en haut des pages non finalisées.
+   Se retire en supprimant le bloc dans tools/build_pages.py. */
+.im-legal__warn {
+  padding: 16px 20px;
+  margin-bottom: 34px;
+  border: 1px solid var(--im-danger);
+  border-radius: var(--im-r-lg);
+  background: rgba(230, 148, 144, 0.09);
+}
+.im-legal__warn p { color: var(--im-fg); font-size: 0.92rem; line-height: 1.6; }
+
+/* Un titre de 4,8 rem sur « Conditions générales de vente » sonne
+   faux : ces pages se consultent, elles ne se vendent pas. */
+.im-head--legal { max-width: 30ch; }
+.im-head--legal h1 { font-size: clamp(2rem, 4vw, 2.9rem); }
+
+/* Le meilleur prix du mois. Le vert ne décore pas : il dit à quelqu'un
+   dont les dates sont souples qu'un jour de décalage change le prix. */
+.im-cal__jour[data-mini="true"] .im-cal__prix {
+  color: var(--im-success);
+  font-weight: 600;
+}
+.im-cal__jour[data-mini="true"][data-bord] .im-cal__prix { color: inherit; }
+
+.im-cal__legende {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 0.78rem;
+  color: var(--im-fg-muted);
+}
+.im-cal__pastille {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--im-success);
+  flex: none;
+}
+
+/* ============================================================
+   SYNTHÈSE DU TABLEAU DE BORD
+   Écran interne. Des chiffres, lisibles d'un coup d'œil sur un
+   téléphone, sans décor.
+   ============================================================ */
+
+.im-synth {
+  border: 1px solid var(--im-rule-2);
+  border-radius: var(--im-r-lg);
+  background: var(--im-bg-2);
+  overflow: hidden;
+}
+.im-synth__tete {
+  padding: clamp(16px, 2vw, 22px);
+  border-bottom: 1px solid var(--im-rule);
+}
+.im-synth__tete h2 {
+  font-family: var(--im-display);
+  font-size: 1.3rem;
+  text-transform: capitalize;
+  color: var(--im-fg);
+}
+.im-synth__tete p { margin: 4px 0 0; font-size: 0.86rem; color: var(--im-fg-muted); }
+.im-synth__tete strong { color: var(--im-fg); font-weight: 500; }
+
+.im-synth__grille {
+  /* Flex, pas grid, et c'est le point important.
+
+     En grille, cinq chiffres sur trois colonnes laissent forcément
+     une case vide en bout de ligne : `auto-fit` ne replie que les
+     COLONNES vides, jamais une cellule manquante. Ce trou se lit
+     comme un chiffre qui n'a pas chargé.
+
+     En flex, la dernière ligne étale simplement ce qu'elle a. Le
+     nombre de chiffres peut changer sans jamais faire de trou. */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1px;
+  background: var(--im-rule);
+}
+/* Le fond du conteneur transparaît dans les gouttières d'un pixel :
+   ce sont elles qui dessinent les filets, pas des bordures. */
+.im-synth__case {
+  flex: 1 1 150px;
+  padding: clamp(14px, 1.8vw, 18px);
+  background: var(--im-bg-2);
+}
+.im-synth__case[data-alerte="true"] { background: var(--im-glass); }
+.im-synth__case[data-alerte="true"] .im-synth__val { color: var(--im-danger); }
+
+.im-synth__val {
+  display: block;
+  font-family: var(--im-display);
+  font-size: clamp(1.35rem, 3vw, 1.7rem);
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--im-fg);
+}
+.im-synth__lib {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.76rem;
   color: var(--im-fg-muted);
 }
 
-@media (max-width: 1000px) {
-  .im-tour { --tour-x: 17; --tour-y: 25; --tour-w: 30; --tour-h: 46; }
+.im-synth__note {
+  padding: clamp(13px, 1.6vw, 16px) clamp(16px, 2vw, 22px);
+  border-top: 1px solid var(--im-rule);
+  font-size: 0.79rem;
+  line-height: 1.5;
+  color: var(--im-fg-muted);
 }
-@media (max-width: 640px) {
-  .im-tour { height: 220vh; --tour-x: 25; --tour-y: 17; --tour-w: 46; --tour-h: 27; }
-}
+.im-synth__note a { color: var(--im-rose-ink); text-decoration: underline; text-underline-offset: 3px; }
 
-/* Sans animation, ou si le script ne tourne pas : les quatre photos
-   s'affichent en grille. Le contenu reste accessible dans tous les cas. */
-.im-tour[data-static="true"] { height: auto; }
-.im-tour[data-static="true"] .im-tour__stage {
-  position: static;
+/* ============================================================
+   BANDEAU D'ALERTE DU TABLEAU DE BORD
+   Portage du composant « Banner ». Repris : bandeau collant en
+   haut, hauteur animée, fermeture mémorisée.
+   Écarté : la variante arc-en-ciel, ses quatre dégradés fluo et
+   son `mix-blend-mode: difference` n'ont rien à voir avec la
+   charte, et un tableau de bord n'a pas à clignoter.
+
+   Il ne s'affiche que s'il y a quelque chose à faire. Un bandeau
+   permanent devient invisible au bout d'une semaine.
+   ============================================================ */
+
+.im-alerte {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 13px clamp(44px, 6vw, 60px);
+  border-bottom: 1px solid var(--im-rule-2);
+  background: var(--im-bg-2);
+  font-size: 0.88rem;
+  line-height: 1.4;
+  text-align: center;
+  color: var(--im-fg);
+  transition: height 0.3s var(--im-ease), opacity 0.3s var(--im-ease);
+}
+.im-alerte[hidden] { display: none; }
+
+/* Rouge seulement pour ce qui doit être fait aujourd'hui. */
+.im-alerte[data-ton="urgent"] {
+  border-bottom-color: var(--im-danger);
+  background: var(--im-glass);
+}
+.im-alerte[data-ton="urgent"] strong { color: var(--im-danger); }
+.im-alerte strong { font-weight: 600; color: var(--im-fg); }
+
+.im-alerte__fermer {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--im-gap);
-  height: auto;
-  max-width: var(--im-maxw);
-  margin-inline: auto;
-  padding: 0 var(--im-page-x) clamp(30px, 5vw, 60px);
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--im-fg-muted);
+  cursor: pointer;
 }
-.im-tour[data-static="true"] .im-tour__card {
-  position: static;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 4 / 5;
-  transform: none !important;
-  opacity: 1 !important;
-}
-.im-tour[data-static="true"] .im-tour__caption { display: none; }
+.im-alerte__fermer:hover { color: var(--im-fg); background: var(--im-glass-2); }
+.im-alerte__fermer svg { width: 15px; height: 15px; }
+
+/* ============================================================
+   RETOUR AU TOUCHER
+   Sur un écran tactile il n'y a pas de survol : sans état enfoncé,
+   taper un élément ne produit rien de visible avant le changement
+   d'écran, et la page paraît morte. Les boutons principaux ont déjà
+   leur `:active` ; voici les éléments tapables qui n'en avaient pas.
+   ============================================================ */
+
+.im-atouts__menu button:active .im-atout__nom { transform: scale(0.97); }
+.im-qr__q:active { opacity: 0.7; }
+.im-qr__onglet:active { transform: scale(0.96); }
+.im-cal__jour:active:not(:disabled) { transform: scale(0.92); }

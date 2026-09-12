@@ -17,8 +17,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/tokens.css?v=6a90ad66">
-<link rel="stylesheet" href="assets/css/base.css?v=6a90ad66">
-<link rel="stylesheet" href="assets/css/components.css?v=6a92e2f1">
+<link rel="stylesheet" href="assets/css/base.css?v=6a95cf3d">
+<link rel="stylesheet" href="assets/css/components.css?v=6a95eb7a">
+<link rel="stylesheet" href="assets/css/parcours.css?v=6a9462f7">
+<link rel="stylesheet" href="assets/css/faq.css?v=6aa51419">
+<link rel="stylesheet" href="assets/css/roue.css?v=6a95cba7">
+<link rel="stylesheet" href="assets/css/eclaircir.css?v=6a95cc27">
 </head>
 <body>
 
@@ -35,8 +39,8 @@
     </a>
     <nav class="im-nav" data-nav aria-label="Navigation principale">
       <ul>
+        <li><a href="index.html#parcours">Réserver</a></li>
         <li><a href="index.html" aria-current="page">La boutique</a></li>
-        <li><a href="index.html#packs">Packs</a></li>
         <li><a href="a-propos.html">À propos</a></li>
         <li><a href="contact.html">Contact</a></li>
       </ul>
@@ -67,8 +71,8 @@
       <img class="im-hero__logo im-anim" style="--i:0" src="assets/img/logo.png"
            alt="INTENSÉ'MANS Love Room" width="76" height="76">
 
-      <a class="im-pill im-anim" style="--i:1" href="#packs">
-        <span>Votre nuit est réservée</span>
+      <a class="im-pill im-anim" style="--i:1" href="#parcours">
+        <span>Le Mans · une suite privatisée pour deux</span>
         <span class="im-pill__rule" aria-hidden="true"></span>
         <span class="im-pill__chip" aria-hidden="true">
           <div><span><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8h9M9 4.5 12.5 8 9 11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8h9M9 4.5 12.5 8 9 11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
@@ -77,9 +81,12 @@
 
       <h1 class="im-anim" style="--i:2">
         Ce soir, derrière la porte,
-        <!-- Chaque mot du rotateur est un produit du catalogue :
-             l'animation sert la vente au lieu de décorer. -->
-        <span class="im-rotator" data-rotator data-rotator-delay="2600">
+        <!-- Formulation d'origine, rétablie : plus courte, elle tient en
+             deux lignes et laisse le mot qui défile porter l'image. La
+             version longue disait le bénéfice dans le titre, mais elle
+             débordait sur trois lignes et cassait le rythme. Le bénéfice
+             est descendu dans le chapô, où il a la place de respirer. -->
+        <span class="im-rotator" data-rotator data-rotator-delay="1700">
           <span>le champagne.</span>
           <span>les pétales.</span>
           <span>les bougies.</span>
@@ -89,23 +96,26 @@
       </h1>
 
       <p class="im-lead im-anim" style="--i:3">
-        Choisissez maintenant, payez en ligne, et tout sera installé dans la
-        suite avant que vous arriviez. Commandes jusqu’à 18 h la veille.
+        Une suite privatisée au Mans, balnéo deux places et lumière tamisée.
+        Dites-nous ce qui doit vous attendre dans la chambre : tout sera en
+        place avant que vous poussiez la porte.
       </p>
 
       <div class="im-hero__cta im-anim" style="--i:4">
         <span class="im-btn-frame">
-          <a class="im-btn im-btn--primary" href="#packs">Voir les attentions</a>
+          <a class="im-btn im-btn--primary" href="#parcours" data-voie-directe="a-reserver">
+            Réserver ma nuit
+          </a>
         </span>
-        <a class="im-btn im-btn--quiet" href="contact.html">
-          Une demande sur mesure
-          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3.5h12v9H2zM2 3.5l6 4.5 6-4.5" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        <a class="im-btn im-btn--quiet" href="#parcours" data-voie-directe="reserve">
+          J’ai déjà réservé, je personnalise
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8h10M9.5 4.5 13 8l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
       </div>
 
       <p class="im-hero__marks im-anim" style="--i:5">
         <span>Le Mans</span>
-        <span>Jacuzzi privatif</span>
+        <span>Balnéo privatif</span>
         <span>Arrivée autonome</span>
         <span>Discrétion totale</span>
       </p>
@@ -113,106 +123,433 @@
 
   </section>
 
-  <!-- --------------------------------------------- La visite -->
-  <!-- Quatre photos réelles du lieu qui se croisent, s'empilent,
-       puis la chambre s'ouvre en plein écran. Grille statique en
-       repli si l'animation est désactivée. -->
-  <section class="im-tour" data-tour aria-label="Visite de la Love Room">
-    <div class="im-tour__stage">
-      <figure class="im-tour__card" data-tour-card="tl">
-        <img src="assets/img/lieu/tour-douche.webp"
-             alt="La douche à l'italienne, colonne noire sur mur en marbre"
-             width="720" height="900" loading="lazy" decoding="async">
-      </figure>
-      <figure class="im-tour__card" data-tour-card="br">
-        <img src="assets/img/lieu/tour-salon.webp"
-             alt="Le coin salon de la chambre : fauteuils bouclette et tables basses dorées"
-             width="620" height="775" loading="lazy" decoding="async">
-      </figure>
-      <figure class="im-tour__card" data-tour-card="bl">
-        <img src="assets/img/lieu/tour-balneo.webp"
-             alt="Le balnéo deux places devant le mur en pierre ardoise"
-             width="980" height="1225" loading="lazy" decoding="async">
-      </figure>
-      <figure class="im-tour__card" data-tour-card="hero">
-        <!-- Deux cadrages : le portrait tant que la carte est petite, le
-             panoramique quand elle s'ouvre en plein écran. Sans ça, on
-             verrait une bande verticale étroite du lit. -->
-        <img class="im-tour__shot" src="assets/img/lieu/tour-lit.webp"
-             alt="Le lit king size, tête de lit capitonnée et enseigne lumineuse love"
-             width="700" height="875" loading="lazy" decoding="async">
-        <img class="im-tour__shot" data-tour-wide src="assets/img/lieu/hero-chambre.webp"
-             alt="" aria-hidden="true"
-             width="2048" height="1152" loading="lazy" decoding="async">
-        <figcaption class="im-tour__caption">
-          <p>Et derrière la porte, la chambre qui vous attend.</p>
-          <span>Balnéo deux places · Douche à l’italienne · Lit king size</span>
-        </figcaption>
-      </figure>
+  <!-- --------------------------------------- Ce qui est compris -->
+  <!-- Les trois points forts de la suite. Ils sont compris dans la
+       nuit : la distinction avec les attentions payantes plus bas
+       doit être immédiate, d'où le « déjà » et la ligne sous le titre. -->
+  <section class="im-atouts" aria-labelledby="atouts-titre" data-atouts>
+    <h2 class="im-sr" id="atouts-titre">Ce qui vous attend déjà</h2>
+
+    <!-- Le menu : un bouton par atout, l'actif en plein, les autres en
+         contour. Le survol suffit à la souris, le clic et le clavier
+         prennent le relais au doigt. -->
+    <nav class="im-atouts__menu im-reveal" aria-label="Les atouts de la suite">
+      <ul>
+        <li>
+          <button type="button" data-atout="0" aria-pressed="true">
+            <span class="im-atout__num">01</span>
+            <span class="im-atout__nom">Douche<br>italienne</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" data-atout="1" aria-pressed="false">
+            <span class="im-atout__num">02</span>
+            <span class="im-atout__nom">Balnéo<br>deux places</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" data-atout="2" aria-pressed="false">
+            <span class="im-atout__num">03</span>
+            <span class="im-atout__nom">Lit<br>king size</span>
+          </button>
+        </li>
+      </ul>
+      <p class="im-atouts__note">
+        Compris dans votre nuit. Rien à ajouter, rien à demander.
+        <!-- Trois atouts sur la dizaine que compte la suite : celui
+             qui veut la liste complète, équipement intime inclus,
+             doit pouvoir y aller sans chercher l'onglet lui-même. -->
+        <a class="im-atouts__lien" href="#faq-equipement">Voir tout ce que contient la suite</a>
+      </p>
+    </nav>
+
+    <!-- La photo, découpée par l'un des trois masques. Les formes du
+         masque entrent en décalé, respirent, puis se retirent, et la
+         boucle reprend : tout est en CSS, aucune bibliothèque. -->
+    <div class="im-atouts__vue im-reveal">
+      <span class="im-atouts__halo" aria-hidden="true"></span>
+      <svg viewBox="0 0 500 500" role="img" aria-labelledby="atouts-photo-titre">
+        <title id="atouts-photo-titre" data-atout-titre>La douche à l’italienne</title>
+        <defs>
+          <clipPath id="im-clip-bandes">
+            <rect class="im-path" x="8"  y="30"  width="484" height="86" rx="10"/>
+            <rect class="im-path" x="8"  y="128" width="484" height="60" rx="10"/>
+            <rect class="im-path" x="8"  y="200" width="484" height="104" rx="10"/>
+            <rect class="im-path" x="8"  y="316" width="484" height="60" rx="10"/>
+            <rect class="im-path" x="8"  y="388" width="484" height="86" rx="10"/>
+          </clipPath>
+
+          <clipPath id="im-clip-mosaique">
+            <rect class="im-path" x="20"  y="20"  width="200" height="280" rx="12"/>
+            <rect class="im-path" x="20"  y="320" width="200" height="160" rx="12"/>
+            <rect class="im-path" x="240" y="20"  width="240" height="140" rx="12"/>
+            <rect class="im-path" x="240" y="180" width="110" height="160" rx="12"/>
+            <rect class="im-path" x="370" y="180" width="110" height="160" rx="12"/>
+            <rect class="im-path" x="240" y="360" width="240" height="120" rx="12"/>
+          </clipPath>
+
+          <clipPath id="im-clip-carres">
+            <rect class="im-path" x="20"  y="20"  width="140" height="140" rx="4"/>
+            <rect class="im-path" x="180" y="20"  width="140" height="140" rx="4"/>
+            <rect class="im-path" x="340" y="20"  width="140" height="140" rx="4"/>
+            <rect class="im-path" x="20"  y="180" width="140" height="140" rx="4"/>
+            <rect class="im-path" x="180" y="180" width="140" height="140" rx="4"/>
+            <rect class="im-path" x="340" y="180" width="140" height="140" rx="4"/>
+            <rect class="im-path" x="20"  y="340" width="140" height="140" rx="4"/>
+            <rect class="im-path" x="180" y="340" width="140" height="140" rx="4"/>
+            <rect class="im-path" x="340" y="340" width="140" height="140" rx="4"/>
+          </clipPath>
+        </defs>
+
+        <g data-atout-groupe clip-path="url(#im-clip-bandes)">
+          <image data-atout-image href="assets/img/lieu/tour-douche.webp"
+                 width="500" height="500" preserveAspectRatio="xMidYMid slice"/>
+        </g>
+      </svg>
     </div>
   </section>
 
+  <!-- ------------------------------------------- Le parcours -->
+
+  <!-- --------------------------------------- Roue de bienvenue -->
+  <!-- Capture d'e-mail par le cadeau plutôt que par la promesse
+       d'une infolettre. Tout le monde gagne : c'est un cadeau de
+       bienvenue, pas un jeu-concours. -->
+  <section class="im-roue" data-roue aria-label="Une attention offerte">
+    <div class="im-shell">
+      <div class="im-roue__carte im-reveal">
+        <!-- La fumée : pas de photo, une turbulence fractale floutée et
+             teintée de rose pâle. Deux nappes de fréquences et de graines
+             différentes pour la profondeur, masquées en haut à droite. -->
+        <svg class="im-roue__fumee" viewBox="0 0 1200 420" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <defs>
+            <filter id="im-fumee-a" x="-25%" y="-25%" width="150%" height="150%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.0055 0.011" numOctaves="4" seed="9" result="n"/>
+              <feGaussianBlur in="n" stdDeviation="14" result="s"/>
+              <feColorMatrix in="s" type="matrix"
+                values="0 0 0 0 0.851
+                        0 0 0 0 0.545
+                        0 0 0 0 0.533
+                        1.1 0.7 0.35 0 -0.52"/>
+            </filter>
+            <filter id="im-fumee-b" x="-25%" y="-25%" width="150%" height="150%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.011 0.02" numOctaves="3" seed="23" result="n"/>
+              <feGaussianBlur in="n" stdDeviation="7" result="s"/>
+              <feColorMatrix in="s" type="matrix"
+                values="0 0 0 0 0.925
+                        0 0 0 0 0.706
+                        0 0 0 0 0.694
+                        1.0 0.6 0.3 0 -0.58"/>
+            </filter>
+            <radialGradient id="im-fumee-forme" cx="0.74" cy="0.06" r="0.92">
+              <stop offset="0%"   stop-color="#fff" stop-opacity="1"/>
+              <stop offset="38%"  stop-color="#fff" stop-opacity="0.62"/>
+              <stop offset="72%"  stop-color="#fff" stop-opacity="0.2"/>
+              <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+            </radialGradient>
+            <mask id="im-fumee-masque">
+              <rect width="1200" height="420" fill="url(#im-fumee-forme)"/>
+            </mask>
+          </defs>
+          <g mask="url(#im-fumee-masque)">
+            <rect width="1200" height="420" filter="url(#im-fumee-a)"/>
+            <rect width="1200" height="420" filter="url(#im-fumee-b)" opacity="0.55"/>
+          </g>
+        </svg>
+        <div class="im-roue__corps"></div>
+      </div>
+    </div>
+  </section>
+
+
+
+  <section class="im-pc im-reveal" id="parcours" data-parcours aria-label="Commander votre séjour"></section>
 
   <!-- --------------------------------------------- La boutique -->
-  <div data-render="catalogue"></div>
 
   <!-- --------------------------------------------------- Rappel -->
-  <section class="im-section im-section--tight">
-    <div class="im-shell">
-      <dl class="im-assure">
-        <div>
-          <dt>Installé avant votre arrivée</dt>
-          <dd>Vous poussez la porte, tout est déjà en place.</dd>
-        </div>
-        <div>
-          <dt>Jusqu’à 18 h la veille</dt>
-          <dd>Le délai nécessaire pour tout préparer comme il faut.</dd>
-        </div>
-        <div>
-          <dt>Paiement sécurisé</dt>
-          <dd>Carte bancaire, Apple&nbsp;Pay, Google&nbsp;Pay.</dd>
-        </div>
-        <div>
-          <dt>Discrétion totale</dt>
-          <dd>Aucun contact sur place, aucune mention visible.</dd>
-        </div>
-      </dl>
-    </div>
-  </section>
 
   <!-- ------------------------------------------------------- FAQ -->
-  <section class="im-section im-section--tight">
+  <section class="im-section im-section--tight im-qr" id="faq" data-qr>
     <div class="im-shell">
-      <div class="im-head im-head--row">
-        <div>
-          <span class="im-eyebrow">Questions fréquentes</span>
-          <h2>Ce qu’il faut savoir avant de commander.</h2>
-        </div>
+      <div class="im-qr__tete im-reveal">
+        <span class="im-qr__halo" aria-hidden="true"></span>
+        <span class="im-eyebrow im-qr__sur">Questions fréquentes</span>
+        <h2>Ce qu’il faut savoir avant de commander.</h2>
       </div>
-      <div class="im-faq">
-        <div>
-          <h3>Jusqu’à quand puis-je commander ?</h3>
-          <div class="im-faq__body"><p>Jusqu’à 18 h la veille de votre arrivée. Passé ce délai, nous ne pouvons plus garantir la préparation. Pour une demande de dernière minute, écrivez-nous : on fait au mieux.</p></div>
+
+      <div class="im-qr__onglets im-reveal" role="tablist" aria-label="Catégories de questions">
+        <button class="im-qr__onglet" type="button" role="tab" id="qr-o-commande" aria-controls="qr-p-commande" aria-selected="true"><span>Commander</span></button>
+        <button class="im-qr__onglet" type="button" role="tab" id="qr-o-place" aria-controls="qr-p-place" aria-selected="false"><span>Sur place</span></button>
+        <button class="im-qr__onglet" type="button" role="tab" id="qr-o-equipement" aria-controls="qr-p-equipement" aria-selected="false"><span>Équipement</span></button>
+        <button class="im-qr__onglet" type="button" role="tab" id="qr-o-discretion" aria-controls="qr-p-discretion" aria-selected="false"><span>Discrétion</span></button>
+        <button class="im-qr__onglet" type="button" role="tab" id="qr-o-paiement" aria-controls="qr-p-paiement" aria-selected="false"><span>Paiement et imprévus</span></button>
+      </div>
+
+      <div class="im-qr__panneaux im-reveal">
+        <div class="im-qr__panneau" role="tabpanel" id="qr-p-commande" aria-labelledby="qr-o-commande" tabindex="0">
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-1">
+                <span>Jusqu’à quand puis-je commander ?</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-1">
+              <div><p>Jusqu’à 18 h la veille de votre arrivée. Passé ce délai, nous ne pouvons plus garantir la préparation : certains produits sont achetés frais le matin même. Pour une demande de dernière minute, <a href="contact.html">écrivez-nous</a> : on fait au mieux.</p></div>
+            </div>
+          </div>
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-2">
+                <span>Puis-je ajouter quelque chose après avoir payé ?</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-2">
+              <div><p>Oui. Repassez simplement une commande au même nom et à la même date, tant que le délai de 18 h la veille n’est pas dépassé. Les deux commandes sont regroupées dans la suite : vous ne recevez rien en double.</p></div>
+            </div>
+          </div>
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-3">
+                <span>Les packs sont-ils plus intéressants qu’à l’unité ?</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-3">
+              <div><p>Oui. Un pack rassemble plusieurs attentions à un tarif inférieur à la somme des mêmes articles pris séparément. Vous pouvez tout de même compléter un pack avec un article seul.</p></div>
+            </div>
+          </div>
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-4">
+                <span>Je n’ai pas encore réservé la nuit. C’est possible ici ?</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-4">
+              <div><p>Oui. <a href="#parcours">Le parcours de commande</a> commence justement par cette question : si la nuit n’est pas réservée, vous choisissez votre date, puis vous ajoutez vos attentions dans la foulée. Un seul paiement pour l’ensemble.</p></div>
+            </div>
+          </div>
         </div>
-        <div>
-          <h3>Où mes attentions seront-elles installées ?</h3>
-          <div class="im-faq__body"><p>Dans la suite, avant votre arrivée. Vous ne croisez personne : tout est en place quand vous ouvrez la porte.</p></div>
+        <div class="im-qr__panneau" role="tabpanel" id="qr-p-place" aria-labelledby="qr-o-place" tabindex="0">
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-5">
+                <span>Où mes attentions seront-elles installées ?</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-5">
+              <div><p>Dans la suite, avant votre arrivée. Vous ne croisez personne : tout est en place quand vous ouvrez la porte.</p></div>
+            </div>
+          </div>
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-6">
+                <span>Dois-je être présent à un moment précis ?</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-6">
+              <div><p>Non. Il n’y a ni livreur, ni remise en main propre, ni créneau à respecter. La préparation est faite avant l’heure d’arrivée indiquée sur votre réservation.</p></div>
+            </div>
+          </div>
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-7">
+                <span>Le champagne sera-t-il frais ?</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-7">
+              <div><p>Oui. Les bouteilles sont mises au frais en amont et vous trouverez le seau et les flûtes préparés à côté.</p></div>
+            </div>
+          </div>
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-8">
+                <span>Et si nous arrivons plus tard que prévu ?</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-8">
+              <div><p>Rien ne bouge. Les produits frais sont placés au réfrigérateur de la suite et le reste vous attend en place. Prévenez-nous simplement si le décalage est important.</p></div>
+            </div>
+          </div>
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-16">
+                <span>Combien de verres trouverons-nous ?</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-16">
+              <div><p>Quatre flûtes et quatre verres sont à votre disposition dans la suite. Rien à demander, rien à apporter.</p></div>
+            </div>
+          </div>
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-17">
+                <span>Qu’y a-t-il dans la suite ?</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-17">
+              <div><p>Douche italienne, balnéo deux places, lit king size, vidéoprojecteur, télévision connectée et barre de son. La suite comporte également un équipement plus intime : un fauteuil tantra, une croix de Saint-André avec ses attaches, des menottes et une cravache. Les accessoires mobiles sont rangés dans un coffret fermé ; vous choisissez au moment de réserver s’ils y restent ou s’ils sont sortis et installés. Le mobilier, lui, reste en place.</p></div>
+            </div>
+          </div>
         </div>
-        <div>
-          <h3>Je prépare une surprise. C’est discret ?</h3>
-          <div class="im-faq__body"><p>Entièrement. Vous laissez un message personnalisé au moment de la commande et nous adaptons la mise en scène. Rien n’est dit, rien n’est envoyé à la personne concernée.</p></div>
+        <!-- L'équipement intime était détaillé sur une page dédiée,
+             supprimée. L'information ne l'est pas : annoncer avant
+             l'arrivée ce que contient la chambre évite qu'un couple
+             le découvre en poussant la porte. -->
+        <div class="im-qr__panneau" role="tabpanel" id="qr-p-equipement" aria-labelledby="qr-o-equipement" tabindex="0">
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-e1">
+                <span>Qu’y a-t-il exactement dans la chambre ?</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-e1">
+              <div>
+                <p>Un lit king size avec literie haut de gamme, une douche à l’italienne, un balnéo deux places privatif, un vidéoprojecteur, une télévision connectée et une barre de son. Le tout est compris dans la nuit.</p>
+                <figure class="im-qr__vue">
+                  <img src="assets/img/lieu/equipement-coin.webp"
+                       alt="Deux peignoirs suspendus, des serviettes roulées et le fauteuil tantra de la suite"
+                       width="886" height="1107" loading="lazy" decoding="async">
+                  <figcaption>Peignoirs et linge, déjà en place à votre arrivée.</figcaption>
+                </figure>
+              </div>
+            </div>
+          </div>
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-e2">
+                <span>Et l’équipement plus intime ?</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-e2">
+              <div>
+                <p>Un côté de la chambre est aménagé pour ceux qui souhaitent aller plus loin : un fauteuil tantra, une croix de Saint-André sur socle avec ses attaches réglables aux poignets et aux chevilles, des menottes fixées au lit, une paire de menottes libre avec sa clé, un fouet et une cravache. Tout est compris dans la nuit, il n’y a rien à commander.</p>
+                <!-- La montrer plutôt que la décrire. Cet onglet ne s'ouvre
+                     qu'à la demande : personne ne tombe dessus par accident,
+                     et celui qui pose la question mérite une réponse nette. -->
+                <figure class="im-qr__vue">
+                  <img src="assets/img/lieu/equipement-croix.webp"
+                       alt="La croix de Saint-André de la suite, posée sur son socle, avec ses attaches rembourrées aux poignets et aux chevilles"
+                       width="1000" height="1250" loading="lazy" decoding="async">
+                  <figcaption>La croix, dans son coin de la chambre.</figcaption>
+                </figure>
+              </div>
+            </div>
+          </div>
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-e3">
+                <span>Et si nous n’en voulons pas ?</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-e3">
+              <div><p>Rien n’est imposé. Les accessoires mobiles (menottes, cravache, fouet) sont rangés dans un coffret fermé par défaut : vous ne les voyez pas. Au moment de réserver, une question vous demande simplement si vous préférez qu’ils y restent ou qu’ils soient sortis et installés. Un clic suffit, il n’y a rien à expliquer. Le fauteuil et la croix, eux, font partie du mobilier de la chambre : ils restent en place, sobres et sans accessoire apparent.</p></div>
+            </div>
+          </div>
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-e4">
+                <span>Est-ce nettoyé entre deux séjours ?</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-e4">
+              <div><p>Oui, systématiquement, avec un produit désinfectant adapté aux surfaces concernées. Le linge est changé après chaque séjour. Les accessoires qui ne se désinfectent pas ne sont pas remis en service.</p></div>
+            </div>
+          </div>
         </div>
-        <div>
-          <h3>Les packs sont-ils plus intéressants qu’à l’unité ?</h3>
-          <div class="im-faq__body"><p>Oui. Un pack combine plusieurs attentions à un tarif inférieur à la somme des mêmes articles pris séparément.</p></div>
+        <div class="im-qr__panneau" role="tabpanel" id="qr-p-discretion" aria-labelledby="qr-o-discretion" tabindex="0">
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-9">
+                <span>Je prépare une surprise. C’est vraiment discret ?</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-9">
+              <div><p>Entièrement. Vous laissez un message personnalisé au moment de la commande et nous adaptons la mise en scène. Rien n’est dit, rien n’est envoyé à la personne concernée : la confirmation part uniquement sur votre adresse.</p></div>
+            </div>
+          </div>
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-10">
+                <span>Qu’est-ce qui apparaît sur mon relevé bancaire ?</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-10">
+              <div><p>Un libellé neutre, sans mention du contenu de la commande ni du type d’hébergement.</p></div>
+            </div>
+          </div>
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-11">
+                <span>Que devenez-vous de mes informations ?</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-11">
+              <div><p>Elles servent à préparer votre séjour, rien d’autre. Aucune revente, aucun partage commercial. Vous pouvez demander leur suppression à tout moment ; le détail figure dans <a href="confidentialite.html">la politique de confidentialité</a>.</p></div>
+            </div>
+          </div>
         </div>
-        <div>
-          <h3>Et si mon séjour est déplacé ?</h3>
-          <div class="im-faq__body"><p>Prévenez-nous au plus tard 48 h avant la date prévue : nous reportons votre commande sur vos nouvelles dates, sans frais.</p></div>
-        </div>
-        <div>
-          <h3>Comment se passe le paiement ?</h3>
-          <div class="im-faq__body"><p>En ligne, au moment de la commande, par carte bancaire, Apple Pay ou Google Pay. Le libellé sur votre relevé ne mentionne rien d’explicite.</p></div>
+        <div class="im-qr__panneau" role="tabpanel" id="qr-p-paiement" aria-labelledby="qr-o-paiement" tabindex="0">
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-12">
+                <span>Comment se passe le paiement ?</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-12">
+              <div><p>En ligne, au moment de la commande, par carte bancaire, Apple Pay ou Google Pay. Le paiement est traité par Stripe : nous ne voyons à aucun moment vos coordonnées bancaires.</p></div>
+            </div>
+          </div>
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-13">
+                <span>Et si mon séjour est déplacé ?</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-13">
+              <div><p>Prévenez-nous au plus tard 48 h avant la date prévue : nous reportons votre commande sur vos nouvelles dates, sans frais.</p></div>
+            </div>
+          </div>
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-14">
+                <span>Puis-je annuler ma commande ?</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-14">
+              <div><p>Jusqu’à 48 h avant votre arrivée, oui, ou nous la reportons. Au-delà, les produits sont déjà achetés et la préparation lancée : <a href="contact.html">écrivez-nous</a> et nous cherchons une solution. Les conditions complètes sont dans <a href="cgv.html">les CGV</a>.</p></div>
+            </div>
+          </div>
+          <div class="im-qr__item" data-ouvert="false">
+            <h3>
+              <button class="im-qr__q" type="button" aria-expanded="false" aria-controls="qr-r-15">
+                <span>Ma question n’est pas dans la liste.</span>
+                <svg class="im-qr__plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              </button>
+            </h3>
+            <div class="im-qr__r" id="qr-r-15">
+              <div><p>Écrivez-nous depuis <a href="contact.html">la page contact</a>. Nous répondons dans la journée, et les demandes sur mesure ne nous font pas peur.</p></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -233,10 +570,8 @@
         <div>
           <h3>La boutique</h3>
           <ul>
-            <li><a href="index.html#packs">Nos packs</a></li>
-            <li><a href="index.html#deguster">À déguster</a></li>
-            <li><a href="index.html#decorer">À décorer</a></li>
-            <li><a href="index.html#attentions">Petites attentions</a></li>
+            <li><a href="index.html#parcours">Réserver et composer</a></li>
+            <li><a href="index.html#parcours">Nos disponibilités</a></li>
             <li><a href="contact.html">Une demande sur mesure</a></li>
           </ul>
         </div>
@@ -244,10 +579,10 @@
           <h3>Informations</h3>
           <ul>
             <li><a href="a-propos.html">À propos</a></li>
-            <li><a href="#">Mentions légales</a></li>
-            <li><a href="#">Conditions générales de vente</a></li>
-            <li><a href="#">Confidentialité et cookies</a></li>
-            <li><a href="#">Remboursement</a></li>
+            <li><a href="mentions-legales.html">Mentions légales</a></li>
+            <li><a href="cgv.html">Conditions générales de vente</a></li>
+            <li><a href="confidentialite.html">Confidentialité et cookies</a></li>
+            <li><a href="cgv.html#annulation">Annulation et remboursement</a></li>
           </ul>
         </div>
       </div>
@@ -264,11 +599,20 @@
   </div>
 </footer>
 
-<script src="assets/js/products-images.js?v=6a92e13d"></script>
-<script src="assets/js/products.js?v=6a90b6b8"></script>
-<script src="assets/js/cart.js?v=6a92e29f"></script>
-<script src="assets/js/orders.js?v=6a92e21a"></script>
-<script src="assets/js/app.js?v=6a92e286"></script>
+<script src="assets/js/products-images.js?v=6aa513db"></script>
+<script src="assets/js/products.js?v=6a94422c"></script>
+<script src="assets/js/cart.js?v=6a94422c"></script>
+<script src="assets/js/orders.js?v=6a94643f"></script>
+<script src="assets/js/app.js?v=6a95ec27"></script>
+<script src="assets/js/rates-public.js?v=6a944785"></script>
+<script src="assets/js/calendrier.js?v=6aa516ff"></script>
+<script src="assets/js/parcours.js?v=6aa54f67"></script>
+<script src="assets/js/faq.js?v=6a948c3c"></script>
+<script src="assets/js/roue.js?v=6aa54f7e"></script>
+<!-- Mesure d'audience Vercel. Sans cookie et sans identifiant
+     persistant : aucun bandeau de consentement n'est requis, et
+     rien de ce fichier ne fonctionne hors de Vercel. -->
+<script defer src="/_vercel/insights/script.js"></script>
 <script>document.getElementById('im-year').textContent = new Date().getFullYear();</script>
 </body>
 </html>

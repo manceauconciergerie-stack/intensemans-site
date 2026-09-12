@@ -9,11 +9,11 @@
    ============================================================ */
 
 export const CATALOG = Object.freeze({
-  "pack-intense": {"name":"Pack Intense","price":89,"alcohol":true,"adult":true},
-  "pack-planche-champagne": {"name":"Pack Planche & Champagne","price":69,"alcohol":true,"adult":false},
-  "pack-planche-vin": {"name":"Pack Planche & Vin","price":49,"alcohol":true,"adult":false},
-  "pack-double-bulles": {"name":"Pack Double Bulles","price":79,"alcohol":true,"adult":false},
-  "pack-anniversaire": {"name":"Pack Anniversaire","price":79,"alcohol":true,"adult":false},
+  "pack-essentiel": {"name":"L’Essentiel","price":39,"alcohol":true,"adult":false},
+  "pack-planche-champagne": {"name":"Le Champagne","price":69,"alcohol":true,"adult":false},
+  "pack-intense": {"name":"L’Intense","price":89,"alcohol":true,"adult":true},
+  "pack-double-bulles": {"name":"Une seconde bouteille","price":35,"alcohol":true,"adult":false},
+  "pack-anniversaire": {"name":"Anniversaire","price":79,"alcohol":true,"adult":false},
   "champagne-bouteille": {"name":"Bouteille de champagne","price":45,"alcohol":true,"adult":false},
   "planche-apero": {"name":"Planche apéritive","price":34,"alcohol":false,"adult":false},
   "vin-bouteille": {"name":"Bouteille de vin","price":24,"alcohol":true,"adult":false},

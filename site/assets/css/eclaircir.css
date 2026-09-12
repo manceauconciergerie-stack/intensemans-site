@@ -1,0 +1,78 @@
+/* ============================================================
+   INTENSÉ'MANS — Couche d'éclaircissement
+   ------------------------------------------------------------
+   Chargée en dernier. Deux raisons :
+
+   1. Le noir occupait toute la page et rien ne se détachait.
+      Cette couche relève les surfaces, les filets et les textes
+      secondaires sans toucher à la palette de base.
+
+   2. components.css est réécrit par plusieurs sessions et les
+      corrections y disparaissent. Ici, elles tiennent.
+
+   Ne rien mettre d'autre ici que des réglages de clarté.
+   ============================================================ */
+
+:root {
+  /* Filets plus francs : c'est le premier levier pour qu'une carte
+     se détache d'un fond sombre. */
+  --im-rule:   rgba(246, 236, 228, 0.2);
+  --im-rule-2: rgba(246, 236, 228, 0.36);
+  /* Le gris atténué remonte : il servait à des textes qu'on ne lisait plus. */
+  --im-fg-muted: #b3a49b;
+  /* Arête haute des surfaces. */
+  --im-edge: rgba(255, 255, 255, 0.1);
+}
+
+/* ------------------------------------------------------------
+   Section « atouts » — les titres inactifs étaient tracés en brun
+   sombre sur noir, donc invisibles. Contour crème et opacité
+   remontée : on lit les trois atouts d'un coup d'œil.
+   ------------------------------------------------------------ */
+
+.im-atout__nom {
+  -webkit-text-stroke-color: rgba(246, 236, 228, 0.55);
+}
+.im-atouts__menu button[aria-pressed="false"] { opacity: 0.9; }
+/* Même garde que dans components.css : sur tactile, `:hover` reste
+   collé après le tap et l'effet ne s'en va plus. */
+@media (hover: hover) {
+  .im-atouts__menu button[aria-pressed="false"]:hover {
+    opacity: 1;
+  }
+  .im-atouts__menu button[aria-pressed="false"]:hover .im-atout__nom {
+    -webkit-text-stroke-color: var(--im-fg);
+  }
+}
+.im-atout__num { color: var(--im-brass); }
+.im-atouts__note { color: var(--im-fg-soft); }
+
+/* ------------------------------------------------------------
+   Surfaces générales : un cran plus clair, arête haute éclairée.
+   ------------------------------------------------------------ */
+
+.im-summary,
+.im-empty,
+.im-bump,
+.im-notif,
+.im-note {
+  background: var(--im-bg-3);
+  box-shadow: var(--im-shadow), inset 0 1px 0 var(--im-edge);
+}
+
+.im-field input,
+.im-field select,
+.im-field textarea {
+  background: var(--im-bg-3);
+  border-color: var(--im-rule-2);
+}
+
+/* Le pied de page ne doit pas être un trou noir en fin de course. */
+.im-footer { background: var(--im-bg-2); }
+.im-footer a { color: var(--im-fg-soft); }
+
+/* Textes secondaires : moins de gris, plus de crème. */
+.im-quiet,
+.im-field__help,
+.im-summary__legal,
+.im-card__desc { color: var(--im-fg-soft); }

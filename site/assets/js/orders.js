@@ -12,7 +12,6 @@
    ============================================================ */
 
 const IMOrders = (() => {
-  const SECRET = 'im_preparer_secret';
   const ENDPOINT = '/api/orders';
   const listeners = new Set();
 
@@ -22,14 +21,38 @@ const IMOrders = (() => {
     listeners.forEach((fn) => fn(cache));
   }
 
-  function secret() {
-    try { return localStorage.getItem(SECRET) || ''; } catch (e) { return ''; }
+  /* Il n'y a rien à envoyer ici : la session vit dans un cookie
+     HttpOnly que le navigateur joint tout seul, et que le JavaScript
+     de la page ne peut ni lire ni recopier ailleurs. Un mot de passe
+     gardé en localStorage, lui, se volait avec une seule injection. */
+
+  /* Les adresses collectées par la roue. Elles dormaient dans la base
+     sans aucun écran pour les lire : il fallait ouvrir la console
+     Upstash. Même session que le tableau. */
+  async function cadeaux() {
+    const res = await fetch('/api/cadeaux');
+    /* Refus d'accès et liste vide sont deux choses différentes :
+       renvoyer [] dans les deux cas ferait afficher « aucune adresse »
+       à qui n'est pas connecté, ce qui est un mensonge. */
+    if (res.status === 401 || res.status === 429) {
+      const err = new Error('Accès refusé');
+      err.code = res.status;
+      throw err;
+    }
+    if (!res.ok) return [];
+    const data = await res.json().catch(() => ({}));
+    return data.cadeaux || [];
+  }
+
+  async function synthese() {
+    const res = await fetch('/api/synthese');
+    return res.ok ? res.json().catch(() => null) : null;
   }
 
   async function call(method, body) {
     const res = await fetch(ENDPOINT, {
       method,
-      headers: { 'content-type': 'application/json', 'x-preparer-secret': secret() },
+      headers: { 'content-type': 'application/json' },
       body: body ? JSON.stringify(body) : undefined
     });
 
@@ -57,6 +80,8 @@ const IMOrders = (() => {
   }
 
   const api = {
+    synthese,
+    cadeaux,
     /* Le serveur renvoie déjà les commandes triées par date de séjour
        puis par heure d'arrivée : l'ordre de préparation de la journée. */
     all() {
@@ -67,18 +92,21 @@ const IMOrders = (() => {
       return call('GET');
     },
 
-    hasSecret() {
-      return Boolean(secret());
+    /* Demande d'un lien de connexion. Le serveur répond toujours la
+       même chose, adresse autorisée ou non : sinon la page dirait à
+       un curieux quelle adresse administre le site. */
+    demanderLien(email) {
+      return fetch('/api/connexion', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: String(email || '').trim() })
+      });
     },
 
-    setSecret(value) {
-      try { localStorage.setItem(SECRET, String(value || '').trim()); } catch (e) { /* mode privé */ }
-    },
-
-    forgetSecret() {
-      try { localStorage.removeItem(SECRET); } catch (e) { /* mode privé */ }
+    deconnecter() {
       cache = [];
       notify();
+      return fetch('/api/connexion', { method: 'DELETE' });
     },
 
     onChange(fn) {
@@ -123,6 +151,11 @@ const IMOrders = (() => {
 
     /* Urgence : elle pilote la couleur du liseré de chaque ligne. */
     tone(order) {
+      /* Une arrivée trop proche pour être garantie disponible attend
+         un feu vert de l'hôte. Tant qu'il ne l'a pas donné, elle
+         passe avant tout le reste, même une arrivée du soir même :
+         la préparer ne sert à rien si la nuit doit être remboursée. */
+      if (order.status === 'a-confirmer') return 'danger';
       if (order.prepared) return 'success';
       const d = daysUntil(order.stay.date);
       if (d === null) return 'default';

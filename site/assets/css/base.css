@@ -32,8 +32,16 @@ body::after {
   z-index: var(--z-toast);
   pointer-events: none;
   opacity: 0.05;
-  mix-blend-mode: overlay;
+  /* `overlay` fonce et réchauffe ce qui est clair : sur les grandes
+     lettres crème des atouts, il virait au brun et laissait voir les
+     raccords de la tuile de 180 px. `soft-light` agit beaucoup plus
+     doucement sur les zones claires. */
+  mix-blend-mode: soft-light;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (max-width: 900px) {
+  body::after { display: none; }
 }
 
 img, svg, video { display: block; max-width: 100%; }
@@ -148,10 +156,14 @@ p:last-child { margin-bottom: 0; }
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--im-brass-line), transparent);
 }
+/* Le losange : le glyphe ❤︎ du HTML sert de repli sans CSS, mais il
+   ne doit pas s'afficher ici. `text-indent: -99em` le déportait de
+   1584 px et gonflait la largeur défilable de la page. `font-size: 0`
+   le fait disparaître sans rien déplacer. */
 .im-flourish span {
   width: 5px; height: 5px;
-  overflow: hidden;
-  text-indent: -99em;
+  font-size: 0;
+  line-height: 0;
   background: var(--im-brass-line);
   transform: rotate(45deg);
 }
@@ -180,8 +192,14 @@ p:last-child { margin-bottom: 0; }
 .im-head--row { max-width: 52ch; margin-bottom: clamp(26px, 3.2vw, 42px); }
 .im-head--row h2 { font-size: clamp(1.55rem, 2.8vw, 2.2rem); }
 
-/* Halo rose diffus derrière une section, pour éviter les aplats morts. */
-.im-glow { position: relative; isolation: isolate; }
+/* Halo rose diffus derrière une section, pour éviter les aplats morts.
+
+   `overflow: hidden` n'est pas décoratif : le halo déborde de 20 %
+   de chaque côté (son `inset`), et sans rognage il portait la
+   largeur de la page à 450 px sur un écran de 375. Sur iOS, ce
+   surplus se traduisait par une page qu'on pouvait faire glisser
+   latéralement, l'en-tête paraissant « poussé à gauche ». */
+.im-glow { position: relative; isolation: isolate; overflow: hidden; }
 .im-glow::before {
   content: "";
   position: absolute;
@@ -218,11 +236,23 @@ p:last-child { margin-bottom: 0; }
 }
 .im-reveal.is-in { opacity: 1; transform: none; }
 
+/* « Réduire les animations » vise le MOUVEMENT — déplacements,
+   parallaxe, rotations — parce qu'il déclenche des troubles
+   vestibulaires. Il ne vise pas le simple fondu, que les
+   recommandations donnent au contraire comme le remplacement à
+   privilégier.
+
+   La règle habituelle (`transition-duration: 0.01ms` sur tout)
+   supprime aussi les fondus : les images changeaient d'un coup,
+   sans transition, ce qui donne un site cassé plutôt qu'apaisé.
+   On ne garde donc que l'opacité, et on coupe le reste. */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .im-reveal { opacity: 1; transform: none; transition: none; }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-property: opacity !important;
+    transition-duration: 0.28s !important;
   }
 }

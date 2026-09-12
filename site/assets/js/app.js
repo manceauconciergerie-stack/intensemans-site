@@ -100,7 +100,7 @@
           </details>
 
           <div class="im-card__foot">
-            <span class="im-price im-card__price">${IM.euro(p.price)}</span>
+            ${prix(p)}
             ${qty
               ? `<div class="im-qty im-qty--sm">
                    <button type="button" data-line-minus="${p.id}" aria-label="Retirer une unité de ${esc(p.name)}">−</button>
@@ -155,10 +155,21 @@
     toastTimer = setTimeout(() => toastEl.setAttribute('data-show', 'false'), 4200);
   }
 
+  /* Le prix, et ce que les mêmes articles coûteraient séparément.
+     L'économie affichée vaut mieux qu'un argument : le client la
+     calcule tout seul, et plus vite que nous. */
+  function prix(p) {
+    const economie = (typeof p.value === 'number' && p.value > p.price)
+      ? `<span class="im-card__valeur"><s>${IM.euro(p.value)}</s> séparément</span>` : '';
+    return `<span class="im-card__prix">
+      <span class="im-price im-card__price">${IM.euro(p.price)}</span>${economie}
+    </span>`;
+  }
+
   function footMarkup(p) {
     const qty = IMCart.qtyOf(p.id);
     return `
-      <span class="im-price im-card__price">${IM.euro(p.price)}</span>
+      ${prix(p)}
       ${qty
         ? `<div class="im-qty im-qty--sm">
              <button type="button" data-line-minus="${p.id}" aria-label="Retirer une unité de ${esc(p.name)}">−</button>
@@ -269,6 +280,121 @@
     }));
   }
 
+  /* ----------------------------------------------------------
+     Ce qui est compris
+     Un atout à la fois : le menu bascule la photo et le masque qui
+     la découpe. L'animation des formes est en CSS ; ici on se
+     contente de la relancer, en forçant un reflow entre le retrait
+     et la repose de la classe — sans quoi le navigateur regroupe
+     les deux et l'animation ne repart pas.
+     ---------------------------------------------------------- */
+
+  const ATOUTS = [
+    { img: 'lieu/tour-douche.webp', clip: 'im-clip-bandes',   titre: 'La douche à l’italienne' },
+    { img: 'lieu/tour-balneo.webp', clip: 'im-clip-mosaique', titre: 'Le balnéo deux places' },
+    { img: 'lieu/tour-lit.webp',    clip: 'im-clip-carres',   titre: 'Le lit king size' }
+  ];
+
+  function initAtouts() {
+    const host = $('[data-atouts]');
+    if (!host) return;
+
+    const boutons = $$('[data-atout]', host);
+    const groupe = $('[data-atout-groupe]', host);
+    const image = $('[data-atout-image]', host);
+    const titre = $('[data-atout-titre]', host);
+    if (!boutons.length || !groupe || !image) return;
+
+    let actif = 0;
+
+    /* L'instant où le masque de l'atout affiché a (re)démarré son
+       cycle : c'est la référence de phase du minuteur d'enchaînement. */
+    let ancre = performance.now();
+
+    const montrer = (i) => {
+      if (i === actif) return;
+      actif = i;
+      const a = ATOUTS[i];
+
+      boutons.forEach((b, n) => b.setAttribute('aria-pressed', String(n === i)));
+      image.setAttribute('href', `assets/img/${a.img}`);
+      groupe.setAttribute('clip-path', `url(#${a.clip})`);
+      if (titre) titre.textContent = a.titre;
+
+      /* Les formes du nouveau masque reprennent leur cycle au début,
+         sinon on les découvre au milieu de leur respiration. */
+      const formes = $$(`#${a.clip} .im-path`, host);
+      formes.forEach((f) => { f.style.animation = 'none'; });
+      void host.offsetWidth;
+      formes.forEach((f) => { f.style.animation = ''; });
+      ancre = performance.now();
+    };
+
+    boutons.forEach((b, i) => {
+      b.addEventListener('mouseenter', () => montrer(i));
+      b.addEventListener('focus', () => montrer(i));
+      b.addEventListener('click', () => montrer(i));
+    });
+
+    /* --- Enchaînement automatique, calé sur la phase du masque ---
+
+       Sur téléphone il n'y a pas de survol : sans ceci, la photo
+       restait figée sur la douche pour toujours.
+
+       Pas d'évènement d'animation ici : les formes vivent dans un
+       <clipPath>, un contexte que Safari ne rend pas directement, et
+       leurs évènements d'itération n'y sont pas fiables (constaté :
+       l'enchaînement ne partait jamais sur iPhone). On calcule donc
+       l'instant de bascule : chaque réarmement du masque pose une
+       ancre, le cycle dure 6,2 s, et les formes sont toutes refermées
+       de 74 % à 100 % du cycle. À 5,5 s de phase, l'écran est noir :
+       c'est là qu'on change de photo, hors champ. Le minuteur se
+       recale à chaque tour sur la phase réelle, donc il ne dérive pas,
+       et un tour raté (section hors écran, onglet caché) se retente
+       un cycle plus tard, toujours dans le noir. */
+    {
+      const CYCLE = 6200;
+      const FERME = 5500;
+      let enVue = false;
+      let manuel = false;
+      let reprise = null;
+      let prochain = null;
+
+      const caler = () => {
+        const phase = (performance.now() - ancre) % CYCLE;
+        let attente = FERME - phase;
+        while (attente < 200) attente += CYCLE;
+        clearTimeout(prochain);
+        prochain = setTimeout(avancer, attente);
+      };
+
+      const avancer = () => {
+        if (enVue && !manuel && !document.hidden) montrer((actif + 1) % ATOUTS.length);
+        caler();
+      };
+
+      /* Visibilité lue dans la boucle de trames, pour la même raison
+         que le rotateur : l'observateur est muet sur ce document. */
+      IMFrame.add(() => {
+        const h = window.innerHeight || document.documentElement.clientHeight;
+        const r = host.getBoundingClientRect();
+        enVue = r.top < h * 0.7 && r.bottom > h * 0.3;
+      });
+
+      /* Quand le visiteur prend la main (survol ou tap sur un bouton),
+         l'automatique s'efface, puis reprend après douze secondes sans
+         nouveau contact. Un arrêt définitif punirait un simple tap
+         curieux : la vitrine redeviendrait morte pour toute la visite. */
+      boutons.forEach((b) => b.addEventListener('pointerenter', () => {
+        manuel = true;
+        clearTimeout(reprise);
+        reprise = setTimeout(() => { manuel = false; }, 12000);
+      }));
+
+      caler();
+    }
+  }
+
   function initHeaderScroll() {
     const header = $('.im-header');
     if (!header) return;
@@ -357,20 +483,30 @@
   function initReveal() {
     const items = $$('.im-reveal');
     if (!items.length) return;
-    if (!('IntersectionObserver' in window)) {
-      items.forEach((el) => el.classList.add('is-in'));
-      return;
-    }
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-in');
-        io.unobserve(entry.target);
-      });
-    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+
     items.forEach((el, i) => {
       el.style.transitionDelay = `${Math.min(i % 4, 3) * 70}ms`;
-      io.observe(el);
+    });
+
+    /* Ni écouteur de défilement ni IntersectionObserver : même verdict
+       que pour l'en-tête, quelques lignes plus bas. Sur ce document le
+       body est le conteneur de défilement, et sur iPhone ces signaux ne
+       se déclenchaient pas — les sections restaient invisibles ou
+       surgissaient sans fondu. On lit donc la position à chaque trame,
+       dans la boucle unique déjà payée par l'en-tête.
+
+       Le sens de panne est choisi : un élément au rectangle nul (bloc
+       replié, mise en page pas encore posée) se révèle immédiatement.
+       Au pire le fondu manque ; jamais un contenu ne reste caché. */
+    let restants = items.slice();
+    IMFrame.add(() => {
+      if (!restants.length) return;
+      const seuil = (window.innerHeight || document.documentElement.clientHeight) * 0.92;
+      restants = restants.filter((el) => {
+        if (el.getBoundingClientRect().top >= seuil) return true;
+        el.classList.add('is-in');
+        return false;
+      });
     });
   }
 
@@ -408,61 +544,20 @@
     const host = $('[data-render="catalogue"]');
     if (!host) return;
 
-    const cats = IM.categories.filter((c) => IM.byCat(c.id).length);
-
-    const nav = `
-      <nav class="im-catnav" aria-label="Catégories">
-        <div class="im-catnav__inner">
-          ${cats.map((c) => `
-            <a href="#${c.id}" data-catlink="${c.id}">
-              ${icon(c.icon)} ${esc(c.name)}
-              <em>${IM.byCat(c.id).length}</em>
-            </a>`).join('')}
-        </div>
-      </nav>`;
-
-    host.innerHTML = nav + cats.map((cat) => {
-      /* Les packs passent par le coverflow : ce sont les cinq produits
-         qui portent le panier moyen, ils méritent une mise en scène.
-         Le conteneur est rempli juste après par initFlow(). */
-      if (cat.id === 'packs') return '<div data-flow-host></div>';
-      return `
-      <section class="im-section im-section--tight" id="${cat.id}">
-        <div class="im-shell">
-          <div class="im-head im-head--row">
-            <div>
-              <span class="im-eyebrow">${esc(cat.name)}</span>
-              <h2>${esc(cat.desc)}</h2>
-            </div>
-          </div>
-          <div class="im-grid">${IM.byCat(cat.id).map(productCard).join('')}</div>
-        </div>
-      </section>`;
-    }).join('');
+    /* Deux systèmes coexistaient — un carrousel pour les packs, trois
+       grilles de vignettes pour le reste — et on ne savait plus où
+       chercher quoi. Il n'en reste qu'un seul point d'achat : le
+       compositeur, qui couvre les 18 attentions. Le carrousel garde
+       son rôle de vitrine au-dessus. */
+    host.innerHTML = '<div data-flow-host></div><div data-compose-host></div>';
 
     const flowHost = $('[data-flow-host]', host);
     if (flowHost) initFlow(flowHost, IM.byCat('packs'));
 
-    initCatnav();
+    const composeHost = $('[data-compose-host]', host);
+    if (composeHost) initCompose(composeHost);
   }
 
-  /* Souligne la catégorie en cours de lecture dans le filtre collant. */
-  function initCatnav() {
-    const links = $$('[data-catlink]');
-    if (!links.length || !('IntersectionObserver' in window)) return;
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (!e.isIntersecting) return;
-        links.forEach((l) => l.removeAttribute('aria-current'));
-        const active = links.find((l) => l.getAttribute('data-catlink') === e.target.id);
-        if (active) active.setAttribute('aria-current', 'true');
-      });
-    }, { rootMargin: '-30% 0px -60% 0px' });
-    links.forEach((l) => {
-      const section = document.getElementById(l.getAttribute('data-catlink'));
-      if (section) io.observe(section);
-    });
-  }
 
   /* ----------------------------------------------------------
      Boucle d'animation unique
@@ -497,128 +592,6 @@
       add(fn) { jobs.push(fn); start(); }
     };
   })();
-
-  /* ----------------------------------------------------------
-     Visite au défilement
-     Portage du composant scroll-choreography. La progression est
-     lissée par interpolation à chaque trame — c'est l'équivalent
-     du ressort de framer-motion sans la bibliothèque.
-     ---------------------------------------------------------- */
-
-  /* Interpolation linéaire par paliers, comme useTransform. */
-  function track(p, stops, values) {
-    if (p <= stops[0]) return values[0];
-    for (let i = 1; i < stops.length; i++) {
-      if (p <= stops[i]) {
-        const t = (p - stops[i - 1]) / (stops[i] - stops[i - 1]);
-        return values[i - 1] + (values[i] - values[i - 1]) * t;
-      }
-    }
-    return values[values.length - 1];
-  }
-
-  function initTour() {
-    const section = $('[data-tour]');
-    if (!section) return;
-
-    const card = (k) => $(`[data-tour-card="${k}"]`, section);
-    const tl = card('tl'), br = card('br'), bl = card('bl'), hero = card('hero');
-    const caption = $('.im-tour__caption', section);
-    const wide = $('[data-tour-wide]', section);
-    if (!tl || !br || !bl || !hero) return;
-
-    /* Sans le script ou sans animation, la grille statique prend le
-       relais : les quatre photos restent visibles. */
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      section.setAttribute('data-static', 'true');
-      return;
-    }
-
-    let X = 20, Y = 14, W = 36, H = 24;
-    const readVars = () => {
-      const cs = getComputedStyle(section);
-      const n = (name, fallback) => {
-        const v = parseFloat(cs.getPropertyValue(name));
-        return Number.isFinite(v) ? v : fallback;
-      };
-      X = n('--tour-x', 20); Y = n('--tour-y', 14);
-      W = n('--tour-w', 36); H = n('--tour-h', 24);
-    };
-    readVars();
-
-    /* Les trois phases du composant d'origine :
-       0 à 0.30  les deux diagonales se croisent
-       0.35 à 0.65  tout converge au centre
-       0.70 à 0.90  la chambre s'ouvre en plein écran */
-    const S = [0, 0.3, 0.35, 0.65, 1];
-
-    const apply = (p) => {
-      const move = (el, xs, ys) =>
-        (el.style.transform =
-          `translate3d(${track(p, S, xs).toFixed(2)}vw, ${track(p, S, ys).toFixed(2)}vh, 0)`);
-
-      move(tl, [-X, -X, -X, 0, 0], [-Y,  Y,  Y, 0, 0]);
-      move(br, [ X,  X,  X, 0, 0], [ Y, -Y, -Y, 0, 0]);
-      move(bl, [-X, -X, -X, 0, 0], [ Y,  Y,  Y, 0, 0]);
-      move(hero, [X, X, X, 0, 0], [-Y, -Y, -Y, 0, 0]);
-
-      hero.style.width  = track(p, [0.65, 0.7, 0.9, 1], [W, W, 100, 100]).toFixed(2) + 'vw';
-      hero.style.height = track(p, [0.65, 0.7, 0.9, 1], [H, H, 100, 100]).toFixed(2) + 'vh';
-      hero.style.borderRadius = track(p, [0.7, 0.9], [14, 0]).toFixed(1) + 'px';
-
-      /* Les trois autres s'effacent sous la chambre qui s'ouvre. */
-      const o = track(p, [0.75, 0.85], [1, 0]).toFixed(3);
-      tl.style.opacity = br.style.opacity = bl.style.opacity = o;
-
-      /* Le cadrage panoramique remplace le portrait pendant l'ouverture. */
-      if (wide) wide.style.opacity = track(p, [0.68, 0.86], [0, 1]).toFixed(3);
-      if (caption) caption.style.opacity = track(p, [0.88, 0.97], [0, 1]).toFixed(3);
-    };
-
-    const measure = () => {
-      const r = section.getBoundingClientRect();
-      const course = section.offsetHeight - window.innerHeight;
-      target = course > 0 ? Math.min(1, Math.max(0, -r.top / course)) : 0;
-    };
-
-    /* On mesure à chaque trame et on ne travaille que lorsque la section
-       approche de l'écran. Aucune dépendance aux événements ni aux
-       observateurs. */
-    let target = 0, current = 0, largeurConnue = window.innerWidth;
-
-    let trames = 0;
-
-    IMFrame.add(() => {
-      trames++;
-      const r = section.getBoundingClientRect();
-      const marge = window.innerHeight;
-      if (r.bottom < -marge || r.top > window.innerHeight + marge) return;
-      if (window.innerWidth !== largeurConnue) { largeurConnue = window.innerWidth; readVars(); }
-      measure();
-      current += (target - current) * 0.13;
-      apply(current);
-    });
-
-    /* Filet de sécurité : si aucune trame n'est arrivée, la chorégraphie
-       ne tournera pas et les quatre cartes resteraient empilées dans les
-       coins. On bascule alors sur la grille statique, qui reste lisible. */
-    setTimeout(() => {
-      if (trames === 0) {
-        section.setAttribute('data-static', 'true');
-        [tl, br, bl, hero].forEach((el) => {
-          el.style.transform = '';
-          el.style.width = '';
-          el.style.height = '';
-          el.style.opacity = '';
-          el.style.borderRadius = '';
-        });
-      }
-    }, 900);
-
-    measure();
-    current = target;
-    apply(current);
-  }
 
   /* ----------------------------------------------------------
      Vitrine des packs
@@ -658,7 +631,7 @@
         <button class="im-flow__cta" type="button" data-add="${p.id}" data-flow-cta="${p.id}">
           ${PLUS}<span>Ajouter · ${IM.euro(p.price)}</span>
         </button>
-        <a class="im-flow__detail" href="produit.html?id=${p.id}">Voir le détail</a>
+        <a class="im-flow__detail" href="#composer" data-compose-select="${p.id}">Voir le détail</a>
       </div>`;
   }
 
@@ -717,11 +690,11 @@
     let timer = null;
     let visible = false;
     let paused = false;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
     const tick = () => go(index + 1);
     const sync = () => {
-      const run = visible && !paused && !reduced && total > 1 && !document.hidden;
+      /* Le fondu croisé des photos ne bouge rien : il reste actif
+         sous « réduire les animations », comme le rotateur. */
+      const run = visible && !paused && total > 1 && !document.hidden;
       if (run && !timer) timer = setInterval(tick, 5600);
       if (!run && timer) { clearInterval(timer); timer = null; }
     };
@@ -732,13 +705,15 @@
     section.addEventListener('focusout', () => { paused = false; sync(); });
     document.addEventListener('visibilitychange', sync);
 
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver((entries) => {
-        entries.forEach((e) => { visible = e.isIntersecting; sync(); });
-      }, { threshold: 0.25 }).observe(section);
-    } else {
-      visible = true; sync();
-    }
+    /* Visibilité lue dans la boucle de trames — dernier des quatre
+       morceaux accrochés à IntersectionObserver, muet sur iPhone
+       avec ce document dont le body est le conteneur de défilement. */
+    IMFrame.add(() => {
+      const h = window.innerHeight || document.documentElement.clientHeight;
+      const r = section.getBoundingClientRect();
+      const d = r.top < h * 0.75 && r.bottom > h * 0.25;
+      if (d !== visible) { visible = d; sync(); }
+    });
 
     /* --- Commandes --- */
     $('[data-flow-prev]', host).addEventListener('click', () => go(index - 1));
@@ -783,6 +758,200 @@
   }
 
   /* ----------------------------------------------------------
+     Compositeur
+     Une seule interface d'achat : deux menus déroulants à droite,
+     le panier qui se remplit à gauche. Remplace les grilles de
+     vignettes — le client a déjà réservé, il compose une commande.
+     ---------------------------------------------------------- */
+
+  function composeMarkup() {
+    return `
+      <section class="im-section im-section--tight" id="composer">
+        <div class="im-shell">
+          <div class="im-head im-head--row">
+            <div>
+              <span class="im-eyebrow">Composez votre soirée</span>
+              <h2>Choisissez, tout arrive dans votre séjour.</h2>
+            </div>
+          </div>
+
+          <div class="im-compose__grid">
+            <aside class="im-compose__cart" data-compose-cart aria-live="polite"></aside>
+
+            <div class="im-compose__picker">
+              <div class="im-compose__selects">
+                <div class="im-field">
+                  <label for="cp-cat">Catégorie</label>
+                  <select id="cp-cat" data-compose-cat></select>
+                </div>
+                <div class="im-field">
+                  <label for="cp-prod">Attention</label>
+                  <select id="cp-prod" data-compose-prod></select>
+                </div>
+              </div>
+              <div data-compose-preview></div>
+            </div>
+          </div>
+        </div>
+      </section>`;
+  }
+
+  function initCompose(host) {
+    host.innerHTML = composeMarkup();
+
+    const selCat = $('[data-compose-cat]', host);
+    const selProd = $('[data-compose-prod]', host);
+    const preview = $('[data-compose-preview]', host);
+    const cartBox = $('[data-compose-cart]', host);
+    let qty = 1;
+    let dernierAjout = null;
+
+    /* --- Menus --- */
+
+    selCat.innerHTML = IM.categories
+      .filter((c) => IM.byCat(c.id).length)
+      .map((c) => `<option value="${c.id}">${esc(c.name)} · ${IM.byCat(c.id).length}</option>`)
+      .join('');
+
+    const remplirProduits = (catId, choisir) => {
+      const list = IM.byCat(catId);
+      selProd.innerHTML = list
+        .map((p) => `<option value="${p.id}">${esc(p.name)}, ${IM.euro(p.price)}</option>`)
+        .join('');
+      if (choisir && list.some((p) => p.id === choisir)) selProd.value = choisir;
+      renderPreview();
+    };
+
+    /* --- Aperçu --- */
+
+    function renderPreview() {
+      const p = IM.byId(selProd.value);
+      if (!p) { preview.innerHTML = ''; return; }
+      qty = 1;
+      preview.innerHTML = `
+        <div class="im-compose__preview">
+          <div class="im-compose__shot">${media(p.ph, '4x5', p.img, p.alt)}</div>
+          <div>
+            <p class="im-compose__kicker">${esc(p.kicker)}</p>
+            <h3 class="im-compose__name">${esc(p.name)}</h3>
+            <p class="im-compose__desc">${esc(p.desc)}</p>
+            <ul class="im-compose__incl">
+              ${p.includes.map((i) => `<li>${esc(i)}</li>`).join('')}
+            </ul>
+            ${p.alcohol ? '<p class="im-card__legal">Contient de l’alcool. Vente interdite aux mineurs de 18 ans.</p>' : ''}
+            <div class="im-compose__buy">
+              <span class="im-price im-compose__price">${IM.euro(p.price)}</span>
+              <div class="im-qty">
+                <button type="button" data-cp-minus aria-label="Retirer une unité">−</button>
+                <output data-cp-qty aria-live="polite">1</output>
+                <button type="button" data-cp-plus aria-label="Ajouter une unité">+</button>
+              </div>
+              <button class="im-btn im-btn--primary" type="button" data-cp-add="${p.id}">
+                Ajouter à mon séjour <span aria-hidden="true">❤︎</span>
+              </button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    /* --- Panier --- */
+
+    function renderCart() {
+      const lines = IMCart.lines();
+      const n = IMCart.count();
+
+      if (!lines.length) {
+        cartBox.innerHTML = `
+          <h3>Votre séjour <span class="im-compose__count">vide</span></h3>
+          <p class="im-compose__vide">
+            Rien encore. Choisissez une catégorie, puis une attention :
+            elle viendra se poser ici.
+          </p>`;
+        return;
+      }
+
+      cartBox.innerHTML = `
+        <h3>Votre séjour <span class="im-compose__count">${n} attention${n > 1 ? 's' : ''}</span></h3>
+        <ul class="im-compose__lines">
+          ${lines.map((l) => `
+            <li data-fresh="${String(l.product.id === dernierAjout)}">
+              <span class="im-compose__lname">${esc(l.product.name)}</span>
+              <span class="im-price im-compose__lsum">${IM.euro(l.total)}</span>
+              <span class="im-compose__ltools">
+                <span class="im-qty im-qty--sm">
+                  <button type="button" data-line-minus="${l.product.id}" aria-label="Retirer une unité de ${esc(l.product.name)}">−</button>
+                  <output aria-live="polite">${l.qty}</output>
+                  <button type="button" data-line-plus="${l.product.id}" aria-label="Ajouter une unité de ${esc(l.product.name)}">+</button>
+                </span>
+                <button class="im-compose__drop" type="button" data-line-remove="${l.product.id}">Retirer</button>
+              </span>
+            </li>`).join('')}
+        </ul>
+        <p class="im-compose__total"><span>Total</span><span class="im-price">${IM.euro(IMCart.total())}</span></p>
+        <a class="im-btn im-btn--primary im-btn--block" href="commander.html">
+          Valider mon séjour <span aria-hidden="true">❤︎</span>
+        </a>
+        <p class="im-compose__legal">
+          Vos attentions seront préparées avant votre arrivée.
+          Commande à passer avant 18 h la veille.
+        </p>`;
+
+      dernierAjout = null;
+    }
+
+    /* --- Interactions --- */
+
+    selCat.addEventListener('change', () => remplirProduits(selCat.value));
+    selProd.addEventListener('change', renderPreview);
+
+    preview.addEventListener('click', (e) => {
+      const moins = e.target.closest('[data-cp-minus]');
+      const plus = e.target.closest('[data-cp-plus]');
+      const add = e.target.closest('[data-cp-add]');
+      if (moins || plus) {
+        qty = Math.min(9, Math.max(1, qty + (plus ? 1 : -1)));
+        const out = $('[data-cp-qty]', preview);
+        if (out) out.textContent = qty;
+        return;
+      }
+      if (add) {
+        const id = add.getAttribute('data-cp-add');
+        IMCart.add(id, qty);
+        dernierAjout = id;
+        toast(IM.byId(id).name);
+        renderCart();
+        qty = 1;
+        const out = $('[data-cp-qty]', preview);
+        if (out) out.textContent = '1';
+      }
+    });
+
+    /* Les +/− et « Retirer » du panier passent par le gestionnaire
+       global ; on se contente de redessiner après coup. */
+    cartBox.addEventListener('click', (e) => {
+      if (e.target.closest('[data-line-plus], [data-line-minus], [data-line-remove]')) {
+        setTimeout(renderCart, 0);
+      }
+    });
+
+    /* Le coverflow envoie ici avec un pack présélectionné. */
+    document.addEventListener('click', (e) => {
+      const lien = e.target.closest('[data-compose-select]');
+      if (!lien) return;
+      e.preventDefault();
+      const p = IM.byId(lien.getAttribute('data-compose-select'));
+      if (!p) return;
+      selCat.value = p.cat;
+      remplirProduits(p.cat, p.id);
+      host.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    remplirProduits(selCat.value);
+    renderCart();
+    IMCart.onChange(renderCart);
+  }
+
+  /* ----------------------------------------------------------
      Fiche produit
      ---------------------------------------------------------- */
 
@@ -803,7 +972,7 @@
       return;
     }
 
-    document.title = `${p.name} — INTENSÉ'MANS Love Room`;
+    document.title = `${p.name}, INTENSÉ'MANS Love Room`;
     const crumb = $('[data-crumb]');
     if (crumb) crumb.textContent = p.name;
 
@@ -1129,11 +1298,12 @@
           À préparer
           ${pending ? `<span class="im-notif__count">${pending}</span>` : ''}
         </h2>
-        ${orders.length ? `
-          <div class="im-notif__actions">
+        <div class="im-notif__actions">
+          ${orders.length ? `
             ${pending ? '<button type="button" data-board-all>Tout marquer préparé</button>' : ''}
-            <button type="button" data-board-archive data-danger>Archiver les séjours passés</button>
-          </div>` : ''}
+            <button type="button" data-board-archive data-danger>Archiver les séjours passés</button>` : ''}
+          <button type="button" data-board-logout>Se déconnecter</button>
+        </div>
       </header>`;
 
     if (!orders.length) {
@@ -1142,7 +1312,7 @@
           ${head}
           <div class="im-notif__empty">
             ${TICK}
-            <p>Aucune commande. Rien à préparer.</p>
+            <p>Aucune arrivée. Rien à préparer.</p>
           </div>
           <footer class="im-notif__foot">En attente de commandes</footer>
         </section>`;
@@ -1181,9 +1351,17 @@
                   style="animation-delay:${delay}ms">
                 <span class="im-notif__glyph">${icon(IMOrders.emoji(o))}</span>
                 <div class="im-notif__body">
-                  <p class="im-notif__source">Arrivée ${esc(o.stay.arrival || '—')}${o.stay.resa ? ` · ${esc(o.stay.resa)}` : ''}</p>
+                  <p class="im-notif__source">
+                    ${o.kind === 'sejour'
+                      ? '<span class="im-notif__tag">Réservé sur le site</span>'
+                      : '<span class="im-notif__tag" data-ton="neutre">Attentions seules</span>'}
+                    ${o.status === 'a-confirmer'
+                      ? '<span class="im-notif__tag" data-ton="urgent">À valider</span>'
+                      : ''}
+                    Arrivée ${esc(o.stay.arrival || '—')}${o.stay.resa ? ` · ${esc(o.stay.resa)}` : ''}
+                  </p>
                   <div class="im-notif__line">
-                    <p class="im-notif__name">${esc(o.stay.name || 'Sans nom')} — ${IM.euro(o.total)}</p>
+                    <p class="im-notif__name">${esc(o.stay.name || 'Sans nom')}, ${IM.euro(o.total)}</p>
                     <time class="im-notif__time">${esc(IMOrders.relative(o))}</time>
                   </div>
                   <p class="im-notif__text">${esc(o.stay.message || resume)}</p>
@@ -1202,7 +1380,7 @@
                   ${o.prepared ? '<span></span>' : '<span class="im-notif__dot" aria-label="Pas encore préparé"></span>'}
                   <button class="im-notif__tick" type="button"
                           data-board-toggle="${o.ref}"
-                          aria-label="${o.prepared ? 'Marquer à préparer' : 'Marquer préparé'} — ${esc(o.stay.name || '')}"
+                          aria-label="${o.prepared ? 'Marquer à préparer' : 'Marquer préparé'}, ${esc(o.stay.name || '')}"
                           aria-pressed="${o.prepared}">${TICK}</button>
                 </span>
               </li>`;
@@ -1215,7 +1393,7 @@
         ${head}
         ${body}
         <footer class="im-notif__foot">
-          ${orders.length} commande${orders.length > 1 ? 's' : ''} ·
+          ${orders.length} arrivée${orders.length > 1 ? 's' : ''} ·
           ${pending ? `${pending} en attente` : 'tout est préparé'} ·
           cliquez une ligne pour la déplier
         </footer>
@@ -1223,51 +1401,80 @@
   }
 
   /* Le tableau expose des noms, des numéros de réservation et des
-     messages personnels : il demande le mot de passe de l'hôte, gardé
-     ensuite sur l'appareil. */
-  function renderBoardGate(message) {
+     messages personnels. Il n'y a pourtant aucun mot de passe ici :
+     l'hôte saisit son adresse, reçoit un lien valable un quart
+     d'heure, et le clic ouvre la session.
+
+     Rien à retenir, rien à voler, rien à forcer. Ce qui protège
+     l'accès est sa boîte mail, qu'un attaquant ne contrôle pas. */
+  function renderBoardGate(message, ton) {
     const host = $('[data-render="board"]');
     if (!host) return;
     host.innerHTML = `
       <section class="im-notif">
         <header class="im-notif__head"><h2 class="im-notif__title">Accès réservé</h2></header>
-        <form class="im-form" data-board-gate style="padding:22px">
+        <form class="im-form" data-board-gate style="padding:22px" novalidate>
           <div class="im-field">
-            <label for="f-secret">Mot de passe</label>
-            <input id="f-secret" name="secret" type="password" autocomplete="current-password" required>
-            ${message ? `<p class="im-field__err">${esc(message)}</p>` : ''}
+            <label for="f-mail">Votre adresse e-mail</label>
+            <input id="f-mail" name="mail" type="email" autocomplete="email"
+                   inputmode="email" placeholder="vous@exemple.fr" required>
+            ${message ? `<p class="${ton === 'ok' ? 'im-field__note' : 'im-field__err'}">${esc(message)}</p>` : ''}
           </div>
-          <button class="im-btn im-btn--primary" type="submit">Ouvrir le tableau</button>
+          <button class="im-btn im-btn--primary" type="submit">Recevoir mon lien</button>
+          <p class="im-note" style="margin-top:16px">
+            <span aria-hidden="true">✦</span>
+            <span>Un lien vous est envoyé, valable quinze minutes et utilisable une
+            seule fois. Aucun mot de passe à retenir.</span>
+          </p>
         </form>
       </section>`;
-    $('[name="secret"]', host).focus();
+    if (ton !== 'ok') $('[name="mail"]', host).focus();
   }
 
   function loadBoard() {
     IMOrders.load()
       .then(renderBoard)
       .catch((err) => {
-        if (err.code === 401) {
-          IMOrders.forgetSecret();
-          renderBoardGate(IMOrders.hasSecret() ? 'Mot de passe refusé.' : '');
-        } else {
-          renderBoardGate('Impossible de joindre le serveur. Réessayez.');
-        }
+        if (err.code === 401) renderBoardGate('');
+        else renderBoardGate('Impossible de joindre le serveur. Réessayez.');
       });
   }
 
   function initBoard() {
     if (!$('[data-render="board"]')) return;
 
-    if (!IMOrders.hasSecret()) renderBoardGate('');
-    else loadBoard();
+    /* On tente d'emblée : si le cookie de session est encore valide,
+       l'hôte n'a rien à saisir. Le formulaire n'apparaît qu'au refus. */
+    loadBoard();
+
+    /* Retour d'un lien périmé ou déjà cliqué. Le paramètre est retiré
+       de la barre d'adresse pour qu'un rechargement ne réaffiche pas
+       le message une fois le lien redemandé. */
+    if (new URLSearchParams(location.search).get('lien') === 'expire') {
+      renderBoardGate('Ce lien a expiré ou a déjà servi. Demandez-en un nouveau.');
+      history.replaceState(null, '', location.pathname);
+    }
 
     document.addEventListener('submit', (e) => {
       const gate = e.target.closest('[data-board-gate]');
       if (!gate) return;
       e.preventDefault();
-      IMOrders.setSecret($('[name="secret"]', gate).value);
-      loadBoard();
+
+      const champ = $('[name="mail"]', gate);
+      const mail = champ.value.trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) {
+        renderBoardGate('Cette adresse ne semble pas valide.');
+        return;
+      }
+
+      const bouton = $('button[type="submit"]', gate);
+      bouton.disabled = true;
+      bouton.textContent = 'Envoi…';
+
+      IMOrders.demanderLien(mail)
+        .then(() => renderBoardGate(
+          'Si cette adresse est autorisée, le lien vient de partir. Ouvrez votre boîte mail.', 'ok'))
+        .catch(() => renderBoardGate('Envoi impossible. Réessayez dans un instant.'));
     });
 
     document.addEventListener('click', (e) => {
@@ -1290,6 +1497,15 @@
 
       if (e.target.closest('[data-board-archive]')) {
         IMOrders.archivePrepared().then(renderBoard).catch(loadBoard);
+        return;
+      }
+
+      if (e.target.closest('[data-board-logout]')) {
+        /* Rechargement plutôt que redessin : la synthèse, le bandeau
+           et les adresses ont leurs propres hôtes, et les vider un
+           par un laisserait forcément un chiffre affiché au prochain
+           écran ajouté. */
+        IMOrders.deconnecter().then(() => location.reload());
         return;
       }
 
@@ -1414,12 +1630,192 @@
     initRotator();
     initHeroAnim();
     initHeaderScroll();
-    initTour();
+    initAtouts();
 
     /* Ancre de catégorie après rendu du catalogue */
     if (location.hash) {
       const target = document.getElementById(location.hash.slice(1));
       if (target) requestAnimationFrame(() => target.scrollIntoView({ behavior: 'auto', block: 'start' }));
     }
+  });
+})();
+
+/* ============================================================
+   Les adresses collectées par la roue
+   ------------------------------------------------------------
+   Affichées sur le tableau de l'hôte, sous les commandes. Sans
+   cet écran, elles restaient dans la base sans que personne ne
+   les voie : autant ne pas les collecter.
+   ============================================================ */
+(() => {
+  'use strict';
+
+  const hote = document.querySelector('[data-render="cadeaux"]');
+  if (!hote || typeof IMOrders === 'undefined' || !IMOrders.cadeaux) return;
+
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+
+  const quand = (iso) => {
+    const d = new Date(iso);
+    return Number.isNaN(d.getTime()) ? '—'
+      : d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: '2-digit' });
+  };
+
+  IMOrders.cadeaux().catch(() => null).then((liste) => {
+    /* Pas connecté : on n'affiche rien du tout. Le formulaire de
+       connexion du tableau parle déjà pour toute la page. */
+    if (!liste) { hote.innerHTML = ''; return; }
+
+    if (!liste.length) {
+      hote.innerHTML = `
+        <section class="im-notif">
+          <header class="im-notif__head"><h2 class="im-notif__title">Adresses collectées</h2></header>
+          <div class="im-notif__empty"><p>Aucune adresse pour l’instant.</p></div>
+        </section>`;
+      return;
+    }
+
+    /* Le consentement conditionne le droit d'écrire à ces personnes
+       autrement que pour leur cadeau : il doit se voir. */
+    const optIn = liste.filter((c) => c.accord).length;
+
+    hote.innerHTML = `
+      <section class="im-notif">
+        <header class="im-notif__head">
+          <h2 class="im-notif__title">
+            Adresses collectées <span class="im-notif__count">${liste.length}</span>
+          </h2>
+          <div class="im-notif__actions">
+            <button type="button" data-cadeaux-copier>Copier les adresses</button>
+          </div>
+        </header>
+        <p style="padding:0 clamp(16px,2vw,22px);font-size:0.83rem;color:var(--im-fg-muted)">
+          ${optIn} sur ${liste.length} acceptent de recevoir vos offres. N’écrivez qu’à celles-là.
+        </p>
+        <ul class="im-notif__list">
+          ${liste.map((c) => `
+            <li class="im-notif__row" data-tone="${c.accord ? 'success' : 'default'}">
+              <div style="padding:13px clamp(16px,2vw,22px);display:grid;gap:3px">
+                <span style="font-size:0.95rem;color:var(--im-fg)">${esc(c.email)}</span>
+                <span style="font-size:0.8rem;color:var(--im-fg-muted)">
+                  ${esc(c.lot)} · ${esc(c.code)} · ${esc(quand(c.createdAt))}${c.accord ? '' : ' · sans accord'}
+                </span>
+              </div>
+            </li>`).join('')}
+        </ul>
+      </section>`;
+
+    hote.querySelector('[data-cadeaux-copier]').addEventListener('click', (e) => {
+      /* Seules celles qui ont donné leur accord : copier les autres
+         reviendrait à les mettre dans une liste de diffusion. */
+      const adresses = liste.filter((c) => c.accord).map((c) => c.email).join(', ');
+      navigator.clipboard.writeText(adresses).then(() => {
+        e.target.textContent = `${liste.filter((c) => c.accord).length} adresses copiées`;
+      });
+    });
+  });
+})();
+
+/* ============================================================
+   La synthèse du mois
+   ------------------------------------------------------------
+   Ce que l'hôte veut savoir en ouvrant son tableau : combien
+   c'est entré, ce qui arrive, et ce qui l'attend. Les virements
+   ne sont pas ici : Stripe les présente déjà mieux.
+   ============================================================ */
+(() => {
+  'use strict';
+
+  const hote = document.querySelector('[data-render="synthese"]');
+  if (!hote || typeof IMOrders === 'undefined' || !IMOrders.synthese) return;
+
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+
+  const moisLong = (ym) => {
+    const d = new Date(ym + '-01T12:00:00');
+    return Number.isNaN(d.getTime()) ? ym
+      : d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  };
+
+  const jourCourt = (iso) => {
+    const d = new Date(iso + 'T12:00:00');
+    return Number.isNaN(d.getTime()) ? iso
+      : d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+  };
+
+  IMOrders.synthese().then((s) => {
+    if (!s) return;
+
+    const chiffre = (valeur, libelle, alerte) => `
+      <div class="im-synth__case"${alerte ? ' data-alerte="true"' : ''}>
+        <span class="im-synth__val">${esc(valeur)}</span>
+        <span class="im-synth__lib">${esc(libelle)}</span>
+      </div>`;
+
+    hote.innerHTML = `
+      <section class="im-synth">
+        <header class="im-synth__tete">
+          <h2>${esc(moisLong(s.mois))}</h2>
+          ${s.prochaine
+            ? `<p>Prochaine arrivée : <strong>${esc(jourCourt(s.prochaine.checkin))}</strong>${
+                s.prochaine.nom ? `, ${esc(s.prochaine.nom)}` : ''}</p>`
+            : '<p>Aucune arrivée prévue.</p>'}
+        </header>
+        <div class="im-synth__grille">
+          ${chiffre(IM.euro(s.ca.total), 'encaissé ce mois')}
+          ${chiffre(s.nuitsReservees, s.nuitsReservees > 1 ? 'nuits réservées' : 'nuit réservée')}
+          ${chiffre(s.commandes, s.commandes > 1 ? 'commandes' : 'commande')}
+          ${chiffre(s.adresses, s.adresses > 1 ? 'adresses' : 'adresse')}
+          ${s.aValider ? chiffre(s.aValider, 'à valider', true) : ''}
+          ${s.aPreparer ? chiffre(s.aPreparer, 'à préparer', true) : ''}
+        </div>
+        <p class="im-synth__note">
+          Dont ${esc(IM.euro(s.ca.nuits))} de nuits et ${esc(IM.euro(s.ca.attentions))} d’attentions.
+          Les virements se consultent dans <a href="https://dashboard.stripe.com/payouts" target="_blank" rel="noopener">Stripe</a>.
+        </p>
+      </section>`;
+  });
+})();
+
+/* Le bandeau d'alerte du tableau de bord. Il réutilise la synthèse
+   déjà chargée plus haut, donc aucun appel réseau de plus. */
+(() => {
+  'use strict';
+
+  const hote = document.querySelector('[data-render="alerte"]');
+  if (!hote || typeof IMOrders === 'undefined' || !IMOrders.synthese) return;
+
+  const CROIX = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+
+  IMOrders.synthese().then((s) => {
+    if (!s) return;
+
+    const points = [];
+    if (s.aValider) points.push(`<strong>${s.aValider}</strong> réservation${s.aValider > 1 ? 's' : ''} à valider`);
+    /* « arrivées » et non « commandes » : depuis que les nuits
+       réservées sur le site rejoignent le tableau, une ligne peut
+       être un séjour entier et pas seulement des attentions. */
+    if (s.aPreparer) points.push(`<strong>${s.aPreparer}</strong> arrivée${s.aPreparer > 1 ? 's' : ''} à préparer`);
+    if (!points.length) return;
+
+    /* La clé porte le contenu : une alerte fermée hier ne doit pas
+       masquer une alerte différente aujourd'hui. */
+    const cle = `im_alerte_${s.aValider}_${s.aPreparer}`;
+    try { if (localStorage.getItem(cle) === 'lu') return; } catch (e) { /* mode privé */ }
+
+    hote.innerHTML = `
+      <div class="im-alerte" role="status" data-ton="${s.aValider ? 'urgent' : 'normal'}">
+        <span>${points.join(' · ')}</span>
+        <button class="im-alerte__fermer" type="button" data-alerte-fermer aria-label="Masquer">${CROIX}</button>
+      </div>`;
+
+    hote.querySelector('[data-alerte-fermer]').addEventListener('click', () => {
+      try { localStorage.setItem(cle, 'lu'); } catch (e) { /* mode privé */ }
+      hote.innerHTML = '';
+    });
   });
 })();

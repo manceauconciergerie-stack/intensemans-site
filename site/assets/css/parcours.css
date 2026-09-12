@@ -1,0 +1,768 @@
+/* ============================================================
+   INTENSÉ'MANS — Parcours de commande
+   ------------------------------------------------------------
+   Fichier séparé, volontairement : plusieurs sessions écrivent
+   dans components.css et le travail s'y écrase. Tout ce qui
+   concerne le parcours vit ici et nulle part ailleurs.
+
+   Deux chemins selon que la nuit est déjà réservée ou non.
+   ============================================================ */
+
+.im-pc { padding-block: clamp(56px, 8vw, 110px); }
+
+/* ------------------------------------------------------------
+   Fil des étapes — barre « tubelight »
+   Reprise du composant : pastille en verre, étape active éclairée,
+   et un néon qui glisse au-dessus d'elle. Le ressort de
+   framer-motion est rendu par une transition à dépassement ;
+   la lampe est positionnée par le script.
+   ------------------------------------------------------------ */
+
+.im-pc__fil {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0 0 clamp(34px, 5vw, 62px);
+  padding: 5px;
+  border: 1px solid var(--im-rule);
+  border-radius: 999px;
+  background: rgba(24, 19, 20, 0.6);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: var(--im-shadow), inset 0 1px 0 var(--im-edge);
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.im-pc__fil::-webkit-scrollbar { display: none; }
+
+.im-pc__etape {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  padding: 11px clamp(16px, 2vw, 24px);
+  border-radius: 999px;
+  font-size: 0.92rem;
+  white-space: nowrap;
+  /* Libellés en blanc cassé : c'est ce qui éclaircit la barre. */
+  color: var(--im-fg);
+  opacity: 0.55;
+  transition: opacity 0.3s var(--im-ease), color 0.3s var(--im-ease);
+}
+.im-pc__etape[data-etat="faite"] { opacity: 0.85; cursor: pointer; }
+.im-pc__etape[data-etat="faite"]:hover { opacity: 1; }
+.im-pc__etape[data-etat="courante"] { opacity: 1; font-weight: 500; }
+.im-pc__etape[data-etat="avenir"] { cursor: default; }
+
+.im-pc__num {
+  font-size: 0.76rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--im-rose);
+}
+.im-pc__etape[data-etat="faite"] .im-pc__num::after { content: " ✓"; }
+
+/* La lampe : le fond adouci sous l'étape active, surmonté du néon. */
+.im-pc__lampe {
+  position: absolute;
+  z-index: 0;
+  top: 5px;
+  bottom: 5px;
+  left: 0;
+  border-radius: 999px;
+  background: rgba(217, 139, 136, 0.1);
+  transition: transform 0.55s var(--im-spring), width 0.55s var(--im-spring);
+  pointer-events: none;
+}
+.im-pc__lampe i {
+  position: absolute;
+  display: block;
+  border-radius: 999px;
+  background: var(--im-rose);
+}
+/* Le trait net, posé sur l'arête haute. */
+.im-pc__lampe i:nth-child(1) {
+  top: -6px; left: 50%;
+  width: 42px; height: 3px;
+  margin-left: -21px;
+  border-radius: 999px 999px 0 0;
+  box-shadow: 0 0 12px rgba(217, 139, 136, 0.9);
+}
+/* Deux halos de plus en plus larges : la diffusion du néon. */
+.im-pc__lampe i:nth-child(2) {
+  top: -14px; left: 50%;
+  width: 66px; height: 22px;
+  margin-left: -33px;
+  opacity: 0.22;
+  filter: blur(10px);
+}
+.im-pc__lampe i:nth-child(3) {
+  top: -10px; left: 50%;
+  width: 34px; height: 16px;
+  margin-left: -17px;
+  opacity: 0.3;
+  filter: blur(7px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .im-pc__lampe { transition: none; }
+}
+
+@media (max-width: 720px) {
+  .im-pc__fil { display: flex; width: 100%; }
+  .im-pc__etape { padding-inline: 14px; font-size: 0.86rem; }
+  .im-pc__nom { display: none; }
+  .im-pc__etape[data-etat="courante"] .im-pc__nom { display: inline; }
+}
+
+/* ------------------------------------------------------------
+   Le choix d'entrée
+   ------------------------------------------------------------ */
+
+.im-pc__choix {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: clamp(16px, 2.4vw, 26px);
+  max-width: 780px;
+}
+.im-pc__carte {
+  display: block;
+  padding: clamp(22px, 3vw, 32px);
+  border: 1px solid var(--im-rule);
+  border-radius: var(--im-r-lg);
+  background: var(--im-bg-2);
+  text-align: left;
+  transition: border-color 0.3s var(--im-ease), background 0.3s var(--im-ease), transform 0.25s var(--im-spring);
+}
+.im-pc__carte:hover {
+  border-color: var(--im-rose-ink);
+  background: var(--im-bg-3);
+  transform: translateY(-2px);
+}
+.im-pc__carte h3 { font-size: clamp(1.35rem, 2.2vw, 1.7rem); margin-bottom: 8px; }
+.im-pc__carte p { margin: 0; font-size: 0.94rem; line-height: 1.55; color: var(--im-fg-muted); }
+.im-pc__carte .im-pc__fleche {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 16px;
+  font-size: 0.9rem;
+  color: var(--im-rose-ink);
+}
+/* Ciblé sur la flèche seule : en visant tous les SVG de la carte,
+   cette règle écrasait aussi le personnage au trait, réduit à
+   16 × 8 px — l'illustration était là, mais invisible. */
+.im-pc__fleche svg { width: 16px; height: 8px; transition: transform 0.35s var(--im-spring); }
+.im-pc__carte:hover svg { transform: translateX(5px); }
+
+/* ------------------------------------------------------------
+   Panneaux d'étape
+   ------------------------------------------------------------ */
+
+.im-pc__panneau { display: grid; gap: clamp(20px, 2.6vw, 30px); }
+.im-pc__panneau > h2 { font-size: clamp(1.7rem, 3vw, 2.4rem); }
+.im-pc__intro { max-width: 56ch; color: var(--im-fg-soft); }
+
+.im-pc__deux {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+  gap: clamp(24px, 3.4vw, 52px);
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .im-pc__deux { grid-template-columns: 1fr; }
+  .im-pc__cote { order: 2; }
+  .im-pc__principal { order: 1; }
+}
+
+/* Emplacement du calendrier, fourni par un autre module. */
+.im-pc__calendrier {
+  min-height: 120px;
+  padding: clamp(16px, 2.2vw, 24px);
+  border: 1px dashed var(--im-rule-2);
+  border-radius: var(--im-r-lg);
+  background: var(--im-bg-2);
+}
+.im-pc__calendrier[data-monte="true"] { border-style: solid; padding: 0; background: transparent; }
+.im-pc__attente { margin: 0; font-size: 0.9rem; line-height: 1.6; color: var(--im-fg-muted); }
+
+/* ------------------------------------------------------------
+   Panier latéral
+   ------------------------------------------------------------ */
+
+.im-pc__cote {
+  position: sticky;
+  top: calc(var(--im-header-h) + 24px);
+  padding: clamp(20px, 2.6vw, 28px);
+  border-radius: var(--im-r-lg);
+  background: var(--im-bg-2);
+  box-shadow: var(--im-shadow);
+}
+@media (max-width: 900px) { .im-pc__cote { position: static; } }
+.im-pc__cote h3 {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  margin-bottom: 14px; font-size: 1.3rem;
+}
+.im-pc__cote h3 span { font-family: var(--im-sans); font-size: 0.84rem; color: var(--im-fg-muted); }
+
+.im-pc__lignes { margin: 0; padding: 0; list-style: none; }
+.im-pc__lignes li {
+  display: grid; grid-template-columns: 1fr auto; gap: 3px 12px;
+  padding: 11px 0; border-top: 1px solid var(--im-rule);
+}
+.im-pc__lignes li:first-child { border-top: 0; }
+.im-pc__lnom { font-family: var(--im-display); font-size: 1.06rem; color: var(--im-fg); }
+.im-pc__louts { grid-column: 1 / -1; display: flex; align-items: center; gap: 14px; }
+.im-pc__retirer { font-size: 0.8rem; color: var(--im-fg-muted); text-decoration: underline; text-underline-offset: 3px; }
+.im-pc__retirer:hover { color: var(--im-rose-ink); }
+
+@keyframes im-pc-entre { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
+.im-pc__lignes li[data-neuf="true"] { animation: im-pc-entre 400ms var(--im-spring) both; }
+.im-pc__lignes li[data-neuf="true"] .im-pc__lnom { color: var(--im-rose-ink); }
+
+.im-pc__total {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 14px;
+  margin-top: 16px; padding-top: 14px;
+  border-top: 1px solid var(--im-rule-2);
+  color: var(--im-fg);
+}
+.im-pc__total .im-price { font-size: 1.45rem; }
+.im-pc__vide { padding: 18px 0; font-size: 0.92rem; line-height: 1.6; color: var(--im-fg-muted); }
+
+/* ------------------------------------------------------------
+   Sélecteur d'attentions
+   ------------------------------------------------------------ */
+
+.im-pc__selects {
+  display: flex; flex-direction: column;
+  gap: clamp(14px, 2vw, 20px); margin-bottom: clamp(18px, 2.4vw, 26px);
+}
+.im-pc__selects .im-field:first-child { max-width: 280px; }
+.im-pc__selects select {
+  appearance: none; padding-right: 42px; cursor: pointer;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--im-rose-ink) 50%),
+    linear-gradient(135deg, var(--im-rose-ink) 50%, transparent 50%);
+  background-position: calc(100% - 20px) calc(50% + 2px), calc(100% - 14px) calc(50% + 2px);
+  background-size: 6px 6px, 6px 6px; background-repeat: no-repeat;
+}
+
+/* Rangée d'attentions : on montre les articles, on ne les cache plus
+   derrière un menu qui, avec trois options, donnait l'impression
+   qu'il n'y en avait qu'une. Ça défile s'il y en a plus que la
+   largeur n'en montre. */
+.im-pc__chips {
+  display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px;
+  scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch;
+}
+.im-pc__chips::-webkit-scrollbar { height: 5px; }
+.im-pc__chips::-webkit-scrollbar-thumb { background: var(--im-rule-2); border-radius: 3px; }
+.im-pc__chip {
+  scroll-snap-align: start; flex: 0 0 auto;
+  display: flex; flex-direction: column; gap: 4px;
+  min-width: 150px; padding: 12px 16px;
+  border: 1px solid var(--im-rule); border-radius: var(--im-r-md);
+  background: var(--im-bg-2); text-align: left; cursor: pointer;
+  transition: border-color 0.25s var(--im-ease), background 0.25s var(--im-ease);
+}
+.im-pc__chip:hover { border-color: var(--im-fg-muted); }
+.im-pc__chip[aria-selected="true"] { border-color: var(--im-rose-ink); background: var(--im-bg-3); }
+.im-pc__chipnom { font-family: var(--im-display); font-size: 0.98rem; color: var(--im-fg); }
+.im-pc__chipprix { font-size: 0.82rem; color: var(--im-fg-muted); }
+.im-pc__chip[aria-selected="true"] .im-pc__chipprix { color: var(--im-rose-ink); }
+
+.im-pc__apercu {
+  display: grid; grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+  gap: clamp(16px, 2.4vw, 30px); align-items: start;
+  padding: clamp(16px, 2.2vw, 24px);
+  border-radius: var(--im-r-lg); background: var(--im-bg-2); box-shadow: var(--im-shadow);
+}
+@media (max-width: 560px) { .im-pc__apercu { grid-template-columns: 1fr; } }
+.im-pc__shot { overflow: hidden; border-radius: var(--im-r-md); }
+.im-pc__shot .im-ph, .im-pc__shot .im-img { border-radius: 0; }
+.im-pc__kicker { font-family: var(--im-display); font-style: italic; font-size: 0.98rem; color: var(--im-rose-ink); }
+.im-pc__nomprod { margin: 4px 0 8px; font-size: clamp(1.4rem, 2.2vw, 1.85rem); }
+.im-pc__desc { font-size: 0.93rem; line-height: 1.6; color: var(--im-fg-soft); }
+.im-pc__incl { margin: 14px 0 0; padding: 0; list-style: none; }
+.im-pc__incl li { display: flex; gap: 10px; padding: 4px 0; font-size: 0.89rem; color: var(--im-fg-soft); }
+.im-pc__incl li::before {
+  content: ""; flex: 0 0 auto; width: 4px; height: 4px; margin-top: 9px;
+  border-radius: 50%; background: var(--im-rose);
+}
+.im-pc__acheter { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: clamp(16px, 2.2vw, 24px); }
+.im-pc__prix { font-size: 1.6rem; margin-right: auto; }
+
+/* ------------------------------------------------------------
+   Récapitulatif et navigation
+   ------------------------------------------------------------ */
+
+.im-pc__recap { margin: 0; padding: 0; }
+.im-pc__recap div {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+  padding: 10px 0; border-top: 1px solid var(--im-rule);
+  font-size: 0.94rem; color: var(--im-fg-soft);
+}
+.im-pc__recap div:first-child { border-top: 0; }
+.im-pc__recap dt { color: var(--im-fg-muted); }
+.im-pc__recap dd { margin: 0; text-align: right; color: var(--im-fg); }
+
+.im-pc__nav {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 14px;
+  margin-top: clamp(22px, 3vw, 34px);
+}
+.im-pc__retour {
+  font-size: 0.9rem; color: var(--im-fg-muted);
+  text-decoration: underline; text-underline-offset: 4px;
+}
+.im-pc__retour:hover { color: var(--im-fg); }
+.im-pc__nav .im-btn--primary { margin-left: auto; }
+@media (max-width: 560px) {
+  .im-pc__nav { flex-direction: column-reverse; align-items: stretch; }
+  .im-pc__nav .im-btn--primary { margin-left: 0; width: 100%; }
+  .im-pc__retour { text-align: center; }
+}
+
+.im-pc__erreur {
+  padding: 13px 16px;
+  border-left: 2px solid var(--im-danger);
+  border-radius: 0 var(--im-r-sm) var(--im-r-sm) 0;
+  background: var(--im-bg-2);
+  font-size: 0.9rem; color: var(--im-fg);
+}
+
+/* ------------------------------------------------------------
+   Personnages au trait — style Notion
+   Un dessin par choix, tracé simple, une seule épaisseur, un seul
+   accent rose. Ils donnent le ton avant la première question.
+   ------------------------------------------------------------ */
+
+.im-pc__perso {
+  display: block;
+  width: clamp(58px, 6vw, 72px);
+  height: auto;
+  margin-bottom: clamp(14px, 2vw, 20px);
+  overflow: visible;
+}
+.im-pc__perso [data-trait] {
+  fill: none;
+  stroke: var(--im-fg-soft);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.3s var(--im-ease);
+}
+.im-pc__perso [data-accent] {
+  fill: none;
+  stroke: var(--im-rose);
+  stroke-width: 1.7;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.im-pc__perso [data-plein] { fill: var(--im-rose); stroke: none; }
+.im-pc__carte:hover .im-pc__perso [data-trait] { stroke: var(--im-fg); }
+
+/* ============================================================
+   ÉCLAIRCISSEMENT
+   ------------------------------------------------------------
+   Le noir occupait tout. Le parcours devient une zone éclairée
+   posée sur la page : un socle plus clair, des surfaces relevées
+   d'un cran, des arêtes hautes qui accrochent la lumière, et du
+   texte remonté en blanc cassé.
+   ============================================================ */
+
+/* Socle : une bande plus claire qui détache tout le tunnel du noir. */
+.im-pc {
+  position: relative;
+  background:
+    linear-gradient(180deg,
+      transparent 0%,
+      var(--im-bg-2) 6%,
+      var(--im-bg-2) 94%,
+      transparent 100%);
+}
+.im-pc::before,
+.im-pc::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--im-rule-2), transparent);
+}
+.im-pc::before { top: 0; }
+.im-pc::after { bottom: 0; }
+
+/* Surfaces relevées d'un cran, avec un liseré clair sur l'arête haute :
+   c'est ce qui fait qu'un panneau se détache au lieu de se fondre. */
+.im-pc__carte,
+.im-pc__cote,
+.im-pc__apercu,
+.im-pc__calendrier {
+  background: var(--im-bg-3);
+  border: 1px solid var(--im-rule-2);
+  box-shadow: var(--im-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+.im-pc__carte:hover { background: var(--im-bg-4); border-color: var(--im-rose); }
+
+/* Champs et menus : fond plus clair et bordure franche. */
+.im-pc input,
+.im-pc select,
+.im-pc textarea {
+  background: var(--im-bg-3);
+  border-color: var(--im-rule-2);
+  color: var(--im-fg);
+}
+.im-pc input:hover,
+.im-pc select:hover,
+.im-pc textarea:hover { border-color: var(--im-fg-muted); }
+
+/* Libellés et textes courants remontés : moins de gris, plus de crème. */
+.im-pc .im-field > label { color: var(--im-fg-soft); }
+.im-pc__intro,
+.im-pc__desc,
+.im-pc__carte p { color: var(--im-fg-soft); }
+.im-pc__recap dt { color: var(--im-fg-soft); }
+.im-pc__vide { color: var(--im-fg-soft); }
+
+/* Barre d'étapes : les inactives ne doivent plus disparaître. */
+.im-pc__fil {
+  background: rgba(45, 36, 37, 0.72);
+  border-color: var(--im-rule-2);
+}
+.im-pc__etape { opacity: 0.72; }
+.im-pc__etape[data-etat="faite"] { opacity: 0.92; }
+.im-pc__etape[data-etat="avenir"] { opacity: 0.6; }
+.im-pc__lampe { background: rgba(246, 236, 228, 0.1); }
+
+/* Le trait du néon reste rose, mais le fond sous l'étape active
+   passe au crème : c'est lui qui apporte la clarté. */
+.im-pc__etape[data-etat="courante"] { opacity: 1; }
+
+/* Les personnages gagnent en présence. */
+.im-pc__perso [data-trait] { stroke: var(--im-fg); stroke-opacity: 0.75; }
+.im-pc__carte:hover .im-pc__perso [data-trait] { stroke-opacity: 1; }
+
+/* ============================================================
+   LES OFFRES
+   Une ligne par offre : nom, promesse, prix. Tout tient à l'écran
+   sans défiler — la version en cartes déroulait la liste complète
+   des ingrédients avant même qu'on ait choisi, et faisait neuf
+   écrans de haut sur un téléphone. Le détail n'apparaît que sur
+   l'offre retenue.
+   ============================================================ */
+
+.im-pc__formules { margin-bottom: clamp(22px, 3vw, 32px); }
+
+.im-pc__groupe {
+  margin-bottom: 12px;
+  font-family: var(--im-display);
+  font-size: clamp(1.15rem, 1.9vw, 1.4rem);
+  font-weight: 500;
+  color: var(--im-fg);
+}
+
+.im-pc__offres { display: grid; gap: 8px; list-style: none; }
+
+.im-pc__offre {
+  position: relative;
+  border: 1px solid var(--im-rule-2);
+  border-radius: var(--im-r-sm);
+  background: var(--im-bg-2);
+  transition: border-color 0.25s var(--im-ease);
+}
+.im-pc__offre:hover { border-color: var(--im-fg-muted); }
+.im-pc__offre[data-phare="true"] { border-color: var(--im-rose-ink); }
+.im-pc__offre[data-prise="true"] { border-color: var(--im-rose-ink); background: var(--im-rose-veil); }
+
+/* Le ruban se pose dans la ligne, pas au-dessus : il ne doit pas
+   ajouter de hauteur à ce qui doit rester compact. */
+.im-pc__ruban {
+  position: absolute;
+  top: -8px;
+  right: 12px;
+  padding: 2px 9px;
+  border-radius: var(--im-r-xs);
+  background: var(--im-rose-ink);
+  color: var(--im-bg);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.im-pc__ligne {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.im-pc__coche {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 21px;
+  height: 21px;
+  border: 1px solid var(--im-rule-2);
+  border-radius: 50%;
+  color: var(--im-bg);
+}
+.im-pc__offre[data-prise="true"] .im-pc__coche {
+  border-color: var(--im-rose-ink);
+  background: var(--im-rose-ink);
+}
+.im-pc__coche svg { width: 12px; height: 12px; }
+
+.im-pc__otxt { flex: 1 1 auto; min-width: 0; }
+.im-pc__onom {
+  display: block;
+  font-family: var(--im-display);
+  font-size: 1.08rem;
+  font-weight: 500;
+  color: var(--im-fg);
+}
+.im-pc__oshort {
+  display: block;
+  margin-top: 1px;
+  font-size: 0.79rem;
+  line-height: 1.35;
+  color: var(--im-fg-muted);
+}
+
+.im-pc__oprix { flex: none; text-align: right; }
+.im-pc__oprix .im-price { display: block; font-size: 1.18rem; color: var(--im-fg); }
+.im-pc__oprix s {
+  font-size: 0.72rem;
+  color: var(--im-fg-muted);
+  text-decoration-thickness: 1px;
+}
+
+.im-pc__detail {
+  padding: 0 16px 14px 49px;
+  border-top: 1px solid var(--im-rule);
+  margin-top: -1px;
+  padding-top: 12px;
+}
+.im-pc__detail .im-pc__incl { margin-bottom: 10px; }
+
+/* La composition à la carte reste disponible, sans concurrencer
+   les offres au premier regard. */
+.im-pc__carte[open] { margin-bottom: 12px; }
+.im-pc__carte > summary {
+  cursor: pointer;
+  padding: 13px 0;
+  border-top: 1px solid var(--im-rule);
+  font-size: 0.9rem;
+  color: var(--im-fg-soft);
+}
+.im-pc__carte > summary:hover { color: var(--im-fg); }
+
+@media (max-width: 420px) {
+  .im-pc__ligne { padding: 12px 13px; gap: 10px; }
+  .im-pc__onom { font-size: 1rem; }
+  .im-pc__ruban { right: 10px; font-size: 0.58rem; }
+  .im-pc__detail { padding-left: 13px; }
+}
+
+/* Le délai de commande : une contrainte, pas un argument. Discret
+   tant qu'il est tenu, franc quand il ne l'est plus. */
+.im-pc__delai {
+  margin-top: 14px;
+  font-size: 0.83rem;
+  line-height: 1.5;
+  color: var(--im-fg-muted);
+}
+.im-pc__delai[data-alerte="true"] {
+  padding: 12px 15px;
+  border-left: 2px solid var(--im-danger);
+  background: var(--im-glass);
+  color: var(--im-fg-soft);
+}
+
+/* Le détail de ce qui est compris. Le client paie une nuit à trois
+   chiffres : lui montrer la ligne du pack seule, face à un total plus
+   élevé, laissait l'écart inexpliqué. */
+.im-pc__lnuit { border-bottom: 1px solid var(--im-rule); padding-bottom: 14px; }
+.im-pc__lnote {
+  grid-column: 1 / -1;
+  margin-top: 2px;
+  font-size: 0.78rem;
+  color: var(--im-fg-muted);
+}
+.im-pc__compris {
+  grid-column: 1 / -1;
+  margin: 8px 0 0;
+  padding-left: 2px;
+  list-style: none;
+  display: grid;
+  gap: 3px;
+}
+/* La puce était calée en absolu à 0.55em du haut de la ligne : juste
+   tant que la ligne fait exactement une ligne de texte, décalée dès
+   qu'on lui ajoute une marge ou un filet. Elle est maintenant un vrai
+   élément de flex, centré sur la PREMIÈRE ligne quelle que soit la
+   hauteur du bloc — y compris quand le texte passe sur deux lignes. */
+.im-pc__compris li {
+  display: flex;
+  gap: 10px;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--im-fg-muted);
+}
+.im-pc__compris li::before {
+  content: "";
+  flex: 0 0 4px;
+  height: 4px;
+  /* (hauteur de ligne − diamètre) / 2 : le centre du point tombe sur
+     le centre optique de la première ligne. */
+  margin-top: calc((1.45em - 4px) / 2);
+  border-radius: 50%;
+  background: var(--im-rose-ink);
+  opacity: 0.6;
+}
+
+/* Code cadeau */
+.im-pc__code {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--im-rule);
+}
+.im-pc__code label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 0.78rem;
+  color: var(--im-fg-muted);
+}
+.im-pc__codeligne { display: flex; gap: 8px; }
+.im-pc__codeligne input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--im-rule-2);
+  border-radius: var(--im-r-sm);
+  background: var(--im-bg);
+  color: var(--im-fg);
+  font-size: 0.88rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.im-pc__codeligne button {
+  flex: none;
+  padding: 0 16px;
+  border: 1px solid var(--im-rose-ink);
+  border-radius: var(--im-r-sm);
+  color: var(--im-rose-ink);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.im-pc__codeligne button:hover { background: var(--im-rose-veil); }
+
+.im-pc__code[data-pose="true"] {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.im-pc__codeok { font-size: 0.83rem; line-height: 1.5; color: var(--im-fg-soft); }
+.im-pc__codeok strong {
+  display: block;
+  font-family: var(--im-display);
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  color: var(--im-rose-ink);
+}
+
+
+/* Le lien qui explique la question doit se voir : sans soulignement il
+   se confond avec le texte d'aide, et la question reste incomprise. */
+.im-field__help a {
+  color: var(--im-rose-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Le récapitulatif et les champs qui le suivent se touchaient : leur
+   intitulé venait buter sur la dernière ligne du tableau. */
+.im-pc__principal > .im-field { margin-top: 26px; }
+
+/* ============================================================
+   LE RÉCAPITULATIF EN CLAIR
+   C'est le seul bloc que le client doit lire attentivement avant
+   de payer : il devient donc la seule surface claire de la page.
+   Hiérarchie, pas décoration.
+
+   Les couleurs sont inversées une par une plutôt qu'avec un
+   filtre : un `invert()` retournerait aussi le rose et le laiton.
+   La lueur rose reste très basse en opacité ; au-delà, elle vire
+   au néon et abîme le registre.
+   ============================================================ */
+
+.im-pc__cote {
+  background: var(--im-fg);
+  color: var(--im-bg);
+  box-shadow:
+    0 0 0 1px rgba(217, 139, 136, 0.22),
+    0 0 60px -12px rgba(217, 139, 136, 0.38),
+    var(--im-shadow-lg);
+}
+
+.im-pc__cote h3 { color: var(--im-bg); }
+.im-pc__cote h3 span { color: rgba(16, 12, 13, 0.55); }
+
+.im-pc__cote .im-pc__lignes li { border-top-color: rgba(16, 12, 13, 0.14); }
+.im-pc__cote .im-pc__lnuit { border-bottom-color: rgba(16, 12, 13, 0.14); }
+.im-pc__cote .im-pc__lnom { color: var(--im-bg); }
+.im-pc__cote .im-price { color: var(--im-bg); }
+.im-pc__cote .im-pc__lnote { color: rgba(16, 12, 13, 0.6); }
+
+.im-pc__cote .im-pc__compris li { color: rgba(16, 12, 13, 0.66); }
+.im-pc__cote .im-pc__compris li::before { background: var(--im-rose-ink); opacity: 1; }
+
+.im-pc__cote .im-pc__retirer { color: rgba(16, 12, 13, 0.55); }
+.im-pc__cote .im-pc__retirer:hover { color: var(--im-bg); }
+
+.im-pc__cote .im-qty {
+  border-color: rgba(16, 12, 13, 0.2);
+  background: rgba(16, 12, 13, 0.04);
+}
+.im-pc__cote .im-qty button,
+.im-pc__cote .im-qty output { color: var(--im-bg); }
+
+.im-pc__cote .im-pc__total {
+  border-top-color: rgba(16, 12, 13, 0.18);
+  color: var(--im-bg);
+}
+.im-pc__cote .im-pc__vide { color: rgba(16, 12, 13, 0.6); }
+
+/* Le code cadeau : champ clair sur carte claire, il lui faut un
+   cadre net pour rester identifiable comme zone de saisie. */
+.im-pc__cote .im-pc__code { border-top-color: rgba(16, 12, 13, 0.18); }
+.im-pc__cote .im-pc__code label { color: rgba(16, 12, 13, 0.6); }
+.im-pc__cote .im-pc__codeligne input {
+  border-color: rgba(16, 12, 13, 0.28);
+  background: rgba(16, 12, 13, 0.05);
+  color: var(--im-bg);
+}
+.im-pc__cote .im-pc__codeligne input::placeholder { color: rgba(16, 12, 13, 0.4); }
+.im-pc__cote .im-pc__codeligne button {
+  border-color: var(--im-rose-ink);
+  color: #8c4b48;
+}
+.im-pc__cote .im-pc__codeligne button:hover { background: rgba(217, 139, 136, 0.16); }
+.im-pc__cote .im-pc__codeok { color: rgba(16, 12, 13, 0.7); }
+.im-pc__cote .im-pc__codeok strong { color: #8c4b48; }
+
+/* L'article qui vient d'être ajouté est mis en rose clair : lisible
+   sur fond sombre, illisible sur la carte claire (1,74:1). Sur elle,
+   c'est la version sombre du rose qui prend le relais. */
+.im-pc__cote .im-pc__lignes li[data-neuf="true"] .im-pc__lnom { color: #8c4b48; }

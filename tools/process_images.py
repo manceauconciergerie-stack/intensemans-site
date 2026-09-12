@@ -141,45 +141,40 @@ print("Traitement des photos :\n")
 #  image/generees/pack-intense.jpg et rétablir ce bloc.
 # ------------------------------------------------------------------
 
-# ------------------------------------------------------------------
-#  La chambre — seule photo d'ambiance exploitable pour le hero.
-#  Fenêtre brûlée à droite : forte compression des hautes lumières.
-# ------------------------------------------------------------------
-room = Image.open(SRC / "PHOTO-2026-08-25-22-26-47.jpg").convert("RGB")
-room_g = grade(room, warmth=1.05, contrast=1.05, lift=-0.02,
-               vignette=0.34, highlight_rolloff=0.45, desaturate=0.03)
-save(crop_ratio(room_g, 16 / 9, anchor=0.42), "lieu/hero-chambre.webp", 2200)
-# Vignette d'ambiance du coverflow, pour les produits sans photo.
-save(crop_ratio(room_g, 4 / 5, anchor=0.5), "lieu/ambiance-amb.webp", 64)
-save(crop_ratio(room_g, 4 / 5, anchor=0.5), "lieu/chambre-4x5.webp", 1200)
+# ==================================================================
+#  LES PHOTOS DU LIEU — livraison du 7 septembre 2026
+#
+#  Changement de nature, pas seulement de qualité : les premières
+#  photos étaient prises EN PLEIN JOUR (fenêtre brûlée, néon éteint,
+#  lit défait). L'étalonnage devait donc fabriquer la nuit de toutes
+#  pièces : warmth 1.12, vignette 0.40, rolloff 0.60.
+#
+#  Celles-ci sont déjà des photos de nuit, chaudes, lit fait, néon
+#  allumé. Leur appliquer l'ancienne recette les sur-cuirait : orange
+#  saturé, noirs bouchés. D'où deux recettes bien plus douces, selon
+#  que la source est chaude (chambre, croix, peignoirs) ou neutre
+#  (balnéo et salle d'eau, éclairés en blanc).
+# ==================================================================
 
-# Version portrait pour le hero mobile : un recadrage centré du 16:9 ferait
-# remonter la table basse encombrée en bas de l'écran, là où se posent les
-# boutons. On cadre haut, sur le rideau, l'enseigne et le lit.
-# Cadrage exact en 3:4 : plafond exclu en haut, sol et table basse exclus
-# en bas. Il reste le rideau, l'enseigne et la tête de lit.
-room_mobile = room_g.crop((680, 150, 1430, 1150))
-save(room_mobile, "lieu/hero-chambre-mobile.webp", 1000)
+#  Sources chaudes : on ne fait qu'accentuer ce qui est déjà là.
+NUIT = dict(warmth=1.03, contrast=1.05, lift=-0.012,
+            vignette=0.22, highlight_rolloff=0.18, desaturate=0.02)
 
-# ------------------------------------------------------------------
-#  Le jacuzzi — cadrage serré sur la baignoire et le mur ardoise,
-#  le sol nu et les traces de chantier sortent du cadre.
-# ------------------------------------------------------------------
-spa = Image.open(SRC / "PHOTO-2026-08-25-22-26-46 4.jpg").convert("RGB")
-spa = spa.crop((100, 380, 1536, 1560))
-spa_g = grade(spa, warmth=1.07, contrast=1.08, lift=-0.025,
-              vignette=0.34, highlight_rolloff=0.3, desaturate=0.05)
-save(crop_ratio(spa_g, 4 / 5, anchor=0.5), "lieu/spa-4x5.webp", 1200)
-save(crop_ratio(spa_g, 16 / 9, anchor=0.5), "lieu/spa-16x9.webp", 1800)
+#  Sources neutres : le gris de l'ardoise et le blanc de la baignoire
+#  tirent vers le froid, il faut les ramener vers l'ambre de la charte.
+FROID = dict(warmth=1.10, contrast=1.07, lift=-0.028,
+             vignette=0.30, highlight_rolloff=0.38, desaturate=0.06)
 
+#  Le marbre blanc de la salle d'eau part très haut en luminance et
+#  éblouirait sur un fond de page noir : compression plus appuyée.
+#  Desserré après examen de la sortie : le premier réglage éteignait
+#  le marbre, qui doit au contraire rayonner. Le projet a déjà reçu
+#  deux fois le reproche « trop sombre », on ne le reprend pas.
+MARBRE = dict(warmth=1.06, contrast=1.04, lift=0.012,
+              vignette=0.20, highlight_rolloff=0.45, desaturate=0.04)
 
-# ------------------------------------------------------------------
-#  Visite au défilement — quatre atouts réels de l'appartement
-#  Cadres en 4:5, choisis pour qu'on identifie ce qu'on regarde :
-#  le balnéo, la douche italienne, le coin salon, le lit.
-#  Les cadres évitent les WC, la panière de produits d'entretien et
-#  la caisse à outils présents dans les originaux.
-# ------------------------------------------------------------------
+NEW = SRC / "NEW PHOTO"
+
 
 def c45(im, x, y, w):
     """Découpe un cadre 4:5 à partir d'un coin haut-gauche et d'une largeur."""
@@ -190,22 +185,57 @@ def c45(im, x, y, w):
     return im.crop((x, y, x + w, y + h))
 
 
-sdb = Image.open(SRC / "PHOTO-2026-08-25-22-26-46 2.jpg").convert("RGB")
-spa_src = Image.open(SRC / "PHOTO-2026-08-25-22-26-46 4.jpg").convert("RGB")
-cha = Image.open(SRC / "PHOTO-2026-08-25-22-26-47.jpg").convert("RGB")
+# ------------------------------------------------------------------
+#  La chambre : lit fait, néon « love » allumé, rideaux rouges.
+#  Le cadre part au-dessus du néon pour qu'il entre dans l'image :
+#  c'est lui qui signe la Love Room en un coup d'œil.
+# ------------------------------------------------------------------
+chambre = Image.open(NEW / "PHOTO-2026-09-07-17-44-15.jpg").convert("RGB")
+chambre_g = grade(chambre, **NUIT)
 
-TOUR = dict(warmth=1.12, contrast=1.1, lift=-0.055, vignette=0.4,
-            highlight_rolloff=0.6, desaturate=0.08)
+save(c45(chambre_g, 300, 466, 786), "lieu/tour-lit.webp", 1000)
 
-# Le marbre blanc de la douche part à 120 de luminance : il éblouirait
-# sur un fond noir. Traitement plus appuyé pour ce seul cadre.
-MARBRE = dict(warmth=1.14, contrast=1.12, lift=-0.13, vignette=0.5,
-              highlight_rolloff=1.5, desaturate=0.12)
+#  Aperçu pour les réseaux sociaux (Open Graph). Il n'est jamais
+#  affiché sur le site : seulement dans les vignettes de partage.
+#  Bande horizontale prise sur le néon et le lit.
+save(crop_ratio(chambre_g.crop((0, 560, 1086, 1260)), 16 / 9, anchor=0.5),
+     "lieu/hero-chambre.webp", 1086)
 
-save(grade(c45(spa_src, 60, 480, 980), **TOUR),  "lieu/tour-balneo.webp", 1000)
-save(grade(c45(sdb, 340, 300, 720), **MARBRE),   "lieu/tour-douche.webp", 1000)
-save(grade(c45(cha, 600, 700, 620), **TOUR),     "lieu/tour-salon.webp", 1000)
-save(grade(c45(cha, 1120, 330, 700), **TOUR),    "lieu/tour-lit.webp", 1000)
+# ------------------------------------------------------------------
+#  Le balnéo deux places, mur en pierre ardoise.
+# ------------------------------------------------------------------
+balneo = Image.open(NEW / "PHOTO-2026-09-07-17-44-15 2.jpg").convert("RGB")
+balneo_g = grade(balneo, **FROID)
+
+#  Le cadre démarre à droite d'une bouteille en plastique oubliée sur
+#  le rebord de la baignoire (x 335 à 395 dans l'original), et coupe
+#  bas : le premier essai laissait un tiers de carrelage nu sous le
+#  sujet. Il reste le mur en ardoise, la baignoire et les serviettes.
+save(c45(balneo_g, 410, 420, 760), "lieu/tour-balneo.webp", 1000)
+save(c45(balneo_g, 390, 400, 800), "lieu/spa-4x5.webp", 1200)
+
+# ------------------------------------------------------------------
+#  La salle d'eau : douche à l'italienne, vasque noire, miroir
+#  rétroéclairé. Le cadre écarte les WC, à gauche dans l'original.
+# ------------------------------------------------------------------
+eau = Image.open(NEW / "PHOTO-2026-09-07-17-44-16 2.jpg").convert("RGB")
+eau_g = grade(eau, **MARBRE)
+
+save(c45(eau_g, 330, 180, 756), "lieu/tour-douche.webp", 1000)
+
+# ------------------------------------------------------------------
+#  L'équipement, annoncé avant l'arrivée plutôt que découvert en
+#  poussant la porte. Ces deux visuels sont nouveaux : jusqu'ici la
+#  FAQ décrivait l'équipement intime sans jamais le montrer.
+# ------------------------------------------------------------------
+coin = Image.open(NEW / "PHOTO-2026-09-07-17-44-16.jpg").convert("RGB")
+save(grade(c45(coin, 200, 340, 886), **NUIT), "lieu/equipement-coin.webp", 1000)
+
+croix = Image.open(NEW / "PHOTO-2026-09-07-17-44-15 4.jpg").convert("RGB")
+#  La croix mesure près de toute la hauteur de l'original : un cadre
+#  de 900 de large la décapitait. À 1000, elle tient entière, du bras
+#  haut jusqu'au socle.
+save(grade(c45(croix, 40, 190, 1000), **NUIT), "lieu/equipement-croix.webp", 1000)
 
 # ------------------------------------------------------------------
 #  Le logo, en plusieurs tailles

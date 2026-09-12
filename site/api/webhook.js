@@ -13,7 +13,8 @@
 
 import Stripe from 'stripe';
 import { markPaid } from './_lib/store.js';
-import { notifyHost } from './_lib/email.js';
+import { marquerPaye } from './_lib/stays.js';
+import { notifyHost, notifyStay, confirmerAuClient, confirmerCommandeAuClient } from './_lib/email.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -45,23 +46,46 @@ export async function POST(request) {
     return Response.json({ received: true });
   }
 
-  const order = await markPaid(ref, {
-    payment: (session.payment_method_types || [])[0] || 'carte',
-    stripeSessionId: session.id
-  });
+  const paiement = (session.payment_method_types || [])[0] || 'carte';
+  const estSejour = (session.metadata && session.metadata.type) === 'sejour';
 
-  /* Déjà traitée : deuxième livraison du même événement, ou commande
+  /* Deux produits passent par le même webhook : une nuit dans la
+     chambre, ou des attentions pour un séjour déjà réservé. Le type
+     posé à la création de la session les distingue. */
+  const enregistre = estSejour
+    ? await marquerPaye(ref, { payment: paiement, stripeSessionId: session.id })
+    : await markPaid(ref, { payment: paiement, stripeSessionId: session.id });
+
+  /* Déjà traité : deuxième livraison du même événement, ou commande
      expirée. On répond 200 pour que Stripe cesse de réessayer. */
-  if (!order) return Response.json({ received: true, duplicate: true });
+  if (!enregistre) return Response.json({ received: true, duplicate: true });
+
+  /* Deux destinataires, deux besoins. L'hôte doit préparer, le
+     client doit avoir une trace écrite de ce qu'il a payé et de ses
+     horaires. Les envois sont indépendants : si l'un échoue, l'autre
+     doit partir quand même. */
+  const clientEmail = estSejour
+    ? (enregistre.guest && enregistre.guest.email)
+    : ((session.customer_details && session.customer_details.email) || session.customer_email);
 
   try {
-    await notifyHost(order);
+    await (estSejour ? notifyStay(enregistre) : notifyHost(enregistre));
   } catch (e) {
-    /* Le paiement est encaissé et la commande enregistrée : elle
-       reste visible sur le tableau de préparation même si le mail
-       échoue. On journalise sans renvoyer d'erreur à Stripe, sinon
-       il rejouerait l'événement et rien ne changerait. */
+    /* Le paiement est encaissé et la réservation enregistrée : les
+       nuits sont verrouillées et elle apparaît au tableau même si le
+       mail échoue. On journalise sans renvoyer d'erreur à Stripe,
+       sinon il rejouerait l'événement et rien ne changerait. */
     console.error('Notification hôte impossible', ref, e);
+  }
+
+  try {
+    await (estSejour
+      ? confirmerAuClient(enregistre)
+      : confirmerCommandeAuClient(enregistre, clientEmail));
+  } catch (e) {
+    /* Le paiement est encaissé : on ne renvoie pas d'erreur à Stripe,
+       il rejouerait l'événement et l'hôte recevrait un second mail. */
+    console.error('Confirmation client impossible', ref, e);
   }
 
   return Response.json({ received: true });

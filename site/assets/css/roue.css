@@ -1,0 +1,345 @@
+/* ============================================================
+   INTENSÉ'MANS — Carte d'appel et roue de bienvenue
+   ------------------------------------------------------------
+   Reprise de la carte d'appel à l'action : photo en fond, voile
+   sombre, texte à gauche, formulaire à droite. Le bleu-vert du
+   modèle est remplacé par le rose poudré de la marque.
+
+   Fichier séparé : plusieurs sessions écrivent dans les fichiers
+   partagés et le travail s'y écrase.
+   ============================================================ */
+
+.im-roue { padding-block: clamp(30px, 5vw, 60px); }
+
+.im-roue__carte {
+  position: relative;
+  overflow: hidden;
+  max-width: var(--im-maxw);
+  margin-inline: auto;
+  border: 1px solid var(--im-rule-2);
+  border-radius: clamp(14px, 1.6vw, 20px);
+  background: var(--im-bg);
+  box-shadow: var(--im-shadow-lg), inset 0 1px 0 var(--im-edge);
+  isolation: isolate;
+}
+
+/* La fumée occupe toute la carte, derrière le contenu. Aucune image :
+   c'est une turbulence fractale rendue par le navigateur. */
+.im-roue__fumee {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Le fond de la carte reste sombre et uni : la fumée seule apporte
+   la couleur, exactement comme sur le modèle. */
+.im-roue__carte::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(96deg, rgba(10, 7, 8, 0.9) 0%, rgba(10, 7, 8, 0.4) 52%, transparent 100%);
+}
+
+.im-roue__corps {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: center;
+  gap: clamp(24px, 4vw, 56px);
+  padding: clamp(26px, 4vw, 52px);
+}
+/* `minmax(0, 1fr)` et non `1fr`, exactement comme la règle de bureau
+   juste au-dessus. `1fr` vaut `minmax(auto, 1fr)`, et ce `auto`
+   interdit à la colonne de descendre sous la largeur de son contenu
+   le plus large : la rangée de pastilles, insécable, imposait 540 px
+   de colonne dans une carte de 346 px. Le débordement était ensuite
+   rogné par l'`overflow: hidden` de la carte, donc le texte était
+   coupé sans même pouvoir défiler pour le lire. */
+@media (max-width: 860px) {
+  .im-roue__corps { grid-template-columns: minmax(0, 1fr); }
+}
+
+.im-roue__titre {
+  max-width: 16ch;
+  font-size: clamp(1.62rem, 3.4vw, 3rem);
+  text-wrap: balance;
+  line-height: 1.06;
+  color: var(--im-fg);
+}
+.im-roue__texte {
+  max-width: 46ch;
+  margin-top: clamp(12px, 1.8vw, 18px);
+  font-size: clamp(1rem, 1.2vw, 1.1rem);
+  line-height: 1.62;
+  color: var(--im-fg-soft);
+}
+
+/* Les lots, annoncés avant de jouer : c'est ce qui donne envie. */
+/* Une seule rangée, qui défile latéralement si besoin : sur trois
+   lignes, les pastilles faisaient monter la carte de 90 px et on
+   perdait les proportions basses du modèle. */
+.im-roue__lots {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 7px;
+  margin-top: clamp(14px, 1.8vw, 20px);
+  padding: 0 0 4px;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  /* Estompe le bord droit pour annoncer qu'il y a une suite. */
+  mask-image: linear-gradient(90deg, #000 88%, transparent 100%);
+}
+.im-roue__lots::-webkit-scrollbar { display: none; }
+.im-roue__lots li {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  padding: 6px 12px;
+  border: 1px solid rgba(246, 236, 228, 0.28);
+  border-radius: 999px;
+  background: rgba(10, 7, 8, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  font-size: 0.84rem;
+  color: var(--im-fg);
+}
+.im-roue__lots li { font-size: 0.8rem; }
+.im-roue__lots li::before { content: "· "; color: var(--im-rose); }
+
+/* ------------------------------------------------------------
+   Formulaire
+   ------------------------------------------------------------ */
+
+.im-roue__form { display: grid; gap: 12px; width: 100%; max-width: 480px; }
+.im-roue__champs { display: flex; flex-wrap: wrap; gap: 10px; }
+.im-roue__champs input[type="email"] {
+  flex: 1 1 220px;
+  min-height: 52px;
+  padding: 0 18px;
+  border: 1px solid rgba(246, 236, 228, 0.3);
+  border-radius: var(--im-r-md);
+  background: rgba(10, 7, 8, 0.55);
+  color: var(--im-fg);
+  font-size: 1rem;
+}
+.im-roue__champs input[type="email"]::placeholder { color: rgba(246, 236, 228, 0.55); }
+.im-roue__champs input[type="email"]:focus {
+  outline: none;
+  border-color: var(--im-rose);
+  box-shadow: 0 0 0 3px rgba(217, 139, 136, 0.22);
+}
+/* Bouton crème plein, comme le modèle : c'est lui qui claque. */
+.im-roue__champs button {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 22px;
+  border-radius: var(--im-r-md);
+  background: var(--im-fg);
+  color: var(--im-bg);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background 0.28s var(--im-ease), transform 0.2s var(--im-spring);
+}
+.im-roue__champs button:hover { background: var(--im-rose); }
+.im-roue__champs button:active { transform: scale(0.98); }
+.im-roue__champs button svg { width: 15px; height: 15px; }
+
+.im-roue__accord {
+  display: flex;
+  gap: 10px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: rgba(246, 236, 228, 0.72);
+}
+.im-roue__accord input { margin-top: 2px; accent-color: var(--im-rose); }
+.im-roue__accord a { color: var(--im-fg); text-decoration: underline; text-underline-offset: 3px; }
+
+.im-roue__err {
+  font-size: 0.85rem;
+  color: var(--im-danger);
+}
+
+/* ------------------------------------------------------------
+   La roue
+   ------------------------------------------------------------ */
+
+.im-roue__jeu { display: grid; place-items: center; gap: clamp(16px, 2.4vw, 24px); }
+
+.im-roue__disque {
+  position: relative;
+  width: min(300px, 74vw);
+  aspect-ratio: 1;
+}
+.im-roue__disque::after {
+  /* La pointe, en haut, qui désigne le lot. */
+  content: "";
+  position: absolute;
+  z-index: 3;
+  top: -6px; left: 50%;
+  width: 0; height: 0;
+  margin-left: -11px;
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-top: 18px solid var(--im-fg);
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6));
+}
+
+.im-roue__plateau {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid rgba(246, 236, 228, 0.45);
+  box-shadow: 0 0 0 6px rgba(217, 139, 136, 0.16), var(--im-shadow-lg);
+  transition: transform 4.6s cubic-bezier(0.16, 0.85, 0.18, 1);
+  transform: rotate(0deg);
+}
+.im-roue__plateau span {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 46%;
+  transform-origin: 0 50%;
+  padding-left: 16%;
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  color: var(--im-bg);
+  text-align: left;
+  pointer-events: none;
+}
+.im-roue__moyeu {
+  position: absolute;
+  z-index: 2;
+  top: 50%; left: 50%;
+  width: 22%; aspect-ratio: 1;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px solid rgba(246, 236, 228, 0.4);
+  background: var(--im-bg-2);
+  color: var(--im-rose);
+  font-family: var(--im-display);
+  font-style: italic;
+  font-size: 0.8rem;
+}
+
+.im-roue__resultat {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  max-width: 40ch;
+  text-align: center;
+}
+.im-roue__gain {
+  font-family: var(--im-display);
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+  color: var(--im-rose-ink);
+}
+.im-roue__suite { font-size: 0.92rem; line-height: 1.6; color: var(--im-fg-soft); }
+.im-roue__code {
+  padding: 9px 16px;
+  border: 1px dashed var(--im-rose);
+  border-radius: var(--im-r-sm);
+  font-family: var(--im-sans);
+  font-size: 1rem;
+  letter-spacing: 0.14em;
+  color: var(--im-fg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .im-roue__plateau { transition: none; }
+}
+
+/* ============================================================
+   FENÊTRE DE LA ROUE
+   ------------------------------------------------------------
+   La carte d'appel garde son formulaire ; le clic ouvre une
+   fenêtre par-dessus. On s'appuie sur <dialog> natif : le focus
+   est piégé et la touche Échap ferme, sans code supplémentaire.
+   ============================================================ */
+
+.im-roue__modale {
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100dvh - 40px);
+  padding: 0;
+  border: 1px solid var(--im-rule-2);
+  border-radius: clamp(14px, 1.8vw, 20px);
+  background: var(--im-bg-2);
+  color: var(--im-fg-soft);
+  box-shadow: var(--im-shadow-lg), inset 0 1px 0 var(--im-edge);
+  overflow: hidden;
+}
+.im-roue__modale::backdrop {
+  background: rgba(6, 4, 5, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Entrée : la fenêtre monte d'un cran en apparaissant. */
+@keyframes im-modale-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+.im-roue__modale[open] { animation: im-modale-in 320ms var(--im-spring) both; }
+@media (prefers-reduced-motion: reduce) {
+  .im-roue__modale[open] { animation: none; }
+}
+
+.im-roue__mtete {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: clamp(18px, 2.6vw, 26px) clamp(18px, 2.6vw, 28px) 0;
+}
+.im-roue__mtitre {
+  margin: 0;
+  font-family: var(--im-display);
+  font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+  color: var(--im-fg);
+}
+.im-roue__mnote { margin: 6px 0 0; font-size: 0.88rem; line-height: 1.55; color: var(--im-fg-muted); }
+
+.im-roue__fermer {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 34px; height: 34px;
+  border: 1px solid var(--im-rule-2);
+  border-radius: 999px;
+  color: var(--im-fg-muted);
+  transition: border-color 0.25s var(--im-ease), color 0.25s var(--im-ease), background 0.25s var(--im-ease);
+}
+.im-roue__fermer:hover { border-color: var(--im-rose); color: var(--im-fg); background: var(--im-bg-3); }
+.im-roue__fermer svg { width: 15px; height: 15px; }
+
+.im-roue__mcorps {
+  display: grid;
+  place-items: center;
+  gap: clamp(16px, 2.4vw, 24px);
+  padding: clamp(18px, 2.6vw, 28px);
+}
+
+/* Un halo rose derrière le disque : la fenêtre ne doit pas être
+   un rectangle sombre de plus. */
+.im-roue__mcorps { position: relative; isolation: isolate; }
+.im-roue__mcorps::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -10% 0 auto;
+  height: 70%;
+  background: radial-gradient(58% 60% at 50% 30%, rgba(217, 139, 136, 0.22), transparent 72%);
+  pointer-events: none;
+}

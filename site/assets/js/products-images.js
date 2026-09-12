@@ -2,7 +2,7 @@
    Chaque clé correspond à un identifiant de produit, ou à une catégorie
    préfixée par « cat- ». products.js fusionne ce tableau au chargement. */
 
-const IM_IMG_V = '6a92e13d';
+const IM_IMG_V = '6aa513db';
 
 const IM_IMAGES = {
   'pack-anniversaire': { img: 'produits/pack-anniversaire.webp', amb: 'produits/pack-anniversaire-amb.webp', gallery: ['produits/pack-anniversaire-1.webp', 'produits/pack-anniversaire-2.webp', 'produits/pack-anniversaire-3.webp'] },
