@@ -49,26 +49,47 @@
      rien à qui ignore l'heure normale ; « Départ retardé » se comprend
      sans contexte, et la phrase complète donne les horaires.
 
-     Ce lot a déjà été recalé une fois, quand l'arrivée est passée de
-     17 h à 19 h. L'arrivée est désormais fixée à 16 h, et « arrivée
-     anticipée » tomberait à 14 h : il ne resterait que trois heures
-     entre le départ des uns et l'arrivée des autres pour remettre à
-     neuf une chambre avec balnéo, qu'il faut vidanger et remplir.
-     Promesse intenable, donc lot remplacé par un objet.
+     « Arrivée anticipée » reste ÉCARTÉE. L'arrivée est fixée à 16 h et
+     le départ à 11 h : l'avancer à 14 h ne laisserait que trois heures
+     pour remettre à neuf une chambre avec balnéo, qu'il faut vidanger
+     et remplir. Promesse intenable, donc lot remplacé par un objet.
 
-     ATTENTION, défaut connu et non corrigé : le disque dessine quatre
-     tranches ÉGALES (`part = 360 / LOTS.length`) alors que les poids
-     ci-dessous sont inégaux. La roue laisse donc croire à un quart de
-     chance pour chacun. Les poids sont volontairement resserrés autour
-     de 25 pour que l'écart reste négligeable ; si un jour ils
-     s'écartent franchement, il faudra dessiner les tranches au
-     prorata des poids plutôt que de les couper en parts égales. */
+     La planche apéritive EXISTE au catalogue à 34 €, ce qui contredit
+     la règle anti-cannibalisation ci-dessus. Choix assumé par
+     l'exploitant le 17/09/2026 : son poids est tenu bas pour que
+     l'effet reste marginal. Si des clients se plaignent d'avoir payé
+     ce qu'un autre a gagné, c'est ce lot qu'il faut retirer en premier.
+
+     La boule part au BALNÉO sur décision de l'exploitant, alors que la
+     version précédente la destinait à la douche. Condition non
+     négociable à l'achat : sans huile, sans beurre, sans paillettes et
+     sans colorant. Une boule classique laisse un film gras dans les
+     canalisations et la pompe, qui ressort en dépôt au bain suivant.
+
+     Le disque est désormais dessiné AU PRORATA des poids (voir BORNES),
+     défaut corrigé. Une roue qui montre quatre quarts égaux alors qu'un
+     lot sort une fois sur sept ment au joueur. Poids et dessin ne
+     doivent plus jamais être modifiés l'un sans l'autre. */
   const LOTS = [
-    { court: 'Boule pour la douche', gain: 'Une boule effervescente parfumée, posée dans la douche', cout: 2, poids: 25 },
-    { court: 'Huile de massage',     gain: 'Un flacon d’huile de massage, à vous deux',              cout: 3, poids: 20 },
-    { court: 'Départ retardé',       gain: 'Le départ retardé : 12 h au lieu de 11 h',               cout: 0, poids: 30 },
-    { court: 'Masque de soie',       gain: 'Un masque de soie, à découvrir dans la suite',           cout: 4, poids: 25 }
+    { court: 'Boule effervescente', gain: 'Une boule effervescente parfumée, à faire fondre dans le bain', cout: 2,  poids: 38 },
+    { court: 'Planche apéritive',   gain: 'Une planche apéritive, dressée pour votre arrivée',             cout: 12, poids: 15 },
+    { court: 'Mignardises',         gain: 'Quelques mignardises, déposées dans la suite',                  cout: 3,  poids: 7 },
+    { court: 'Départ retardé',      gain: 'Le départ retardé : 12 h au lieu de 11 h',                      cout: 0,  poids: 40 }
   ];
+
+  /* Bornes angulaires de chaque tranche, calculées une fois depuis les
+     poids. Le dessin ET l'animation lisent cette table : c'est ce qui
+     garantit que la pointe s'arrête sur la tranche réellement tirée,
+     quelle que soit sa largeur. */
+  const TOTAL_POIDS = LOTS.reduce((somme, l) => somme + l.poids, 0);
+  const BORNES = (() => {
+    let angle = 0;
+    return LOTS.map((l) => {
+      const debut = angle;
+      angle += (l.poids / TOTAL_POIDS) * 360;
+      return { debut, fin: angle, milieu: (debut + angle) / 2 };
+    });
+  })();
 
 
   const CLE = 'im_roue_v1';
@@ -104,8 +125,8 @@
         <h2 class="im-roue__titre">Un cadeau vous attend dans la suite.</h2>
         <p class="im-roue__texte">
           Laissez votre e-mail, tournez la roue, et découvrez laquelle de ces
-          quatre attentions vous sera préparée avant votre arrivée. Aucune
-          n’est vendue sur le site. Tout le monde gagne.
+          quatre attentions vous sera préparée avant votre arrivée.
+          Tout le monde gagne.
         </p>
         <ul class="im-roue__lots">
           ${LOTS.map((l) => `<li>${esc(l.court)}</li>`).join('')}
@@ -132,10 +153,9 @@
   /* Le disque : une tranche par lot en dégradé conique, les libellés
      posés par-dessus, un par tranche. */
   function vueDisque() {
-    const part = 360 / LOTS.length;
     const tranches = LOTS.map((l, i) => {
       const ton = i % 2 ? 'rgba(217,139,136,0.92)' : 'rgba(246,236,228,0.92)';
-      return `${ton} ${i * part}deg ${(i + 1) * part}deg`;
+      return `${ton} ${BORNES[i].debut}deg ${BORNES[i].fin}deg`;
     }).join(', ');
     /* Le dégradé conique compte les angles depuis midi ; l'étiquette,
        elle, part de 3 heures (transform-origin à gauche, largeur vers
@@ -143,7 +163,7 @@
        se posait sur la tranche suivante et la roue annonçait un lot
        différent de celui qu'elle désignait. */
     const etiquettes = LOTS.map((l, i) =>
-      `<span style="transform: rotate(${i * part + part / 2 - 90}deg)">${esc(l.court)}</span>`
+      `<span style="transform: rotate(${BORNES[i].milieu - 90}deg)">${esc(l.court)}</span>`
     ).join('');
 
     return `
@@ -220,10 +240,10 @@
     else dlg.setAttribute('open', '');
 
     const plateau = $('[data-plateau]', dlg);
-    const part = 360 / LOTS.length;
-    /* La pointe est en haut : on amène le centre de la tranche
-       gagnante sous elle, après cinq tours complets. */
-    const cible = 360 * 5 - (index * part + part / 2);
+    /* La pointe est en haut : on amène le centre de la tranche gagnante
+       sous elle, après cinq tours complets. Le centre vient de BORNES,
+       donc il suit la largeur réelle de la tranche. */
+    const cible = 360 * 5 - BORNES[index].milieu;
     const doux = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     requestAnimationFrame(() => {

@@ -254,3 +254,26 @@
   message trompeur sur le nom du projet. **Règle : quand la CLI d'une plateforme
   se plaint de quelque chose d'absurde (ici le nom du dossier), vérifier d'où
   elle est censée être lancée avant de croire son message.**
+
+- **2026-09-17** | En changeant les lots de la roue, j'ai failli laisser en
+  place la phrase affichée juste au-dessus : « Aucune n'est vendue sur le
+  site. » Elle était vraie avec les anciens lots ; la planche apéritive
+  ajoutée ce soir est vendue 34 € au catalogue, donc le site mentait, et
+  d'un mensonge vérifiable en deux clics par n'importe quel client. Repéré
+  par hasard, sur une capture prise pour autre chose.
+  **Règle : une phrase qui affirme quelque chose SUR une liste est une
+  dépendance cachée de cette liste. En modifiant la liste, relire tous les
+  textes qui la commentent.** Troisième occurrence du même piège sur ce
+  projet, après l'horaire de la roue et les « best-seller ».
+
+- **2026-09-17** | Le défaut connu depuis des semaines (roue dessinée en
+  quatre tranches ÉGALES alors que les poids sont inégaux) est corrigé :
+  les bornes angulaires viennent désormais des poids, et le dessin comme
+  l'animation lisent la même table. Il avait été laissé en l'état avec des
+  poids resserrés « pour que l'écart reste négligeable ». Dès que
+  l'exploitant a voulu un lot à 7 % et un autre à 40 %, le défaut devenait
+  un mensonge sur les chances, c'est-à-dire un problème de loterie
+  publicitaire, pas un détail d'affichage.
+  **Règle : un défaut neutralisé par une valeur de réglage n'est pas
+  corrigé, il est en sursis. Le noter comme dette à échéance, et le traiter
+  AVANT de toucher au réglage qui le masquait.**

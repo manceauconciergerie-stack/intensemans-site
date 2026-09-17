@@ -227,6 +227,17 @@ export async function notifyStay(sejour) {
    formulaire ne la demande pas) et du formulaire pour les nuits.
    ------------------------------------------------------------ */
 
+/* Coordonnees du LIEU, citees dans la confirmation au client.
+   Seul endroit du code qui les porte : un demenagement ou un
+   changement de numero se corrige ici, et nulle part ailleurs.
+   Le code de la boite a cles n'y figure PAS volontairement : il
+   est communique plus tard, de la main de l'hote. */
+const LIEU = {
+  adresse: '1 bis rue Jeanne d’Arc, 72000 Le Mans',
+  tel: process.env.CONTACT_TEL || '06 40 08 10 45',
+  telLien: 'tel:+33640081045'
+};
+
 function coordonnees() {
   return {
     contact: process.env.CONTACT_EMAIL || process.env.HOST_NOTIFY_EMAIL || '',
@@ -262,12 +273,15 @@ export async function confirmerAuClient(sejour) {
       : null,
     `Arrivée      ${jour(sejour.checkin)}, à partir de 16 h`,
     `Départ       ${jour(sejour.checkout)}, avant 11 h`,
+    `Adresse      ${LIEU.adresse}`,
     '',
     lignes.length ? 'PRÉPARÉ POUR VOUS\n' + lignes.map((l) => `  · ${l.name}${l.qty > 1 ? ` × ${l.qty}` : ''}`).join('\n') + '\n' : null,
     `Total payé   ${euro(sejour.total)}`,
     `Référence    ${sejour.ref}`,
     '',
-    'Tout sera installé avant votre arrivée. Vous n’avez rien à apporter.'
+    'Tout sera installé avant votre arrivée. Vous n’avez rien à apporter.',
+    '',
+    `Lenny vous contactera avant votre arrivée pour vous indiquer comment vous\nrendre sur place et vous communiquer les codes d’accès, afin que votre\nséjour se passe au mieux. Vous pouvez le joindre au ${LIEU.tel}.`
   ].filter((l) => l !== null).join('\n');
 
   const html = `
@@ -289,6 +303,7 @@ export async function confirmerAuClient(sejour) {
   <table style="width:100%;border-collapse:collapse;margin-bottom:22px;font-size:15px">
     <tr><td style="padding:6px 0;color:#8a7a72;width:120px">Arrivée</td><td style="padding:6px 0;font-weight:600">${esc(jour(sejour.checkin))}, à partir de 16 h</td></tr>
     <tr><td style="padding:6px 0;color:#8a7a72">Départ</td><td style="padding:6px 0;font-weight:600">${esc(jour(sejour.checkout))}, avant 11 h</td></tr>
+    <tr><td style="padding:6px 0;color:#8a7a72">Adresse</td><td style="padding:6px 0;font-weight:600">${esc(LIEU.adresse)}</td></tr>
     <tr><td style="padding:12px 0;color:#8a7a72">Total payé</td><td style="padding:12px 0;font-weight:600">${esc(euro(sejour.total))}</td></tr>
   </table>
 
@@ -298,6 +313,16 @@ export async function confirmerAuClient(sejour) {
     ${lignes.map((l) => `
     <tr><td style="padding:9px 0;border-bottom:1px solid #ece3da">${esc(l.name)}${l.qty > 1 ? ` <strong>× ${l.qty}</strong>` : ''}</td></tr>`).join('')}
   </table>` : ''}
+
+  <div style="margin:0 0 22px;padding:16px;background:#faf5f0;border-left:3px solid #d98b88">
+    <p style="margin:0;font-size:15px;line-height:1.6">
+      Lenny vous contactera avant votre arrivée pour vous indiquer comment vous
+      rendre sur place et vous communiquer les codes d’accès, afin que votre
+      séjour se passe au mieux.<br>
+      Vous pouvez le joindre au
+      <a href="${LIEU.telLien}" style="color:#191113;font-weight:600;text-decoration:none">${esc(LIEU.tel)}</a>.
+    </p>
+  </div>
 
   <p style="margin:0;font-size:15px;line-height:1.6">
     Tout sera installé avant votre arrivée. Vous n’avez rien à apporter.
