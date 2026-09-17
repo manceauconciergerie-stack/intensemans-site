@@ -7,11 +7,9 @@
    réel du catalogue.
    ============================================================ */
 
-import Stripe from 'stripe';
+import { stripe } from './_lib/stripe.js';
 import { priceOrder } from './_lib/catalog.js';
 import { putPending } from './_lib/store.js';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const MAX = { name: 120, resa: 60, message: 800 };
 
@@ -89,7 +87,7 @@ export async function POST(request) {
   const origin = new URL(request.url).origin;
 
   try {
-    const session = await stripe.checkout.sessions.create({
+    const session = await stripe().checkout.sessions.create({
       mode: 'payment',
       client_reference_id: ref,
       locale: 'fr',

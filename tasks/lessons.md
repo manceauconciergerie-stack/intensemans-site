@@ -228,3 +228,29 @@
   tranches égales alors que les poids sont inégaux, ce qui laisse croire à un
   quart de chance pour chacun. Poids resserrés autour de 25 en attendant un
   dessin au prorata.
+
+- **2026-09-16** | Stripe refusait la clé en production. J'ai cru à une clé
+  révoquée, fait recoller trois fois la MÊME valeur, et annoncé « la clé passe
+  maintenant » alors que l'erreur avait seulement changé de forme
+  (401 → ERR_INVALID_CHAR → 401). La vraie cause : la clé avait été SAISIE AU
+  CLAVIER sur iPhone, et la correction automatique y avait glissé trois
+  homoglyphes invisibles — `с` cyrillique (U+0441) pour `c`, `Ø` (U+00D8) pour
+  `0`, `Х` cyrillique (U+0425) pour `X`. Longueur exacte, bon préfixe, bonne
+  fin : indétectable à l'œil comme au contrôle de format.
+  **Règle : un secret qui « a l'air bon » mais que le prestataire refuse doit
+  être inspecté CARACTÈRE PAR CARACTÈRE avant qu'on suppose quoi que ce soit
+  sur le compte distant.** Un contrôle de forme (`^[A-Za-z0-9_]+$`) qui
+  journalise la position et le point de code, sans jamais écrire la valeur,
+  donne la réponse en un déploiement au lieu de cinq.
+  Cause racine derrière la cause racine : en mode production, Stripe n'affiche
+  une clé secrète QU'UNE FOIS. Ne pouvant plus la copier, l'utilisateur l'a
+  recopiée à la main. **Devant quelqu'un qui n'arrive pas à fournir un secret,
+  demander d'abord comment il l'obtient, pas ce qu'il a collé.** Et un secret
+  ne doit jamais transiter par un téléphone pour finir dans un terminal.
+
+- **2026-09-16** | Corollaire déploiement : le lien Vercel n'existait que dans
+  `site/`, alors que le projet a `site` comme Root Directory et doit donc être
+  déployé depuis la RACINE du dépôt. Chaque `vercel --prod` échouait avec un
+  message trompeur sur le nom du projet. **Règle : quand la CLI d'une plateforme
+  se plaint de quelque chose d'absurde (ici le nom du dossier), vérifier d'où
+  elle est censée être lancée avant de croire son message.**

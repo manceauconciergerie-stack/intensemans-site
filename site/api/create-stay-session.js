@@ -19,13 +19,11 @@
    encore. Sur ces dates-là, c'est l'hôte qui tranche.
    ============================================================ */
 
-import Stripe from 'stripe';
+import { stripe } from './_lib/stripe.js';
 import { chiffrerSejour, nuitsDuSejour, tarifs } from './_lib/rates.js';
 import { priceOrder } from './_lib/catalog.js';
 import { verrouiller, liberer, creerSejour } from './_lib/stays.js';
 import { lireAirbnb } from './_lib/ical.js';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const MAX = { name: 120, email: 160, phone: 30, message: 800 };
 const clean = (v, max) => String(v == null ? '' : v).trim().slice(0, max);
@@ -144,7 +142,7 @@ export async function POST(request) {
     const origin = new URL(request.url).origin;
     const nuitLibelle = `${chiffrage.nights} nuit${chiffrage.nights > 1 ? 's' : ''}`;
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await stripe().checkout.sessions.create({
       mode: 'payment',
       client_reference_id: ref,
       customer_email: guest.email,

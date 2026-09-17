@@ -11,12 +11,10 @@
    évite d'envoyer deux fois le même mail.
    ============================================================ */
 
-import Stripe from 'stripe';
+import { stripe, webhookSecret } from './_lib/stripe.js';
 import { markPaid } from './_lib/store.js';
 import { marquerPaye } from './_lib/stays.js';
 import { notifyHost, notifyStay, confirmerAuClient, confirmerCommandeAuClient } from './_lib/email.js';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(request) {
   /* Corps BRUT, jamais parsé : la signature porte sur les octets
@@ -26,8 +24,8 @@ export async function POST(request) {
 
   let event;
   try {
-    event = stripe.webhooks.constructEvent(
-      body, signature, process.env.STRIPE_WEBHOOK_SECRET
+    event = stripe().webhooks.constructEvent(
+      body, signature, webhookSecret()
     );
   } catch (e) {
     /* Signature invalide : la requête ne vient pas de Stripe. */
