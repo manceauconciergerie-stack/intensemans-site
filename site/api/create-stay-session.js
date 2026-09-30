@@ -155,7 +155,7 @@ export async function POST(request) {
             unit_amount: chiffrage.totalCents,
             product_data: {
               name: `Love Room INTENSE MANS — ${nuitLibelle}`,
-              description: `Arrivee le ${checkin} a partir de 19h, depart le ${checkout} avant 11h`
+              description: `Arrivee le ${checkin} a partir de 16h, depart le ${checkout} avant 11h`
             }
           }
         },
@@ -170,13 +170,24 @@ export async function POST(request) {
       ],
       success_url: `${origin}/sejour-confirme.html?ref=${encodeURIComponent(ref)}`,
       cancel_url: `${origin}/#parcours`,
-      metadata: { ref, type: 'sejour', checkin, checkout }
+      /* La page de paiement se ferme avant que le verrou des nuits
+         tombe (45 min, stays.js). 31 min : Stripe refuse moins de 30. */
+      expires_at: Math.floor(Date.now() / 1000) + 31 * 60,
+      /* Copie de la réservation chez Stripe. Si l'enregistrement se
+         perd, le webhook la reconstitue d'ici : l'hôte reçoit quand
+         même le détail. 500 caractères au plus par valeur. */
+      metadata: {
+        ref, type: 'sejour', checkin, checkout,
+        name: guest.name,
+        phone: guest.phone,
+        message: guest.message.slice(0, 500)
+      }
     });
 
     return Response.json({ url: session.url, ref, needsConfirmation });
   } catch (e) {
     /* Le paiement n'a pas pu s'ouvrir : on rend les nuits tout de
-       suite plutôt que d'attendre les 30 minutes du verrou. */
+       suite plutôt que d'attendre les 45 minutes du verrou. */
     console.error('Stripe séjour', e);
     await liberer(dates, ref);
     return new Response(

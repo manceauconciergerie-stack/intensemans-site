@@ -26,8 +26,13 @@ const INDEX = 'stays:index';
 
 /* Durée du verrou avant paiement : le temps d'un passage sur la
    page Stripe. Au-delà, la nuit se relibère d'elle-même — un
-   panier abandonné ne doit pas bloquer un samedi soir. */
-const VERROU_TTL = 30 * 60;
+   panier abandonné ne doit pas bloquer un samedi soir.
+
+   Elle DOIT dépasser la durée de vie de la session Stripe (voir
+   create-stay-session.js). Quand le verrou tombait à 30 min alors
+   que Stripe laissait payer 24 h, un client lent payait une
+   réservation déjà effacée : ni mail, ni tableau, ni nuits bloquées. */
+const VERROU_TTL = 45 * 60;
 
 const score = (date) => Math.round(Date.parse(`${date}T00:00:00`) / 86400000);
 
@@ -95,6 +100,41 @@ export async function marquerPaye(ref, patch = {}) {
   await redis.zadd(INDEX, { score: score(paye.checkin), member: ref });
   await confirmerNuits(paye.nightDates || [], ref);
   return paye;
+}
+
+/* Séjour payé dont l'enregistrement a disparu, reconstitué depuis
+   Stripe par le webhook. Écrit avec NX : deux livraisons simultanées
+   du même événement ne produisent qu'un séjour, et un seul mail.
+
+   Les nuits sont reprises une par une, sans expiration. Celles qu'un
+   autre séjour a prises entre-temps sont listées dans `conflits` :
+   l'argent est encaissé pour une nuit peut-être déjà vendue, l'hôte
+   doit le savoir avant tout. */
+export async function recupererSejour(sejour) {
+  const pose = await redis.set(cle(sejour.ref), sejour, { nx: true });
+  if (!pose) return null;
+
+  const conflits = [];
+  for (const date of sejour.nightDates || []) {
+    const prise = await redis.set(nuit(date), sejour.ref, { nx: true });
+    if (!prise && (await redis.get(nuit(date))) !== sejour.ref) conflits.push(date);
+  }
+
+  const complet = { ...sejour, conflits };
+  await redis.set(cle(sejour.ref), complet);
+  await redis.zadd(INDEX, { score: score(complet.checkin), member: complet.ref });
+  return complet;
+}
+
+/* Trace des envois (hostNotifiedAt, clientNotifiedAt) : c'est elle
+   qui permet au webhook de réessayer un mail raté sans renvoyer
+   celui qui est déjà parti. */
+export async function noterSejour(ref, patch) {
+  const sejour = await redis.get(cle(ref));
+  if (!sejour) return null;
+  const suivant = { ...sejour, ...patch };
+  await redis.set(cle(ref), suivant);
+  return suivant;
 }
 
 export async function listerSejours() {

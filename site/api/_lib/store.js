@@ -20,8 +20,10 @@ const key = (ref) => `order:${ref}`;
 const INDEX = 'orders:index';
 
 /* Une commande impayée ne doit pas s'accumuler indéfiniment :
-   un panier abandonné sur la page Stripe ne reviendra jamais. */
-const PENDING_TTL = 60 * 60 * 24;
+   un panier abandonné sur la page Stripe ne reviendra jamais.
+   48 h et non 24 : une session Stripe reste payable 24 h, la
+   commande doit lui survivre, retards du webhook compris. */
+const PENDING_TTL = 60 * 60 * 48;
 
 /* Score de l'index : le moment de l'arrivée, en minutes depuis epoch.
    C'est lui qui donne au tableau son tri « par date de séjour puis
@@ -52,6 +54,26 @@ export async function markPaid(ref, patch = {}) {
   await redis.set(key(ref), paid);          // sans ex : plus d'expiration
   await redis.zadd(INDEX, { score: arrivalScore(paid.stay), member: ref });
   return paid;
+}
+
+/* Commande payée dont l'enregistrement a disparu, reconstituée
+   depuis Stripe par le webhook. NX : une seule, même si Stripe livre
+   l'événement deux fois en même temps. */
+export async function recoverOrder(order) {
+  const pose = await redis.set(key(order.ref), order, { nx: true });
+  if (!pose) return null;
+  await redis.zadd(INDEX, { score: arrivalScore(order.stay), member: order.ref });
+  return order;
+}
+
+/* Trace des envois, pour réessayer un mail raté sans doubler
+   celui qui est parti. */
+export async function patchOrder(ref, patch) {
+  const order = await redis.get(key(ref));
+  if (!order) return null;
+  const next = { ...order, ...patch };
+  await redis.set(key(ref), next);
+  return next;
 }
 
 export async function listOrders() {

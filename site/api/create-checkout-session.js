@@ -101,7 +101,15 @@ export async function POST(request) {
       })),
       success_url: `${origin}/confirmation.html?ref=${encodeURIComponent(ref)}`,
       cancel_url: `${origin}/commander.html`,
-      metadata: { ref, stayDate: stay.date, arrival: stay.arrival }
+      /* Copie de la commande chez Stripe : si l'enregistrement se
+         perd, le webhook la reconstitue d'ici. 500 caractères au
+         plus par valeur. */
+      metadata: {
+        ref, stayDate: stay.date, arrival: stay.arrival,
+        name: stay.name,
+        resa: stay.resa,
+        message: stay.message.slice(0, 500)
+      }
     });
 
     return Response.json({ url: session.url, ref });

@@ -137,23 +137,39 @@ async function envoyer({ to, subject, texte, html }) {
    se lit sur l'écran verrouillé d'un téléphone.
    ------------------------------------------------------------ */
 
+/* Offerts avec chaque nuit réservée sur le site, plus vendus au
+   catalogue : ils figurent d'office dans la liste à préparer. */
+const SOFTS_OFFERTS = 'Softs offerts, au réfrigérateur';
+
 export async function notifyStay(sejour) {
   const to = process.env.HOST_NOTIFY_EMAIL;
   if (!to) throw new Error('HOST_NOTIFY_EMAIL manquant');
 
   const g = sejour.guest || {};
   const aValider = sejour.status === 'a-confirmer';
+  const conflits = sejour.conflits || [];
 
-  const subject = aValider
-    ? `À VALIDER — arrivée le ${jour(sejour.checkin)} · ${g.name || 'sans nom'}`
-    : `Réservation ${jour(sejour.checkin)} → ${jour(sejour.checkout)} · ${g.name || 'sans nom'}`;
+  /* Reconstitution (voir reconstitution.js) : le paiement est arrivé
+     alors que la réservation avait expiré. Les nuits ont pu être
+     revendues entre-temps ; si c'est le cas, l'objet le crie. */
+  const alerte = conflits.length
+    ? `DOUBLE RÉSERVATION POSSIBLE — nuit déjà prise le ${conflits.map(jour).join(', ')}. Ne rien confirmer avant d’avoir vérifié.`
+    : sejour.reconstitue
+      ? 'Paiement arrivé après expiration de la réservation : les dates ont été reprises depuis Stripe. Vérifiez les calendriers avant de confirmer.'
+      : aValider
+        ? 'Arrivée proche : vérifiez le calendrier Airbnb avant de confirmer.'
+        : null;
+
+  const subject = conflits.length
+    ? `CONFLIT DE DATES — ${jour(sejour.checkin)} · ${g.name || 'sans nom'}`
+    : aValider
+      ? `À VALIDER — arrivée le ${jour(sejour.checkin)} · ${g.name || 'sans nom'}`
+      : `Réservation ${jour(sejour.checkin)} → ${jour(sejour.checkout)} · ${g.name || 'sans nom'}`;
 
   const texte = [
     aValider ? 'RÉSERVATION À VALIDER' : 'NOUVELLE RÉSERVATION',
     '',
-    aValider
-      ? 'Arrivée proche : vérifiez le calendrier Airbnb avant de confirmer.\n'
-      : null,
+    alerte ? `${alerte}\n` : null,
     `Arrivée       ${jour(sejour.checkin)}`,
     `Départ        ${jour(sejour.checkout)}`,
     `Durée         ${sejour.nights} nuit${sejour.nights > 1 ? 's' : ''}`,
@@ -162,9 +178,8 @@ export async function notifyStay(sejour) {
     `E-mail        ${g.email || '—'}`,
     g.phone ? `Téléphone     ${g.phone}` : null,
     '',
-    (sejour.lines && sejour.lines.length)
-      ? 'À PRÉPARER\n' + sejour.lines.map((l) => `  · ${l.name}${l.qty > 1 ? ` × ${l.qty}` : ''}`).join('\n') + '\n'
-      : null,
+    'À PRÉPARER\n' + [...(sejour.lines || []), { name: SOFTS_OFFERTS, qty: 1 }]
+      .map((l) => `  · ${l.name}${l.qty > 1 ? ` × ${l.qty}` : ''}`).join('\n') + '\n',
     g.message ? `MESSAGE\n  ${g.message}\n` : null,
     `Total payé    ${euro(sejour.total)}`,
     `Référence     ${sejour.ref}`
@@ -179,7 +194,10 @@ export async function notifyStay(sejour) {
     ${esc(jour(sejour.checkin))} → ${esc(jour(sejour.checkout))}
   </h1>
 
-  ${aValider ? `
+  ${(conflits.length || sejour.reconstitue) ? `
+  <p style="margin:0 0 22px;padding:14px 16px;background:#fdf6f6;border-left:3px solid #c0574f;font-size:14px;line-height:1.55">
+    <strong>${esc(alerte)}</strong>
+  </p>` : aValider ? `
   <p style="margin:0 0 22px;padding:14px 16px;background:#fdf6f6;border-left:3px solid #c0574f;font-size:14px;line-height:1.55">
     <strong>Arrivée proche.</strong> Le calendrier Airbnb n’est relu que toutes
     les 3 heures : vérifiez qu’aucune réservation n’est arrivée de ce côté
@@ -194,15 +212,18 @@ export async function notifyStay(sejour) {
     <tr><td style="padding:12px 0;color:#8a7a72">Total payé</td><td style="padding:12px 0;font-weight:600">${esc(euro(sejour.total))}</td></tr>
   </table>
 
-  ${(sejour.lines && sejour.lines.length) ? `
   <p style="margin:0 0 8px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8a7a72">À préparer dans la suite</p>
   <table style="width:100%;border-collapse:collapse;font-size:15px;margin-bottom:22px">
-    ${sejour.lines.map((l) => `
+    ${(sejour.lines || []).map((l) => `
     <tr>
       <td style="padding:10px 0;border-bottom:1px solid #ece3da">${esc(l.name)}${l.qty > 1 ? ` <strong>× ${l.qty}</strong>` : ''}</td>
       <td style="padding:10px 0;border-bottom:1px solid #ece3da;text-align:right;white-space:nowrap">${esc(euro(l.total))}</td>
     </tr>`).join('')}
-  </table>` : ''}
+    <tr>
+      <td style="padding:10px 0;border-bottom:1px solid #ece3da">${esc(SOFTS_OFFERTS)}</td>
+      <td style="padding:10px 0;border-bottom:1px solid #ece3da;text-align:right;white-space:nowrap">offert</td>
+    </tr>
+  </table>
 
   ${g.message ? `
   <div style="padding:16px;background:#faf5f0;border-left:3px solid #d98b88;margin-bottom:22px">
@@ -280,6 +301,7 @@ export async function confirmerAuClient(sejour) {
     `Référence    ${sejour.ref}`,
     '',
     'Tout sera installé avant votre arrivée. Vous n’avez rien à apporter.',
+    'Des boissons fraîches sans alcool vous attendent au réfrigérateur, offertes.',
     '',
     `Lenny vous contactera avant votre arrivée pour vous indiquer comment vous\nrendre sur place et vous communiquer les codes d’accès, afin que votre\nséjour se passe au mieux. Vous pouvez le joindre au ${LIEU.tel}.`
   ].filter((l) => l !== null).join('\n');
@@ -326,6 +348,7 @@ export async function confirmerAuClient(sejour) {
 
   <p style="margin:0;font-size:15px;line-height:1.6">
     Tout sera installé avant votre arrivée. Vous n’avez rien à apporter.
+    Des boissons fraîches sans alcool vous attendent au réfrigérateur, offertes.
   </p>
   <p style="margin:14px 0 0;font-size:13px;color:#8a7a72">Référence ${esc(sejour.ref)}</p>
   ${pied()}
