@@ -450,6 +450,7 @@ page(
         <div><dt>Pour dormir</dt><dd>Un lit king size et une literie haut de gamme. Peignoirs et linge préparés avant votre arrivée.</dd></div>
         <div><dt>Pour se détendre</dt><dd>Un balnéo deux places privatif et une douche à l’italienne, dans la suite, pour vous seuls.</dd></div>
         <div><dt>Pour la soirée</dt><dd>Un vidéoprojecteur, une télévision connectée et une barre de son. Quatre flûtes et quatre verres sont à votre disposition.</dd></div>
+        <div><dt>Pour se rafraîchir</dt><dd>Des boissons fraîches sans alcool vous attendent au réfrigérateur, offertes avec la nuit.</dd></div>
         <div><dt>Pour arriver</dt><dd>Une entrée autonome à partir de 16 h, sans croiser personne. Départ le lendemain avant 11 h.</dd></div>
       </dl>
 
@@ -653,7 +654,7 @@ page(
         <dl>
           <div><dt>Code APE</dt><dd>55.20Z — Hébergement touristique et autre hébergement de courte durée</dd></div>
           <div><dt>Déclaration en mairie du meublé de tourisme</dt><dd>{todo("numéro de déclaration (Cerfa n°14004) délivré par la mairie du Mans")}</dd></div>
-          <div><dt>Adresse du logement</dt><dd>{todo("adresse du logement — ou mention « communiquée après réservation » si elle reste confidentielle")}</dd></div>
+          <div><dt>Adresse du logement</dt><dd>1 bis rue Jeanne d’Arc, 72000 Le Mans</dd></div>
           <div><dt>Assurance responsabilité civile professionnelle</dt><dd>{todo("assureur, numéro de contrat et couverture géographique")}</dd></div>
         </dl>
 
@@ -785,8 +786,10 @@ page(
         <h2 id="prix">4. Prix et taxe de séjour</h2>
         <p>
           Les prix sont indiqués en euros toutes taxes comprises. Le tarif de la nuit
-          varie selon le jour de la semaine ; le montant exact est affiché avant le
-          paiement et c’est celui-ci qui fait foi.
+          varie selon le jour de la semaine, les grands événements du circuit du Mans
+          et la Saint-Valentin. Une remise s’applique à une réservation faite moins de
+          72 heures avant l’arrivée, sauf pour les nuits de la Saint-Valentin. Le montant
+          exact est affiché avant le paiement et c’est celui-ci qui fait foi.
         </p>
         <dl>
           <div><dt>TVA</dt><dd>

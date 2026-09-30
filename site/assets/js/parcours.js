@@ -127,7 +127,12 @@
     try {
       const brut = sessionStorage.getItem(CLE);
       if (!brut) return vierge();
-      return Object.assign(vierge(), JSON.parse(brut));
+      const lu = Object.assign(vierge(), JSON.parse(brut));
+      /* Un article retiré du catalogue depuis (les softs, devenus
+         offerts) ferait refuser tout le paiement par le serveur :
+         on l'écarte, comme le panier de la boutique (cart.js). */
+      lu.items = (Array.isArray(lu.items) ? lu.items : []).filter((l) => l && IM.byId(l.id));
+      return lu;
     } catch (e) {
       return vierge();
     }
@@ -192,6 +197,12 @@
       { cle: 'payer',   nom: 'Paiement' }
     ]
   };
+
+  /* Qui réserve la nuit peut la prendre seule : l'imposer revenait à
+     vendre la chambre avec un supplément forcé (un client a pris les
+     softs à 12 € faute de pouvoir passer). Qui a déjà réservé ailleurs
+     vient justement pour une attention : sans elle, rien à payer. */
+  const attentionsFacultatives = () => etat.voie === 'a-reserver';
 
   const etapes = () => (etat.voie ? ETAPES[etat.voie] : []);
   const etapeCourante = () => etapes()[etat.etape];
@@ -277,6 +288,7 @@
     'Balnéo deux places, privatif',
     'Douche à l’italienne',
     'Peignoirs et linge préparés',
+    'Boissons fraîches sans alcool, offertes',
     'Entrée autonome, sans croiser personne'
   ];
 
@@ -513,6 +525,7 @@
         <p class="im-pc__intro">
           Tout est installé avant votre arrivée : vous ne portez rien, vous ne
           cachez rien, vous n’organisez rien.
+          ${attentionsFacultatives() ? 'Entièrement facultatif : la nuit se réserve aussi seule.' : ''}
         </p>
         <div class="im-pc__deux">
           <div class="im-pc__principal">
@@ -536,7 +549,11 @@
               </div>
               <div data-apercu></div>
             </details>
-            ${nav('Passer au paiement', 'options', !etat.items.length)}
+            ${nav(
+              etat.items.length || !attentionsFacultatives() ? 'Passer au paiement' : 'Continuer sans attention',
+              'options',
+              !attentionsFacultatives() && !etat.items.length
+            )}
           </div>
           ${vueCote()}
         </div>
@@ -804,7 +821,7 @@
       if (!etat.nuit.date) return 'Indiquez la date de votre séjour.';
     }
 
-    if (cle === 'options' && !etat.items.length) {
+    if (cle === 'options' && !attentionsFacultatives() && !etat.items.length) {
       return 'Choisissez au moins une attention.';
     }
 

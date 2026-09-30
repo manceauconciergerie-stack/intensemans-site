@@ -18,7 +18,6 @@ export const CATALOG = Object.freeze({
   "planche-apero": {"name":"Planche apéritive","price":34,"alcohol":false,"adult":false},
   "vin-bouteille": {"name":"Bouteille de vin","price":24,"alcohol":true,"adult":false},
   "duo-cocktails": {"name":"Duo de cocktails","price":28,"alcohol":true,"adult":false},
-  "selection-softs": {"name":"Sélection de softs","price":12,"alcohol":false,"adult":false},
   "petales-roses": {"name":"Pétales de roses","price":25,"alcohol":false,"adult":false},
   "deco-romantique": {"name":"Décoration romantique","price":39,"alcohol":false,"adult":false},
   "deco-anniversaire": {"name":"Décoration anniversaire","price":45,"alcohol":false,"adult":false},

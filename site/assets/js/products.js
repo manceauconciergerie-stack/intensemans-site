@@ -270,19 +270,8 @@ const IM_PRODUCTS = [
     upsell: ['gourmandises', 'petales-roses']
   },
 
-  {
-    id: 'selection-softs',
-    cat: 'deguster',
-    name: 'Sélection de softs',
-    kicker: 'Sans alcool',
-    price: 12,
-    short: 'Boissons fraîches sans alcool, prêtes dans le réfrigérateur.',
-    desc: 'Une sélection de boissons fraîches sans alcool placée dans le réfrigérateur de la suite avant votre arrivée.',
-    includes: ['Eaux plates et pétillantes', 'Sodas et jus', 'Placés au frais avant votre arrivée'],
-    ph: 'Photo à faire : bouteilles alignées dans le frigo ouvert, lumière froide contrastée',
-    gallery: ['Détail : les bouteilles', 'Détail : verre et glace', 'Ambiance : le coin cuisine'],
-    upsell: ['planche-apero', 'gourmandises']
-  },
+  /* Les softs ne se vendent plus : ils sont offerts avec chaque nuit
+     (voir COMPRIS dans parcours.js et la page À propos). */
 
   /* ---------------- À DÉCORER ---------------- */
 

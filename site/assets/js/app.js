@@ -547,7 +547,7 @@
     /* Deux systèmes coexistaient — un carrousel pour les packs, trois
        grilles de vignettes pour le reste — et on ne savait plus où
        chercher quoi. Il n'en reste qu'un seul point d'achat : le
-       compositeur, qui couvre les 18 attentions. Le carrousel garde
+       compositeur, qui couvre les 17 attentions. Le carrousel garde
        son rôle de vitrine au-dessus. */
     host.innerHTML = '<div data-flow-host></div><div data-compose-host></div>';
 

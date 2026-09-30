@@ -277,3 +277,30 @@
   **Règle : un défaut neutralisé par une valeur de réglage n'est pas
   corrigé, il est en sursis. Le noter comme dette à échéance, et le traiter
   AVANT de toucher au réglage qui le masquait.**
+
+- **2026-09-30** | Un paiement de 140 € encaissé sans aucun mail à l'hôte. Trou
+  trouvé : la réservation en attente expirait à 30 min, la session Stripe
+  restait payable 24 h, et le webhook prenait l'enregistrement disparu pour un
+  doublon — 200, zéro log, zéro mail. **Règle : deux durées qui dépendent l'une
+  de l'autre (verrou / session de paiement / TTL) se fixent ENSEMBLE, la plus
+  longue explicitement. Et un « rien à faire » dans un webhook de paiement doit
+  distinguer « déjà traité » de « introuvable » : le second est une alerte,
+  jamais un silence.** Corollaire : la copie de la réservation vit aussi chez
+  Stripe (métadonnées), pour pouvoir la reconstituer.
+
+- **2026-09-30** | Le parcours « réserver une nuit » bloquait sur l'étape
+  attentions sans article, alors que l'étape suivante et le serveur géraient
+  la nuit seule : trois couches, une seule contredisait les deux autres. Un
+  vrai client a payé 12 € de softs pour pouvoir avancer — vente subordonnée,
+  interdite en France (C. conso. L121-11). **Règle : une étape « à options »
+  n'est jamais bloquante sans raison écrite ; et quand une règle est codée à
+  plusieurs couches (UI, validation, serveur), vérifier qu'elles disent la
+  même chose.**
+
+- **2026-09-30** | Document tarifaire de l'hôte contradictoire : « remise si
+  < 72 h » en partie 1, « si ≥ 72 h » en partie 6, plus une remise « longue
+  durée » jamais chiffrée. Coder la première lecture aurait fixé un prix faux
+  sur presque chaque nuit. **Règle : avant de coder une grille métier, relire
+  le document en entier à la recherche de contradictions et de règles citées
+  sans valeur ; les faire trancher AVANT d'écrire une ligne, et ne jamais
+  inventer le chiffre manquant.**

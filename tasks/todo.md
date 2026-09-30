@@ -719,3 +719,43 @@ de 19 h » n'a plus de sens si l'arrivée standard est déjà 16 h.
 - Nom, adresse et site du médiateur agréé
 - Assureur RC pro : nom, numéro de contrat
 - Adresse du logement, ou mention « communiquée après réservation »
+
+## 2026-09-30 — Paiement encaissé (virement Stripe 140 €), aucun mail à Lenny
+
+### Défaut confirmé dans le code
+- `stays.js` : le séjour en attente et le verrou des nuits expirent au bout de 30 min (`VERROU_TTL`).
+- `create-stay-session.js` : la session Stripe n'a pas d'`expires_at` → elle reste payable 24 h (valeur par défaut de Stripe).
+- `webhook.js` : si l'enregistrement a expiré, `marquerPaye` renvoie null et le webhook répond
+  « duplicate » en SILENCE → ni mail, ni ligne au tableau, ni verrou des nuits (risque de double réservation).
+  Même chose si Stripe rejoue le webhook plus de 30 min après un premier échec.
+
+### Plan (à valider)
+- [ ] Diagnostic prod : bloqué par le mode auto (lecture des secrets). Paiement connu par Tom : nuit du 3→4/10 à 128 € (150 − 15 % dernière minute) + softs 12 € = 140 €
+- [x] Session Stripe bornée : `expires_at` = création + 31 min, verrou porté à 45 min, commandes 48 h
+- [x] Webhook : enregistrement introuvable → reconstitué depuis Stripe (`_lib/reconstitution.js`), nuits reprises,
+      conflit signalé dans l'objet du mail. Métadonnées Stripe enrichies (nom, tél., message, n° résa).
+- [x] Webhook : 500 tant que le mail à l'hôte n'est pas parti (Stripe rejoue 3 jours) ; envois tracés
+      (`hostNotifiedAt`, `clientNotifiedAt`) pour ne jamais doubler un mail.
+- [x] Stripe annonçait une arrivée à 19 h, le site 16 h partout : corrigé à 16 h.
+- [x] Même garde-fou pour les commandes d'attentions (`markPaid`)
+- [x] Tests `node --test tests/webhook.test.mjs` : 6/6. L'ancien webhook, même scénario : 200 « duplicate », 0 mail, rien enregistré.
+- [x] Réserver une nuit imposait au moins une attention (bouton grisé + « Choisissez au moins une attention »),
+      alors que l'étape paiement et le serveur acceptaient la nuit seule. Le client du 3/10 a pris les softs
+      à 12 € faute de pouvoir passer. Corrigé pour la voie « a-reserver » (« Continuer sans attention »),
+      inchangé pour « déjà réservé ailleurs ». Vérifié dans le navigateur, les deux voies.
+- [ ] Rembourser au client du 3/10 les 12 € de softs (imposés, et désormais offerts) — à faire par Lenny dans Stripe
+
+- [ ] Stripe → événement du paiement du 3/10 → « Renvoyer » pour que Lenny reçoive le détail
+- [ ] Resend : vérifier le domaine intensemans.com, puis RESEND_FROM sur ce domaine (sinon aucun mail client)
+
+## 2026-09-30 — Nouvelle grille tarifaire (document de Lenny)  ✅ en ligne
+- [x] Source unique `site/api/_lib/grille.js`, recopiée dans le navigateur par `tools/build_rates.mjs`
+- [x] Dim→jeu 115 € ; ven/sam 150 € ; événements 300 € (24 h Motos 8–11/04/27, GP Moto 14–16/05/27,
+      24 h du Mans 9–13/06/27, bornes incluses) ; Saint-Valentin 13 et 14/02 : 350 € fixe
+- [x] Remise DERNIÈRE MINUTE (< 72 h avant 16 h, heure de Paris) : −5 % semaine, −10 % week-end/événements.
+      Le document se contredisait (parties 1/4 « < 72 h », partie 6 « ≥ 72 h ») : Tom a tranché dernière minute.
+- [x] Pas de remise longue durée (citée, jamais chiffrée) ; palier « 240 € » écarté pour la même raison
+- [x] Anciennes hausses supprimées : fêtes de fin d'année (+15 %), ponts de mai (+8 %), semaine St-Valentin (+25 %)
+- [x] CGV §4 mise à jour. Tests `node --test tests/*.test.mjs` : 12/12. Prod vérifiée via /api/availability.
+- [ ] 24 Heures Camions 2027 : ajouter les dates dans grille.js dès l'annonce officielle
+- [ ] Événements 2028 : à saisir chaque année (la grille ne les invente pas)
