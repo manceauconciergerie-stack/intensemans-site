@@ -5,47 +5,22 @@
    ce que cette table dit, mais c'est elle — et jamais le montant
    reçu du client — qui détermine ce qui est débité.
 
-   Les tarifs viennent des variables d'environnement : ils changent
-   sans redéploiement, et aucun chiffre n'est inventé dans le code.
-   Sans eux, la réservation en ligne reste fermée.
+   Les montants sont dans grille.js, validés par l'hôte. Un tarif
+   unique peut encore être imposé par TARIF_SEMAINE / TARIF_WEEKEND
+   (variables d'environnement), qui désactivent alors la grille.
    ============================================================ */
+
+import { BASE, prixGrille } from './grille.js';
 
 const nombre = (valeur) => {
   const n = Number.parseFloat(valeur);
   return Number.isFinite(n) && n > 0 ? n : null;
 };
 
-/* ⚠️ GRILLE PROVISOIRE, À VALIDER PAR L'HÔTE AVANT LA MISE EN LIGNE.
-   Ces montants sont calés sur le marché français des love rooms avec
-   balnéo (90 à 160 € la nuit). Ils ne viennent pas de l'exploitant :
-   ce sont des ordres de grandeur, posés pour que le calendrier soit
-   lisible avant que les vrais prix soient arrêtés.
-
-   Trois effets se combinent, dans cet ordre :
-     1. le jour de la semaine, qui pèse le plus
-     2. la haute saison
-     3. la dernière minute, qui baisse le prix pour remplir une nuit
-        qui serait perdue de toute façon
+/* La grille elle-même (jours, événements, Saint-Valentin, remise
+   de dernière minute) vit dans grille.js, recopiée telle quelle dans
+   le navigateur. Ici : ce qui dépend de l'environnement.
    Poser TARIF_SEMAINE court-circuite toute la grille. */
-const BASE = {
-  0: 109,                       // dimanche
-  1: 99, 2: 99, 3: 99, 4: 105,  // lundi à jeudi
-  5: 139,                       // vendredi
-  6: 149                        // samedi
-};
-
-/* Périodes de forte demande. Bornes incluses, format [mois, jour]. */
-const SAISONS = [
-  { du: [2, 10],  au: [2, 16],  coef: 1.25 },   // Saint-Valentin
-  { du: [12, 20], au: [12, 31], coef: 1.15 },   // fêtes de fin d'année
-  { du: [5, 1],   au: [5, 31],  coef: 1.08 }    // ponts de mai
-];
-
-/* Moins de trois jours avant l'arrivée : sans remise, la nuit reste
-   vide et rapporte zéro. */
-const DERNIERE_MINUTE_JOURS = 3;
-const DERNIERE_MINUTE_COEF = 0.85;
-
 export function tarifs() {
   return {
     base: BASE,
@@ -58,38 +33,19 @@ export function tarifs() {
   };
 }
 
-const dansLaPeriode = (mois, jour, [m1, j1], [m2, j2]) => {
-  const v = mois * 100 + jour;
-  return v >= m1 * 100 + j1 && v <= m2 * 100 + j2;
-};
-
 /* Prix de la nuit qui COMMENCE à cette date : c'est le soir qui
-   compte, pas le lendemain matin. */
-export function prixNuit(dateStr, table = tarifs()) {
+   compte, pas le lendemain matin. `arrivee` (jour d'arrivée du
+   séjour) décide de la remise de dernière minute. */
+export function prixNuit(dateStr, table = tarifs(), { arrivee = dateStr, maintenant = Date.now() } = {}) {
   if (!table) return null;
-  const d = new Date(`${dateStr}T12:00:00`);
-  if (Number.isNaN(d.getTime())) return null;
-  const jour = d.getDay();   // 0 = dimanche
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dateStr))) return null;
 
   if (table.semaine) {
+    const jour = new Date(`${dateStr}T12:00:00Z`).getUTCDay();
     return (jour === 5 || jour === 6) ? (table.weekend || table.semaine) : table.semaine;
   }
 
-  let prix = table.base[jour];
-
-  for (const saison of SAISONS) {
-    if (dansLaPeriode(d.getMonth() + 1, d.getDate(), saison.du, saison.au)) {
-      prix *= saison.coef;
-      break;
-    }
-  }
-
-  const aujourdhui = new Date();
-  aujourdhui.setHours(0, 0, 0, 0);
-  const reste = Math.round((new Date(`${dateStr}T00:00:00`) - aujourdhui) / 86400000);
-  if (reste >= 0 && reste <= DERNIERE_MINUTE_JOURS) prix *= DERNIERE_MINUTE_COEF;
-
-  return Math.round(prix);
+  return prixGrille(dateStr, { arrivee, maintenant });
 }
 
 export function nuitsEntre(checkin, checkout) {
@@ -130,7 +86,7 @@ export function chiffrerSejour(checkin, checkout) {
 
   const lines = nuitsDuSejour(checkin, checkout).map((date) => ({
     date,
-    price: prixNuit(date, table)
+    price: prixNuit(date, table, { arrivee: checkin })
   }));
 
   return {

@@ -2,7 +2,7 @@
    INTENSÉ'MANS — Grille tarifaire, copie navigateur
 
    ⚠️ FICHIER GÉNÉRÉ. Ne pas modifier à la main.
-      Source : site/api/_lib/rates.js
+      Source : site/api/_lib/grille.js
       Régénérer : node tools/build_rates.mjs
 
    Sert uniquement à afficher des prix quand /api/availability ne
@@ -11,47 +11,100 @@
    ============================================================ */
 
 const IM_TARIFS = (() => {
+  /* ============================================================
+     INTENSÉ'MANS — Grille tarifaire (source unique)
+     ------------------------------------------------------------
+     Grille validée par l'hôte le 30/09/2026. Priorité, de haut en bas :
+
+       1. Saint-Valentin (nuits du 13 et du 14 février) : 350 €, fixe,
+          aucune remise
+       2. Grand événement du circuit : 300 €
+       3. Vendredi, samedi : 150 €
+       4. Dimanche à jeudi : 115 €
+
+     Remise de dernière minute, si la réservation est faite moins de
+     72 h avant l'arrivée (16 h, heure de Paris) : −5 % en semaine,
+     −10 % le week-end et pendant les événements. Elle sert à remplir
+     une nuit qui resterait vide, pas à baisser le prix de tous.
+
+     Pas de remise « longue durée » : la grille la cite sans la
+     chiffrer. On ne l'invente pas.
+
+     Ce fichier ne dépend de rien (ni process.env, ni import) : il est
+     recopié tel quel dans le navigateur par tools/build_rates.mjs, pour
+     que le calendrier affiche exactement ce que le serveur débitera.
+     ============================================================ */
+
   const BASE = {
-  0: 109,                       // dimanche
-  1: 99, 2: 99, 3: 99, 4: 105,  // lundi à jeudi
-  5: 139,                       // vendredi
-  6: 149                        // samedi
-};
-
-  const SAISONS = [
-  { du: [2, 10],  au: [2, 16],  coef: 1.25 },   // Saint-Valentin
-  { du: [12, 20], au: [12, 31], coef: 1.15 },   // fêtes de fin d'année
-  { du: [5, 1],   au: [5, 31],  coef: 1.08 }    // ponts de mai
-];
-
-  const DERNIERE_MINUTE_JOURS = 3;
-  const DERNIERE_MINUTE_COEF = 0.85;
-
-  const dansLaPeriode = (mois, jour, [m1, j1], [m2, j2]) => {
-    const v = mois * 100 + jour;
-    return v >= m1 * 100 + j1 && v <= m2 * 100 + j2;
+    0: 115,                         // dimanche
+    1: 115, 2: 115, 3: 115, 4: 115, // lundi à jeudi
+    5: 150,                         // vendredi
+    6: 150                          // samedi
   };
 
-  function prixNuit(dateStr) {
-    const d = new Date(dateStr + 'T12:00:00');
-    if (Number.isNaN(d.getTime())) return null;
+  /* Nuits concernées : du premier au dernier jour INCLUS (la nuit qui
+     commence le dernier jour est au tarif événement). Dates ISO.
+     24 Heures Camions 2027 : dates pas encore annoncées. Ajouter la
+     ligne ici dès qu'elles le sont, puis `node tools/build_rates.mjs`. */
+  const EVENEMENTS = [
+    { nom: '24 Heures Motos',           du: '2027-04-08', au: '2027-04-11', prix: 300 },
+    { nom: 'Grand Prix de France Moto', du: '2027-05-14', au: '2027-05-16', prix: 300 },
+    { nom: '24 Heures du Mans',         du: '2027-06-09', au: '2027-06-13', prix: 300 }
+  ];
 
-    let prix = BASE[d.getDay()];
+  /* Chaque année, [mois, jour]. */
+  const SAINT_VALENTIN = { nuits: [[2, 13], [2, 14]], prix: 350 };
 
-    for (const saison of SAISONS) {
-      if (dansLaPeriode(d.getMonth() + 1, d.getDate(), saison.du, saison.au)) {
-        prix *= saison.coef;
-        break;
-      }
-    }
+  const REMISE = { semaine: 0.05, weekend: 0.10, evenement: 0.10 };
+  const DERNIERE_MINUTE_HEURES = 72;
+  const HEURE_ARRIVEE = 16;
 
-    const aujourdhui = new Date();
-    aujourdhui.setHours(0, 0, 0, 0);
-    const reste = Math.round((new Date(dateStr + 'T00:00:00') - aujourdhui) / 86400000);
-    if (reste >= 0 && reste <= DERNIERE_MINUTE_JOURS) prix *= DERNIERE_MINUTE_COEF;
+  const decoupe = (iso) => iso.split('-').map((n) => Number.parseInt(n, 10));
 
-    return Math.round(prix);
+  /* Décalage de Paris par rapport à UTC à cet instant, en minutes.
+     Le serveur tourne en UTC : sans ce calcul, « 72 h avant 16 h »
+     glisserait de deux heures en été. */
+  function decalageParis(ts) {
+    const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Europe/Paris', hourCycle: 'h23',
+      year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+    }).formatToParts(new Date(ts)).map((x) => [x.type, x.value]));
+    return (Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute) - ts) / 60000;
   }
 
-  return { prixNuit };
+  /* Instant d'arrivée : ce jour-là, 16 h à Paris. */
+  function instantArrivee(iso) {
+    const [a, m, j] = decoupe(iso);
+    const approx = Date.UTC(a, m - 1, j, HEURE_ARRIVEE);
+    return approx - decalageParis(approx) * 60000;
+  }
+
+  function derniereMinute(arrivee, maintenant) {
+    return instantArrivee(arrivee) - maintenant < DERNIERE_MINUTE_HEURES * 3600000;
+  }
+
+  /* Prix de la nuit qui COMMENCE à `iso`. `arrivee` est le jour
+     d'arrivée du séjour : c'est lui qui décide de la dernière minute,
+     pour toutes les nuits du séjour. Arrondi au centime (109,25 €). */
+  function prixGrille(iso, { arrivee = iso, maintenant = Date.now() } = {}) {
+    const [a, m, j] = decoupe(iso);
+    if (!a || !m || !j) return null;
+
+    if (SAINT_VALENTIN.nuits.some(([mm, jj]) => mm === m && jj === j)) {
+      return SAINT_VALENTIN.prix;
+    }
+
+    const jour = new Date(Date.UTC(a, m - 1, j)).getUTCDay();   // 0 = dimanche
+    const evenement = EVENEMENTS.find((e) => iso >= e.du && iso <= e.au);
+
+    const prix = evenement ? evenement.prix : BASE[jour];
+    const remise = evenement ? REMISE.evenement
+      : (jour === 5 || jour === 6) ? REMISE.weekend
+        : REMISE.semaine;
+
+    const final = derniereMinute(arrivee, maintenant) ? prix * (1 - remise) : prix;
+    return Math.round(final * 100) / 100;
+  }
+
+  return { prixNuit: (iso) => prixGrille(iso) };
 })();
