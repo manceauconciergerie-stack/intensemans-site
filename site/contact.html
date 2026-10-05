@@ -68,7 +68,7 @@
       </div>
 
       <div class="im-cart">
-        <form class="im-form" novalidate>
+        <form class="im-form" novalidate data-contact>
           <div class="im-form__row">
             <div class="im-field">
               <label for="c-name">Votre nom</label>
@@ -99,7 +99,8 @@
             <label for="c-message">Votre message</label>
             <textarea id="c-message" name="message" placeholder="Dites-nous tout."></textarea>
           </div>
-          <p class="im-field__help">Prototype : ce formulaire n’envoie encore rien.</p>
+          <p class="im-field__help">Le bouton ouvre votre messagerie, avec votre message prêt à partir.</p>
+          <p class="im-pc__erreur" data-contact-erreur hidden></p>
           <button class="im-btn im-btn--primary" type="submit">Envoyer <span aria-hidden="true">❤︎</span></button>
         </form>
 
@@ -107,10 +108,12 @@
           <h2>Nous joindre</h2>
           <div class="im-summary__row"><span class="im-quiet">Réponse</span><span>Sous 24 h</span></div>
           <div class="im-summary__row"><span class="im-quiet">Commandes</span><span>Jusqu’à 18 h la veille</span></div>
+          <div class="im-summary__row"><span class="im-quiet">Téléphone</span><span><a href="tel:+33640081045">06 40 08 10 45</a></span></div>
+          <div class="im-summary__row"><span class="im-quiet">Courriel</span><span><a href="mailto:rbrsci72@gmail.com">rbrsci72@gmail.com</a></span></div>
           <div class="im-summary__row"><span class="im-quiet">Lieu</span><span>Le Mans</span></div>
           <p class="im-summary__legal">
-            Pour une demande urgente concernant un séjour du jour, précisez-le en objet :
-            nous traitons ces messages en priorité.
+            Pour une demande urgente concernant un séjour du jour, appelez Lenny
+            directement.
           </p>
         </aside>
       </div>
@@ -133,7 +136,6 @@
           <h3>La boutique</h3>
           <ul>
             <li><a href="index.html#parcours">Réserver et composer</a></li>
-            <li><a href="index.html#parcours">Nos disponibilités</a></li>
             <li><a href="contact.html">Une demande sur mesure</a></li>
           </ul>
         </div>
@@ -166,6 +168,7 @@
 <script src="assets/js/cart.js?v=6a94422c"></script>
 <script src="assets/js/orders.js?v=6a94643f"></script>
 <script src="assets/js/app.js?v=6ac415f9"></script>
+<script src="assets/js/contact.js?v=6ac41bf1"></script>
 <!-- Mesure d'audience Vercel. Sans cookie et sans identifiant
      persistant : aucun bandeau de consentement n'est requis, et
      rien de ce fichier ne fonctionne hors de Vercel. -->

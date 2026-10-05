@@ -802,3 +802,19 @@ Hors code (Tom / Lenny, je ne peux pas le faire) :
 - [ ] Stripe : URL du webhook en www ; notifications « paiement réussi » activées pour Lenny
 - [ ] Stripe : libellé de relevé bancaire + téléphone public (un débit reconnaissable évite l'opposition)
 - [ ] Stripe : lire la raison des 3 refus (Radar ou banque) avant de toucher à quoi que ce soit
+
+## 2026-10-05 — Pages réglementaires nettoyées
+- [x] Les 15 « [À COMPLÉTER] » retirés (mentions légales, CGV, confidentialité), source build_pages.py
+- [x] Lien vers la plateforme européenne ODR retiré : fermée par l'UE le 20/07/2025
+- [x] CGV : délais (3 jours, remboursement sous 14 jours), report « sur accord et selon disponibilité »,
+      attentions annulables jusqu'à la veille 18 h, codes donnés par l'exploitant (et non par courriel)
+- [x] Confidentialité corrigée : roue (consentement aux offres, 1 an), Vercel Web Analytics déclaré,
+      cookie de session de l'hôte, commande non payée 48 h, messages de contact 12 mois, RGPD → rbrsci72@gmail.com
+- [x] Contact : le formulaire « Prototype : n'envoie encore rien » ouvre la messagerie du client vers
+      l'exploitant (contact.js) ; téléphone et courriel affichés
+- [x] Pied de page : doublon « Nos disponibilités » retiré
+- [ ] À FOURNIR PAR LENNY (je n'invente pas de données légales) :
+      · MÉDIATEUR de la consommation : adhésion OBLIGATOIRE (art. L.612-1), amende jusqu'à 15 000 € pour une
+        société ; donner son nom, adresse et site → je l'ajoute aux mentions légales et aux CGV
+      · Numéro d'enregistrement du meublé de tourisme, si la mairie du Mans en a délivré un
+      · TVA (franchise art. 293 B + exonération 261 D 4°) à faire confirmer par le comptable

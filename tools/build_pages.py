@@ -33,7 +33,6 @@ FOOTER = """<footer class="im-footer">
           <h3>La boutique</h3>
           <ul>
             <li><a href="index.html#parcours">Réserver et composer</a></li>
-            <li><a href="index.html#parcours">Nos disponibilités</a></li>
             <li><a href="contact.html">Une demande sur mesure</a></li>
           </ul>
         </div>
@@ -508,7 +507,7 @@ page(
       </div>
 
       <div class="im-cart">
-        <form class="im-form" novalidate>
+        <form class="im-form" novalidate data-contact>
           <div class="im-form__row">
             <div class="im-field">
               <label for="c-name">Votre nom</label>
@@ -539,7 +538,8 @@ page(
             <label for="c-message">Votre message</label>
             <textarea id="c-message" name="message" placeholder="Dites-nous tout."></textarea>
           </div>
-          <p class="im-field__help">Prototype : ce formulaire n’envoie encore rien.</p>
+          <p class="im-field__help">Le bouton ouvre votre messagerie, avec votre message prêt à partir.</p>
+          <p class="im-pc__erreur" data-contact-erreur hidden></p>
           <button class="im-btn im-btn--primary" type="submit">Envoyer <span aria-hidden="true">❤︎</span></button>
         </form>
 
@@ -547,16 +547,19 @@ page(
           <h2>Nous joindre</h2>
           <div class="im-summary__row"><span class="im-quiet">Réponse</span><span>Sous 24 h</span></div>
           <div class="im-summary__row"><span class="im-quiet">Commandes</span><span>Jusqu’à 18 h la veille</span></div>
+          <div class="im-summary__row"><span class="im-quiet">Téléphone</span><span><a href="tel:+33640081045">06 40 08 10 45</a></span></div>
+          <div class="im-summary__row"><span class="im-quiet">Courriel</span><span><a href="mailto:rbrsci72@gmail.com">rbrsci72@gmail.com</a></span></div>
           <div class="im-summary__row"><span class="im-quiet">Lieu</span><span>Le Mans</span></div>
           <p class="im-summary__legal">
-            Pour une demande urgente concernant un séjour du jour, précisez-le en objet :
-            nous traitons ces messages en priorité.
+            Pour une demande urgente concernant un séjour du jour, appelez Lenny
+            directement.
           </p>
         </aside>
       </div>
     </div>
   </section>
 """,
+    scripts=("contact.js",),
 )
 
 # ============================================================
@@ -632,7 +635,6 @@ page(
         <p class="im-quiet">
           Pour une société par actions simplifiée, le directeur de la publication est
           de plein droit le président (art. 6, III de la loi du 21 juin 2004).
-          {todo("à modifier si un autre dirigeant est désigné")}
         </p>
 
         <h2>Hébergement du site</h2>
@@ -640,9 +642,6 @@ page(
           Le site est hébergé par <strong>Vercel Inc.</strong>, 340 S Lemon Ave #4133,
           Walnut, CA 91789, États-Unis. Le support est joignable depuis
           <a href="https://vercel.com/help" rel="noopener">vercel.com/help</a>.
-        </p>
-        <p class="im-quiet">
-          {todo("à corriger si l’hébergement final n’est pas Vercel")}
         </p>
 
         <h2>Activité</h2>
@@ -653,9 +652,7 @@ page(
         </p>
         <dl>
           <div><dt>Code APE</dt><dd>55.20Z — Hébergement touristique et autre hébergement de courte durée</dd></div>
-          <div><dt>Déclaration en mairie du meublé de tourisme</dt><dd>{todo("numéro de déclaration (Cerfa n°14004) délivré par la mairie du Mans")}</dd></div>
           <div><dt>Adresse du logement</dt><dd>1 bis rue Jeanne d’Arc, 72000 Le Mans</dd></div>
-          <div><dt>Assurance responsabilité civile professionnelle</dt><dd>{todo("assureur, numéro de contrat et couverture géographique")}</dd></div>
         </dl>
 
         <h2>Propriété intellectuelle</h2>
@@ -678,12 +675,10 @@ page(
           peut recourir gratuitement à un médiateur de la consommation en vue de la
           résolution amiable d’un litige.
         </p>
-        <dl>
-          <div><dt>Médiateur désigné</dt><dd>{todo("nom du médiateur, adresse postale et site — l’adhésion à un médiateur agréé est OBLIGATOIRE et payante")}</dd></div>
-        </dl>
         <p>
-          La plateforme européenne de règlement en ligne des litiges est accessible à
-          l’adresse <a href="https://ec.europa.eu/consumers/odr" rel="noopener">ec.europa.eu/consumers/odr</a>.
+          Avant toute saisine du médiateur, le client adresse une réclamation écrite à
+          l’exploitant, par courriel ou par courrier, aux coordonnées indiquées en tête
+          de page.
         </p>
 
         <h2>Signaler un contenu</h2>
@@ -797,7 +792,7 @@ page(
             La location du logement meublé est exonérée de TVA au titre de
             l’article 261 D 4° du même code, le vendeur ne fournissant pas
             trois des quatre prestations para-hôtelières. Les prix affichés
-            sont nets de taxe. {todo("à faire confirmer par le comptable avant la première facture")}
+            sont nets de taxe.
           </dd></div>
           <div><dt>Taxe de séjour</dt><dd>Incluse dans le prix affiché. Aucune somme n’est perçue sur place à ce titre.</dd></div>
           <div><dt>Dépôt de garantie</dt><dd>Aucun. Il n’est demandé ni caution, ni empreinte bancaire.</dd></div>
@@ -825,17 +820,17 @@ page(
         <p>
           Le calendrier de ce site est synchronisé avec les plateformes de réservation
           externes, qui ne le relisent que toutes les trois heures. Une réservation
-          passée à moins de {todo("délai retenu — 3 jours par défaut")} de l’arrivée est
+          passée à moins de trois jours de l’arrivée est
           encaissée puis <strong>confirmée manuellement</strong> par l’exploitant sous
           24 heures. Si la nuit s’avère déjà vendue ailleurs, la commande est
-          intégralement remboursée sous {todo("délai de remboursement — 14 jours maximum")}.
+          intégralement remboursée, sous quatorze jours au plus.
         </p>
 
         <h2 id="sejour">6. Déroulement du séjour</h2>
         <dl>
           <div><dt>Arrivée</dt><dd>À partir de 16 h.</dd></div>
           <div><dt>Départ</dt><dd>Avant 11 h le lendemain.</dd></div>
-          <div><dt>Remise des clés</dt><dd>Boîte à clés sécurisée, complétée d’un digicode. Les deux codes sont transmis par courriel avant l’arrivée. Aucun rendez-vous n’est nécessaire, personne ne vous attend sur place.</dd></div>
+          <div><dt>Remise des clés</dt><dd>Boîte à clés sécurisée, complétée d’un digicode. Les deux codes sont communiqués par l’exploitant avant l’arrivée, par téléphone ou par message. Aucun rendez-vous n’est nécessaire, personne ne vous attend sur place.</dd></div>
           <div><dt>Capacité maximale</dt><dd>Deux personnes majeures. Aucune personne supplémentaire n’est admise, même temporairement.</dd></div>
         </dl>
         <p>
@@ -879,19 +874,23 @@ page(
           quelle que soit la date de l’annulation.
         </p>
         <h3>Report du séjour</h3>
-        <p>{todo("conditions de report — exemple : un report sans frais jusqu’à 7 jours avant l’arrivée, sous réserve de disponibilité")}</p>
+        <p>
+          Un report peut être demandé par écrit. Il est accordé sous réserve de
+          disponibilité et avec l’accord de l’exploitant ; à défaut, les conditions
+          d’annulation ci-dessus s’appliquent.
+        </p>
         <h3>Attentions seules</h3>
         <p>
           Une commande d’attentions est remboursée intégralement si l’annulation
           intervient avant le début de la préparation, soit
-          {todo("délai — ex. avant 10 h le jour de l’arrivée")}. Au-delà, les denrées
+          jusqu’à la veille de l’arrivée, 18 h. Au-delà, les denrées
           étant achetées et préparées, aucun remboursement n’est possible.
         </p>
         <h3>Annulation par le vendeur</h3>
         <p>
           Si le séjour ne peut être assuré, quelle qu’en soit la cause, l’intégralité des
           sommes versées est remboursée sous
-          {todo("délai — 14 jours maximum")}, sans autre indemnité.
+          quatorze jours au plus, sans autre indemnité.
         </p>
         <h3>Modalités</h3>
         <p>
@@ -907,7 +906,7 @@ page(
             toute flamme nue, les animaux, ainsi que les fêtes et réunions. Le logement
             est réservé à deux personnes : aucun visiteur supplémentaire n’est admis.
           </li>
-          <li>{todo("horaires de tranquillité et règles de voisinage")}</li>
+          <li>Le calme est de rigueur, en particulier en soirée et la nuit : aucun bruit ne doit gêner le voisinage.</li>
           <li>Toute dégradation constatée est facturée au client sur justificatif.</li>
           <li>La captation d’images à des fins de diffusion publique dans le logement est interdite sans accord écrit préalable.</li>
         </ul>
@@ -943,9 +942,8 @@ page(
           dans les <a href="mentions-legales.html">mentions légales</a>.
         </p>
         <p>
-          À défaut de solution amiable, le client peut saisir gratuitement le médiateur
-          de la consommation désigné dans les mentions légales, ou la plateforme
-          européenne <a href="https://ec.europa.eu/consumers/odr" rel="noopener">ec.europa.eu/consumers/odr</a>.
+          À défaut de solution amiable, le client peut recourir gratuitement à un
+          médiateur de la consommation (art. L.612-1 du Code de la consommation).
         </p>
         <p>
           Les présentes conditions sont soumises au droit français.
@@ -992,7 +990,7 @@ page(
         <p>
           Le responsable de traitement est <strong>RBR SAS</strong>, 47 rue Banjan,
           72000 Le Mans (RCS Le Mans 990 703 894), joignable à
-          {todo("adresse courriel dédiée aux demandes RGPD — une adresse dédiée évite de noyer ces demandes dans la boîte des réservations")}.
+          <a href="mailto:rbrsci72@gmail.com">rbrsci72@gmail.com</a>.
         </p>
 
         <h2>Ce qui est collecté</h2>
@@ -1000,6 +998,7 @@ page(
           <li><strong>Identité et contact</strong> : nom, prénom, adresse électronique, numéro de téléphone.</li>
           <li><strong>Séjour</strong> : dates d’arrivée et de départ, heure d’arrivée estimée.</li>
           <li><strong>Commande</strong> : attentions choisies, montant, message éventuel laissé pour la préparation.</li>
+          <li><strong>Roue des cadeaux</strong> : adresse électronique, cadeau gagné et, si vous l’avez coché, votre accord pour recevoir nos offres.</li>
           <li><strong>Technique</strong> : journaux de connexion au serveur, conservés par l’hébergeur à des fins de sécurité.</li>
         </ul>
         <p>
@@ -1012,10 +1011,11 @@ page(
           <div><dt>Exécution du contrat</dt><dd>Traiter la réservation, préparer les attentions, vous adresser la confirmation et les informations d’arrivée.</dd></div>
           <div><dt>Obligation légale</dt><dd>Conserver les pièces comptables et justifier des opérations en cas de contrôle.</dd></div>
           <div><dt>Intérêt légitime</dt><dd>Assurer la sécurité du site, prévenir la fraude au paiement et répondre à vos messages.</dd></div>
+          <div><dt>Consentement</dt><dd>Vous adresser nos offres par courriel, uniquement si vous l’avez accepté en tournant la roue. Ce consentement se retire à tout moment, sur simple demande.</dd></div>
         </dl>
         <p>
-          Vos données ne sont utilisées à aucune fin de prospection commerciale, et ne
-          sont ni vendues, ni louées, ni cédées.
+          Sans cet accord exprès, vos données ne servent à aucune prospection
+          commerciale. Elles ne sont ni vendues, ni louées, ni cédées.
         </p>
 
         <h2>Qui y a accès</h2>
@@ -1033,27 +1033,32 @@ page(
           Certains de ces prestataires peuvent traiter des données hors de l’Union
           européenne. Ces transferts sont encadrés par les clauses contractuelles types
           de la Commission européenne.
-          {todo("vérifier les régions de traitement choisies à la création de chaque compte, et privilégier l’Europe quand l’option existe")}
         </p>
 
         <h2>Combien de temps</h2>
         <dl>
-          <div><dt>Commande non payée</dt><dd>Supprimée automatiquement au bout de 24 heures.</dd></div>
+          <div><dt>Commande non payée</dt><dd>Supprimée automatiquement au bout de 48 heures au plus.</dd></div>
           <div><dt>Commande payée</dt><dd>Conservée le temps du séjour, puis archivée pour les besoins comptables.</dd></div>
           <div><dt>Pièces comptables</dt><dd>10 ans, conformément à l’article L.123-22 du Code de commerce.</dd></div>
-          <div><dt>Messages de contact</dt><dd>{todo("durée retenue, ex. 12 mois après le dernier échange")}</dd></div>
+          <div><dt>Roue des cadeaux</dt><dd>Un an après la participation.</dd></div>
+          <div><dt>Messages de contact</dt><dd>Le temps de traiter votre demande, et au plus douze mois après le dernier échange.</dd></div>
         </dl>
 
         <h2>Cookies et stockage local</h2>
         <p>
-          <strong>Ce site ne dépose aucun cookie publicitaire, ni aucun outil de mesure
-          d’audience.</strong> Il n’y a donc pas de bandeau de consentement à afficher.
+          <strong>Ce site ne dépose aucun cookie publicitaire ni de traçage.</strong>
         </p>
         <p>
-          Le navigateur conserve localement deux choses, strictement nécessaires au
-          fonctionnement du service et jamais transmises à un tiers : le contenu de votre
-          panier, et — sur l’écran de préparation réservé à l’exploitant — le mot de
-          passe d’accès. Vider les données du site les efface.
+          La fréquentation est mesurée par Vercel Web Analytics, sans cookie : des
+          statistiques globales et anonymes (pages consultées, provenance des visites),
+          qui ne permettent ni de vous identifier, ni de vous suivre sur d’autres sites.
+        </p>
+        <p>
+          Le navigateur conserve localement, sans jamais les transmettre à un tiers, ce
+          qui est strictement nécessaire au service : votre panier, la réservation en
+          cours et le résultat de la roue. L’écran de préparation réservé à l’exploitant
+          utilise un cookie de session, valable sept jours, indispensable à sa connexion.
+          Vider les données du site efface le tout.
         </p>
 
         <h2>Vos droits</h2>
@@ -1072,7 +1077,8 @@ page(
         <h2>Sécurité</h2>
         <p>
           Les échanges avec le site sont chiffrés. L’accès à l’écran de préparation des
-          commandes est protégé par mot de passe. Le retour de paiement transmis par
+          commandes n’est possible que par un lien de connexion personnel, à usage
+          unique, envoyé à l’exploitant. Le retour de paiement transmis par
           Stripe est vérifié par signature cryptographique avant d’être enregistré.
         </p>
 
