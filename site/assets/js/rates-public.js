@@ -86,13 +86,18 @@ const IM_TARIFS = (() => {
   /* Prix de la nuit qui COMMENCE à `iso`. `arrivee` est le jour
      d'arrivée du séjour : c'est lui qui décide de la dernière minute,
      pour toutes les nuits du séjour. Arrondi au centime (109,25 €). */
+  /* Nuit de la Saint-Valentin : tarif fixe, aucune promotion, ni
+     dernière minute ni code d'apporteur (promos.js). */
+  function estSaintValentin(iso) {
+    const [, m, j] = decoupe(iso);
+    return SAINT_VALENTIN.nuits.some(([mm, jj]) => mm === m && jj === j);
+  }
+
   function prixGrille(iso, { arrivee = iso, maintenant = Date.now() } = {}) {
     const [a, m, j] = decoupe(iso);
     if (!a || !m || !j) return null;
 
-    if (SAINT_VALENTIN.nuits.some(([mm, jj]) => mm === m && jj === j)) {
-      return SAINT_VALENTIN.prix;
-    }
+    if (estSaintValentin(iso)) return SAINT_VALENTIN.prix;
 
     const jour = new Date(Date.UTC(a, m - 1, j)).getUTCDay();   // 0 = dimanche
     const evenement = EVENEMENTS.find((e) => iso >= e.du && iso <= e.au);
@@ -106,5 +111,5 @@ const IM_TARIFS = (() => {
     return Math.round(final * 100) / 100;
   }
 
-  return { prixNuit: (iso) => prixGrille(iso) };
+  return { prixNuit: (iso) => prixGrille(iso), estSaintValentin };
 })();

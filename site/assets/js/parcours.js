@@ -21,7 +21,7 @@
     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
   ));
   const euro = (n) => new Intl.NumberFormat('fr-FR', {
-    style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 2
+    style: 'currency', currency: 'EUR', minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2
   }).format(n);
 
   const FLECHE = '<svg viewBox="0 0 16 8" fill="none" aria-hidden="true"><path d="M0 4h13M10 1l3 3-3 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -109,6 +109,12 @@
       : '<p class="im-pc__delai">Attentions à commander jusqu’à 18 h la veille de votre arrivée.</p>';
   }
 
+  /* Même règle que create-stay-session.js : 10 à 15 chiffres, « + »,
+     espaces, points, tirets et parenthèses tolérés. */
+  const telValide = (t) => /^[+0-9 ().-]+$/.test(String(t).trim())
+    && String(t).replace(/\D/g, '').length >= 10
+    && String(t).replace(/\D/g, '').length <= 15;
+
   const vierge = () => ({
     voie: null,          // 'reserve' | 'a-reserver'
     etape: 0,
@@ -118,6 +124,7 @@
     message: '',
     intense: 'range',  // 'range' | 'installe' | 'retire'
     code: '',
+    promo: null,         // { code, apporteur, remise } — vérifié par /api/promo
     items: []            // [{ id, qty }]
   });
 
@@ -157,7 +164,22 @@
      le client règle la chambre et ses attentions en une seule fois. */
   const prixNuit = () => (etat.voie === 'a-reserver' && etat.nuit.price ? etat.nuit.price : 0);
   const totalExtras = () => lignes().reduce((s, l) => s + l.total, 0);
-  const total = () => prixNuit() + totalExtras();
+  /* Remise d'apporteur, calculée exactement comme le serveur
+     (create-stay-session.js) : par ligne, au centime, jamais sur une
+     nuit de la Saint-Valentin. C'est le serveur qui débite ; ceci
+     n'évite que la surprise d'un autre montant sur la page Stripe. */
+  const promoActive = () => (etat.voie === 'a-reserver' && etat.promo ? etat.promo : null);
+  const remisePromo = () => {
+    const p = promoActive();
+    if (!p) return 0;
+    const cents = (n) => Math.round(n * 100);
+    const saintValentin = typeof IM_TARIFS !== 'undefined' && IM_TARIFS.estSaintValentin
+      && etat.nuit.date && IM_TARIFS.estSaintValentin(etat.nuit.date);
+    const nuit = saintValentin ? 0 : Math.round(cents(prixNuit()) * p.remise);
+    const extras = lignes().reduce((s, l) => s + Math.round(cents(l.p.price) * p.remise) * l.qty, 0);
+    return (nuit + extras) / 100;
+  };
+  const total = () => Math.round((prixNuit() + totalExtras() - remisePromo()) * 100) / 100;
   const nbArticles = () => etat.items.reduce((n, l) => n + l.qty, 0);
   const contientAlcool = () => lignes().some((l) => l.p.alcohol || l.p.adult);
 
@@ -321,7 +343,51 @@
     } catch (e) { return null; }
   }
 
+  /* Un code saisi est d'abord demandé au serveur : code d'apporteur,
+     il remise le total ; inconnu (404), c'est un code de la roue, qui
+     part à l'hôte comme avant. Serveur injoignable : on le dit, plutôt
+     que de ranger un code promo parmi les cadeaux sans remise. */
+  async function poserCode(saisi) {
+    const erreur = (texte) => {
+      const p = $('[data-code-erreur]', hote);
+      if (p) { p.textContent = texte; p.hidden = false; }
+    };
+    let reponse;
+    try {
+      reponse = await fetch(`/api/promo?code=${encodeURIComponent(saisi)}`);
+    } catch (e) {
+      erreur('Vérification du code impossible pour l’instant. Réessayez.');
+      return;
+    }
+    if (reponse.ok) {
+      const promo = await reponse.json();
+      if (etat.voie !== 'a-reserver') {
+        erreur('Ce code s’applique à la réservation d’une nuit sur le site.');
+        return;
+      }
+      etat.promo = { code: promo.code, apporteur: promo.apporteur, remise: promo.remise };
+    } else if (reponse.status === 404) {
+      etat.code = saisi;
+    } else {
+      erreur('Vérification du code impossible pour l’instant. Réessayez.');
+      return;
+    }
+    ecrire();
+    rendre();
+  }
+
   function champCode() {
+    const p = promoActive();
+    if (p) {
+      return `
+        <div class="im-pc__code" data-pose="true">
+          <p class="im-pc__codeok">
+            <strong>−${Math.round(p.remise * 100)} %</strong>
+            Code ${esc(p.code)}, de la part de ${esc(p.apporteur)}
+          </p>
+          <button type="button" class="im-pc__retirer" data-promo-retirer>Retirer</button>
+        </div>`;
+    }
     if (etat.code) {
       const su = cadeauLocal(etat.code);
       return `
@@ -335,12 +401,13 @@
     }
     return `
       <div class="im-pc__code">
-        <label for="pc-code">Code cadeau</label>
+        <label for="pc-code">Code cadeau ou code promo</label>
         <div class="im-pc__codeligne">
           <input id="pc-code" type="text" inputmode="latin" autocapitalize="characters"
                  placeholder="IM-XXXXX" data-code-champ>
           <button type="button" data-code-valider>Ajouter</button>
         </div>
+        <p class="im-pc__erreur" data-code-erreur hidden></p>
       </div>`;
   }
 
@@ -380,6 +447,8 @@
               </span>
             </li>`).join('')}
         </ul>
+        ${remisePromo() ? `
+        <p class="im-pc__total"><span>Code ${esc(promoActive().code)}</span><span class="im-price">−${euro(remisePromo())}</span></p>` : ''}
         ${champCode()}
         <p class="im-pc__total"><span>Total</span><span class="im-price">${euro(total())}</span></p>
       </aside>`;
@@ -478,9 +547,9 @@
             </div>
           </div>
           <div class="im-field">
-            <label for="pc-tel">Téléphone</label>
-            <input id="pc-tel" name="tel" type="tel" autocomplete="tel" value="${esc(etat.client.tel)}">
-            <p class="im-field__help">Facultatif. Uniquement en cas d’imprévu le jour même.</p>
+            <label for="pc-tel">Téléphone <span class="im-req" aria-hidden="true">*</span></label>
+            <input id="pc-tel" name="tel" type="tel" autocomplete="tel" inputmode="tel" required value="${esc(etat.client.tel)}">
+            <p class="im-field__help">Lenny vous appelle avant votre arrivée pour l’accès et les codes.</p>
           </div>
         </div>
         <p class="im-pc__erreur" data-erreur hidden></p>
@@ -586,6 +655,8 @@
               ${etat.voie === 'a-reserver'
                 ? `<div><dt>E-mail</dt><dd>${esc(etat.client.email || '—')}</dd></div>` : ''}
               ${l.map((x) => `<div><dt>${esc(x.p.name)}${x.qty > 1 ? ` × ${x.qty}` : ''}</dt><dd class="im-price">${euro(x.total)}</dd></div>`).join('')}
+              ${remisePromo()
+                ? `<div><dt>Code ${esc(promoActive().code)} · ${esc(promoActive().apporteur)}</dt><dd class="im-price">−${euro(remisePromo())}</dd></div>` : ''}
             </dl>
 
             ${choixIntense()}
@@ -811,6 +882,9 @@
       etat.client.tel = ($('[name="tel"]', hote) || {}).value || '';
       if (!etat.client.name.trim()) return 'Indiquez votre nom.';
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(etat.client.email)) return 'Indiquez un e-mail valide.';
+      /* Obligatoire : sans lui, une réservation dont les mails se
+         perdent laisse l'hôte sans aucun moyen de joindre le client. */
+      if (!telValide(etat.client.tel)) return 'Indiquez un numéro de téléphone valide.';
     }
 
     if (cle === 'resa') {
@@ -882,6 +956,8 @@
             message: messageHote()
           },
           items: etat.items,
+          promo: promoActive() ? promoActive().code : undefined,
+          cadeau: etat.code || undefined,
           adult: true
         }
       : {
@@ -893,6 +969,7 @@
             message: messageHote()
           },
           items: etat.items,
+          cadeau: etat.code || undefined,
           adult: true
         };
 
@@ -916,6 +993,8 @@
             checkout: corps.checkout,
             nights: 1,
             total: total(),
+            /* La page de confirmation annonce l'appel de Lenny à CE numéro. */
+            phone: corps.guest.phone,
             needsConfirmation: Boolean(data.needsConfirmation)
           }));
         } catch (e2) { /* rien de bloquant */ }
@@ -1004,8 +1083,14 @@
       /* Code cadeau : posé ou retiré, sans quitter la page. */
       if (ev.target.closest('[data-code-valider]')) {
         const champ = $('[data-code-champ]', hote);
-        const saisi = (champ && champ.value || '').trim().toUpperCase();
-        if (saisi) { etat.code = saisi; ecrire(); rendre(); }
+        const saisi = (champ && champ.value || '').replace(/\s+/g, '').toUpperCase();
+        if (saisi) poserCode(saisi);
+        return;
+      }
+      if (ev.target.closest('[data-promo-retirer]')) {
+        etat.promo = null;
+        ecrire();
+        rendre();
         return;
       }
       if (ev.target.closest('[data-code-retirer]')) {

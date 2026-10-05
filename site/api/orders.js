@@ -65,7 +65,8 @@ function enLigne(s) {
       /* À la place du numéro de réservation Airbnb, qui n'existe pas
          ici : la durée du séjour, l'information dont l'hôte a besoin
          pour savoir jusqu'à quand la chambre est prise. */
-      resa: `${nuits} nuit${nuits > 1 ? 's' : ''} · départ le ${jour(s.checkout)}`,
+      resa: `${nuits} nuit${nuits > 1 ? 's' : ''} · départ le ${jour(s.checkout)}${
+        s.promo ? ` · de la part de ${s.promo.apporteur}` : ''}`,
       message: (s.guest && s.guest.message) || ''
     },
     lines: [
@@ -75,7 +76,23 @@ function enLigne(s) {
         qty: nuits,
         total: Number(s.nightsTotal) || 0
       },
-      ...extras
+      ...extras,
+      /* Le cadeau de la roue, à préparer comme le reste : le 3 octobre,
+         la planche gagnée n'apparaissait nulle part. */
+      ...(s.cadeau ? [{
+        id: 'cadeau',
+        name: `Cadeau de la roue : ${s.cadeau.lot || `code ${s.cadeau.code} à vérifier`}`,
+        qty: 1,
+        total: 0
+      }] : []),
+      /* La remise d'apporteur en ligne négative : sans elle, les
+         lignes ne tombent pas sur le total payé. */
+      ...(s.promo && s.promo.montant ? [{
+        id: 'promo',
+        name: `Code ${s.promo.code} (${s.promo.apporteur})`,
+        qty: 1,
+        total: -Number(s.promo.montant)
+      }] : [])
     ],
     total: Number(s.total) || 0,
     payment: s.payment || 'carte',

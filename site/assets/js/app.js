@@ -1603,9 +1603,9 @@
           <span class="im-price">${IM.euro(order.total)}</span>
         </div>
         <p class="im-summary__legal">
-          Votre reçu de paiement vous est envoyé par e-mail. Une question sur votre
-          commande ? Écrivez-nous en rappelant votre numéro, nous vous répondons
-          avant votre arrivée.
+          Votre reçu de paiement vous est envoyé par e-mail. Lenny prépare la suite
+          avant votre arrivée. Une question ? Appelez-le au
+          <a href="tel:+33640081045">06 40 08 10 45</a> en rappelant votre numéro de commande.
         </p>
       </div>`;
 

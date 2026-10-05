@@ -438,6 +438,6 @@ const IM = {
   byCat: (cat) => IM_PRODUCTS.filter((p) => p.cat === cat),
   category: (id) => IM_CATEGORIES.find((c) => c.id === id),
   euro: (n) => new Intl.NumberFormat('fr-FR', {
-    style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 2
+    style: 'currency', currency: 'EUR', minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2
   }).format(n)
 };

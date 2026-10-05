@@ -759,3 +759,46 @@ de 19 h » n'a plus de sens si l'arrivée standard est déjà 16 h.
 - [x] CGV §4 mise à jour. Tests `node --test tests/*.test.mjs` : 12/12. Prod vérifiée via /api/availability.
 - [ ] 24 Heures Camions 2027 : ajouter les dates dans grille.js dès l'annonce officielle
 - [ ] Événements 2028 : à saisir chaque année (la grille ne les invente pas)
+
+## 2026-10-03 — Code d'apporteur VANESSA10 (prêt, NON publié)
+- [x] `site/api/_lib/promos.js` : liste des codes (VANESSA10 → Vanessa, −10 %), saisie insensible à la casse/espaces
+- [x] Remise calculée par le SERVEUR (create-stay-session) ligne par ligne au centime ; code inconnu → 400, rien verrouillé
+- [x] Règles par défaut (questions restées sans réponse) : cumul avec la dernière minute ; jamais sur les nuits
+      de la Saint-Valentin (attentions remisées quand même) ; réservations de nuit uniquement
+- [x] `/api/promo` pour afficher le bon total avant Stripe ; champ « Code cadeau ou code promo » dans le parcours
+- [x] Lenny informé : « De la part de Vanessa · code VANESSA10, −X € » dans le mail, ligne négative au tableau,
+      métadonnée Stripe `promo` ; reconstitution garde l'apporteur
+- [x] Montants non ronds affichés « 121,50 € » et plus « 121,5 € » (5 formateurs)
+- [x] Tests 18/18 ; parcours vérifié dans le navigateur (148,50 € affiché = 14 850 centimes débités)
+- [x] Publié avec les correctifs du 05/10 (feu vert de Tom)
+- [ ] Commission de Vanessa : non gérée (le tableau montre l'apporteur, pas de cumul mensuel)
+
+## 2026-10-05 — Réservation du 3/10 : communication ratée de bout en bout
+Constat (Tom) : ni le client ni Lenny n'ont reçu de mail ; Lenny n'avait que le paiement Stripe, sans le
+détail ni le cadeau gagné (planche) ; le paiement a été refusé 3 fois « frauduleux », le client a fait
+opposition auprès de sa banque.
+
+Dans le code :
+- [x] Téléphone du client OBLIGATOIRE pour réserver une nuit (formulaire + serveur, 10 à 15 chiffres)
+- [x] Numéro de Lenny + adresse sur la page de confirmation (le client y arrive même sans mail)
+      et sur la page de paiement Stripe (custom_text sous le bouton). Source serveur : _lib/lieu.js
+- [x] Paiement Stripe lisible par Lenny SANS mail : description + métadonnées copiées sur le
+      PaymentIntent (nuits ET attentions)
+- [x] Cadeau de la roue retrouvé côté serveur (code → lot, _lib/cadeaux.js) : « À préparer » du mail
+      hôte, tableau, Stripe, mail client ; code introuvable → « à vérifier »
+- [x] Fiche complète sur le PAIEMENT Stripe (_lib/fiche-stripe.js) : 15 lignes numérotées (statut, arrivée,
+      départ, prix par nuit, client, téléphone, e-mail, attentions et prix, cadeau, softs, alcool, code promo,
+      message, total) + fiche CLIENT Stripe (nom, e-mail, téléphone), réutilisée s'il revient
+- [x] Page de confirmation : « Lenny va prendre contact avec vous au <numéro saisi> » ; confirmation des
+      attentions : numéro de Lenny
+- [x] Tests 26/26 ; formulaire et pages de confirmation vérifiés dans le navigateur
+- [ ] Après publication : une réservation test jusqu'à la page Stripe (sans payer) pour vérifier que
+      Stripe accepte payment_intent_data et custom_text — non testables sans clé
+- [ ] Faille notée : le LOT de la roue est envoyé par le navigateur (roue.js) ; un client peut
+      enregistrer un lot qu'il n'a pas gagné. À tirer côté serveur.
+
+Hors code (Tom / Lenny, je ne peux pas le faire) :
+- [ ] Resend : domaine validé + RESEND_FROM sur @intensemans.com — cause n°1 des mails absents
+- [ ] Stripe : URL du webhook en www ; notifications « paiement réussi » activées pour Lenny
+- [ ] Stripe : libellé de relevé bancaire + téléphone public (un débit reconnaissable évite l'opposition)
+- [ ] Stripe : lire la raison des 3 refus (Radar ou banque) avant de toucher à quoi que ce soit

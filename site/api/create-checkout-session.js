@@ -10,6 +10,9 @@
 import { stripe } from './_lib/stripe.js';
 import { priceOrder } from './_lib/catalog.js';
 import { putPending } from './_lib/store.js';
+import { lireCadeau } from './_lib/cadeaux.js';
+import { ficheCommande } from './_lib/fiche-stripe.js';
+import { LIEU } from './_lib/lieu.js';
 
 const MAX = { name: 120, resa: 60, message: 800 };
 
@@ -67,6 +70,8 @@ export async function POST(request) {
     return bad('Confirmation de majorité requise.');
   }
 
+  const cadeau = await lireCadeau(payload.cadeau);
+
   const ref = `IM-${new Date().toISOString().slice(2, 10).replace(/-/g, '')}-${
     String(Math.floor(Math.random() * 9000) + 1000)}`;
 
@@ -78,6 +83,7 @@ export async function POST(request) {
       id: l.id, name: l.name, qty: l.qty, total: l.total, alcohol: l.alcohol
     })),
     total: priced.totalCents / 100,
+    cadeau,
     prepared: false,
     createdAt: new Date().toISOString()
   };
@@ -87,10 +93,25 @@ export async function POST(request) {
   const origin = new URL(request.url).origin;
 
   try {
+    const metadata = {
+      ref, stayDate: stay.date, arrival: stay.arrival,
+      name: stay.name,
+      resa: stay.resa,
+      message: stay.message.slice(0, 500),
+      ...(cadeau ? { cadeau: cadeau.code, lot: cadeau.lot || 'à vérifier' } : {})
+    };
+
+    /* Tout le détail, sur le paiement lui-même (voir fiche-stripe.js). */
+    const fiche = ficheCommande({ ref, stay, lignes: priced.lines, totalCents: priced.totalCents, cadeau });
+
     const session = await stripe().checkout.sessions.create({
       mode: 'payment',
       client_reference_id: ref,
       locale: 'fr',
+      payment_intent_data: fiche,
+      custom_text: {
+        submit: { message: `Tout est installé dans la suite avant votre arrivée. Une question ? ${LIEU.tel}` }
+      },
       line_items: priced.lines.map((l) => ({
         quantity: l.qty,
         price_data: {
@@ -102,14 +123,8 @@ export async function POST(request) {
       success_url: `${origin}/confirmation.html?ref=${encodeURIComponent(ref)}`,
       cancel_url: `${origin}/commander.html`,
       /* Copie de la commande chez Stripe : si l'enregistrement se
-         perd, le webhook la reconstitue d'ici. 500 caractères au
-         plus par valeur. */
-      metadata: {
-        ref, stayDate: stay.date, arrival: stay.arrival,
-        name: stay.name,
-        resa: stay.resa,
-        message: stay.message.slice(0, 500)
-      }
+         perd, le webhook la reconstitue d'ici. */
+      metadata
     });
 
     return Response.json({ url: session.url, ref });

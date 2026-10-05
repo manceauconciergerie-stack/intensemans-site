@@ -19,6 +19,7 @@
 import { stripe } from './stripe.js';
 import { CATALOG } from './catalog.js';
 import { nuitsDuSejour } from './rates.js';
+import { trouverPromo } from './promos.js';
 
 const PAR_NOM = new Map(
   Object.entries(CATALOG).map(([id, p]) => [p.name, { id, ...p }])
@@ -47,6 +48,11 @@ async function lignesAchetees(sessionId) {
     };
   });
 }
+
+/* Cadeau de la roue, recopié dans les métadonnées à la création. */
+const cadeauDe = (m) => (m.cadeau
+  ? { code: m.cadeau, lot: m.lot && m.lot !== 'à vérifier' ? m.lot : null }
+  : null);
 
 const sansCents = ({ cents, ...ligne }) => ligne;
 
@@ -84,6 +90,13 @@ export async function reconstituerSejour(session, patch) {
     lines: extras.map(sansCents),
     total: session.amount_total / 100,
     needsConfirmation: true,
+    /* Le montant exact de la remise n'est plus connu (les lignes Stripe
+       sont déjà remisées) : on garde ce qui compte, qui a envoyé le client. */
+    promo: (() => {
+      const p = trouverPromo(m.promo);
+      return p ? { code: p.code, apporteur: p.apporteur, remise: p.remise, montant: null } : null;
+    })(),
+    cadeau: cadeauDe(m),
     reconstitue: true,
     createdAt: new Date(session.created * 1000).toISOString(),
     paidAt: new Date().toISOString(),
@@ -109,6 +122,7 @@ export async function reconstituerCommande(session, patch) {
     lines: lignes.map(sansCents),
     total: session.amount_total / 100,
     prepared: false,
+    cadeau: cadeauDe(m),
     reconstitue: true,
     createdAt: new Date(session.created * 1000).toISOString(),
     paidAt: new Date().toISOString(),

@@ -24,6 +24,11 @@ import { chiffrerSejour, nuitsDuSejour, tarifs } from './_lib/rates.js';
 import { priceOrder } from './_lib/catalog.js';
 import { verrouiller, liberer, creerSejour } from './_lib/stays.js';
 import { lireAirbnb } from './_lib/ical.js';
+import { trouverPromo, remiseCents } from './_lib/promos.js';
+import { estSaintValentin } from './_lib/grille.js';
+import { lireCadeau } from './_lib/cadeaux.js';
+import { LIEU } from './_lib/lieu.js';
+import { ficheSejour, clientStripe } from './_lib/fiche-stripe.js';
 
 const MAX = { name: 120, email: 160, phone: 30, message: 800 };
 const clean = (v, max) => String(v == null ? '' : v).trim().slice(0, max);
@@ -68,6 +73,13 @@ export async function POST(request) {
   };
   if (!guest.name) return bad('Votre nom est nécessaire.');
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(guest.email)) return bad('Adresse e-mail invalide.');
+  /* Obligatoire depuis le 05/10/2026 : la réservation du 3 octobre a
+     montré qu'un mail perdu laissait l'hôte sans moyen de joindre le
+     client. Même règle que le formulaire (parcours.js). */
+  const chiffres = guest.phone.replace(/\D/g, '');
+  if (!/^[+0-9 ().-]+$/.test(guest.phone) || chiffres.length < 10 || chiffres.length > 15) {
+    return bad('Votre numéro de téléphone est nécessaire.');
+  }
 
   let chiffrage;
   try {
@@ -90,6 +102,16 @@ export async function POST(request) {
       return bad('Confirmation de majorité requise.');
     }
   }
+
+  /* Code d'apporteur (promos.js). Inconnu : on refuse plutôt que de
+     débiter plein tarif quelqu'un qui croit avoir sa remise. */
+  let promo = null;
+  if (payload.promo) {
+    promo = trouverPromo(payload.promo);
+    if (!promo) return bad('Ce code promo n’existe pas.');
+  }
+
+  const cadeau = await lireCadeau(payload.cadeau);
 
   const dates = nuitsDuSejour(checkin, checkout);
 
@@ -117,7 +139,18 @@ export async function POST(request) {
   const jours = Math.round((arrivee - aujourdhui) / 86400000);
   const needsConfirmation = jours <= delaiConfirmation();
 
-  const totalCents = chiffrage.totalCents + (extras ? extras.totalCents : 0);
+  /* Remise d'apporteur, arrondie ligne par ligne comme dans le
+     navigateur. Les nuits de la Saint-Valentin n'en ont pas. */
+  const taux = promo ? promo.remise : 0;
+  const nuitsRemisables = chiffrage.lines
+    .filter((l) => !estSaintValentin(l.date))
+    .reduce((s, l) => s + Math.round(l.price * 100), 0);
+  const nuitsCents = chiffrage.totalCents - remiseCents(nuitsRemisables, taux);
+  const extrasPayes = extras
+    ? extras.lines.map((l) => ({ ...l, payeCents: l.unitCents - remiseCents(l.unitCents, taux) }))
+    : [];
+  const totalCents = nuitsCents + extrasPayes.reduce((s, l) => s + l.payeCents * l.qty, 0);
+  const pleinCents = chiffrage.totalCents + (extras ? extras.totalCents : 0);
 
   const sejour = {
     ref,
@@ -132,6 +165,12 @@ export async function POST(request) {
       ? extras.lines.map((l) => ({ id: l.id, name: l.name, qty: l.qty, total: l.total, alcohol: l.alcohol }))
       : [],
     total: totalCents / 100,
+    /* Lignes au plein tarif, remise à part : l'hôte voit d'où vient
+       l'écart, et qui a envoyé le client. */
+    promo: promo
+      ? { code: promo.code, apporteur: promo.apporteur, remise: promo.remise, montant: (pleinCents - totalCents) / 100 }
+      : null,
+    cadeau,
     needsConfirmation,
     createdAt: new Date().toISOString()
   };
@@ -142,46 +181,73 @@ export async function POST(request) {
     const origin = new URL(request.url).origin;
     const nuitLibelle = `${chiffrage.nights} nuit${chiffrage.nights > 1 ? 's' : ''}`;
 
+    /* Copie de la réservation chez Stripe. Si l'enregistrement se
+       perd, le webhook la reconstitue d'ici. 500 caractères au plus
+       par valeur. */
+    const metadata = {
+      ref, type: 'sejour', checkin, checkout,
+      name: guest.name,
+      phone: guest.phone,
+      message: guest.message.slice(0, 500),
+      ...(promo ? { promo: promo.code } : {}),
+      ...(cadeau ? { cadeau: cadeau.code, lot: cadeau.lot || 'à vérifier' } : {})
+    };
+
+    /* Tout ce que le site sait de la réservation, posé sur le paiement
+       Stripe lui-même : l'hôte doit pouvoir tout préparer et appeler
+       le client depuis l'application Stripe, sans aucun mail. */
+    const fiche = ficheSejour({
+      ref, checkin, checkout, chiffrage, guest, extras: extrasPayes,
+      promo, pleinCents, totalCents, cadeau, needsConfirmation
+    });
+    const client = await clientStripe({ name: guest.name, email: guest.email, phone: guest.phone, ref });
+
     const session = await stripe().checkout.sessions.create({
       mode: 'payment',
       client_reference_id: ref,
-      customer_email: guest.email,
+      /* Fiche client : nom, e-mail, téléphone visibles sur le paiement. */
+      ...(client ? { customer: client } : { customer_email: guest.email }),
+      /* Les métadonnées d'une session Checkout restent sur la session :
+         la page du PAIEMENT, celle que l'hôte ouvre, n'en montrait rien. */
+      payment_intent_data: fiche,
+      /* Sous le bouton « Payer » : le client sait qui l'appellera, et
+         a un numéro avant même d'avoir payé. */
+      custom_text: {
+        submit: {
+          message: `Après le paiement, Lenny vous appelle avant votre arrivée pour l’accès. Une question ? ${LIEU.tel}`
+        }
+      },
       locale: 'fr',
       line_items: [
         {
           quantity: 1,
           price_data: {
             currency: 'eur',
-            unit_amount: chiffrage.totalCents,
+            unit_amount: nuitsCents,
             product_data: {
               name: `Love Room INTENSE MANS — ${nuitLibelle}`,
-              description: `Arrivee le ${checkin} a partir de 16h, depart le ${checkout} avant 11h`
+              description: `Arrivee le ${checkin} a partir de 16h, depart le ${checkout} avant 11h${
+                promo && nuitsCents < chiffrage.totalCents ? ` · code ${promo.code} -${Math.round(taux * 100)} %` : ''}`
             }
           }
         },
-        ...(extras ? extras.lines.map((l) => ({
+        ...extrasPayes.map((l) => ({
           quantity: l.qty,
           price_data: {
             currency: 'eur',
-            unit_amount: l.unitCents,
-            product_data: { name: l.name }
+            unit_amount: l.payeCents,
+            product_data: promo
+              ? { name: l.name, description: `Code ${promo.code} -${Math.round(taux * 100)} %` }
+              : { name: l.name }
           }
-        })) : [])
+        }))
       ],
       success_url: `${origin}/sejour-confirme.html?ref=${encodeURIComponent(ref)}`,
       cancel_url: `${origin}/#parcours`,
       /* La page de paiement se ferme avant que le verrou des nuits
          tombe (45 min, stays.js). 31 min : Stripe refuse moins de 30. */
       expires_at: Math.floor(Date.now() / 1000) + 31 * 60,
-      /* Copie de la réservation chez Stripe. Si l'enregistrement se
-         perd, le webhook la reconstitue d'ici : l'hôte reçoit quand
-         même le détail. 500 caractères au plus par valeur. */
-      metadata: {
-        ref, type: 'sejour', checkin, checkout,
-        name: guest.name,
-        phone: guest.phone,
-        message: guest.message.slice(0, 500)
-      }
+      metadata
     });
 
     return Response.json({ url: session.url, ref, needsConfirmation });

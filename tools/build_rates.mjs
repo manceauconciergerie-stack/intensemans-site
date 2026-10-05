@@ -46,7 +46,7 @@ const sortie = `/* ============================================================
 
 const IM_TARIFS = (() => {
 ${corps.split('\n').map((l) => (l ? `  ${l}` : l)).join('\n')}
-  return { prixNuit: (iso) => prixGrille(iso) };
+  return { prixNuit: (iso) => prixGrille(iso), estSaintValentin };
 })();
 `;
 

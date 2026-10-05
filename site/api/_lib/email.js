@@ -7,6 +7,7 @@
    ============================================================ */
 
 import { Resend } from 'resend';
+import { LIEU } from './lieu.js';
 
 /* Instanciation différée, et c'est important.
 
@@ -30,7 +31,7 @@ function resend() {
 }
 
 const euro = (n) => new Intl.NumberFormat('fr-FR', {
-  style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 2
+  style: 'currency', currency: 'EUR', minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2
 }).format(n);
 
 const jour = (iso) => {
@@ -40,6 +41,14 @@ const jour = (iso) => {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
   });
 };
+
+/* Le cadeau de la roue, comme une ligne à préparer. Lot inconnu
+   (code expiré ou mal recopié) : l'hôte voit « à vérifier ». */
+const ligneCadeau = (c) => (c ? [{
+  name: `Cadeau de la roue : ${c.lot ? `${c.lot} (${c.code})` : `code ${c.code} à vérifier`}`,
+  qty: 1,
+  offert: true
+}] : []);
 
 const esc = (s) => String(s == null ? '' : s)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -66,7 +75,7 @@ export async function notifyHost(order) {
     stay.resa ? `N° résa       ${stay.resa}` : null,
     '',
     'À PRÉPARER',
-    ...lines.map((l) => `  · ${l.name}${l.qty > 1 ? ` × ${l.qty}` : ''}`),
+    ...[...lines, ...ligneCadeau(order.cadeau)].map((l) => `  · ${l.name}${l.qty > 1 ? ` × ${l.qty}` : ''}`),
     '',
     stay.message ? `MESSAGE DU CLIENT\n  ${stay.message}\n` : null,
     alcool ? 'Contient de l’alcool — à mettre au frais, vérifier la majorité à l’arrivée.\n' : null,
@@ -87,10 +96,10 @@ export async function notifyHost(order) {
 
   <p style="margin:0 0 8px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8a7a72">À préparer</p>
   <table style="width:100%;border-collapse:collapse;font-size:15px;margin-bottom:24px">
-    ${lines.map((l) => `
+    ${[...lines, ...ligneCadeau(order.cadeau)].map((l) => `
     <tr>
       <td style="padding:10px 0;border-bottom:1px solid #ece3da">${esc(l.name)}${l.qty > 1 ? ` <strong>× ${l.qty}</strong>` : ''}</td>
-      <td style="padding:10px 0;border-bottom:1px solid #ece3da;text-align:right;white-space:nowrap">${esc(euro(l.total))}</td>
+      <td style="padding:10px 0;border-bottom:1px solid #ece3da;text-align:right;white-space:nowrap">${l.offert ? 'offert' : esc(euro(l.total))}</td>
     </tr>`).join('')}
     <tr>
       <td style="padding:12px 0;font-weight:600">Total payé</td>
@@ -141,6 +150,13 @@ async function envoyer({ to, subject, texte, html }) {
    catalogue : ils figurent d'office dans la liste à préparer. */
 const SOFTS_OFFERTS = 'Softs offerts, au réfrigérateur';
 
+/* « Vanessa · code VANESSA10, −13,50 € » : qui a envoyé le client,
+   et ce que la remise a coûté. Montant absent sur une réservation
+   reconstituée depuis Stripe. */
+const libellePromo = (p) => p
+  ? `${p.apporteur} · code ${p.code}${p.montant ? `, −${euro(p.montant)}` : ''}`
+  : null;
+
 export async function notifyStay(sejour) {
   const to = process.env.HOST_NOTIFY_EMAIL;
   if (!to) throw new Error('HOST_NOTIFY_EMAIL manquant');
@@ -177,8 +193,9 @@ export async function notifyStay(sejour) {
     `Client        ${g.name || '—'}`,
     `E-mail        ${g.email || '—'}`,
     g.phone ? `Téléphone     ${g.phone}` : null,
+    sejour.promo ? `De la part de ${libellePromo(sejour.promo)}` : null,
     '',
-    'À PRÉPARER\n' + [...(sejour.lines || []), { name: SOFTS_OFFERTS, qty: 1 }]
+    'À PRÉPARER\n' + [...(sejour.lines || []), ...ligneCadeau(sejour.cadeau), { name: SOFTS_OFFERTS, qty: 1 }]
       .map((l) => `  · ${l.name}${l.qty > 1 ? ` × ${l.qty}` : ''}`).join('\n') + '\n',
     g.message ? `MESSAGE\n  ${g.message}\n` : null,
     `Total payé    ${euro(sejour.total)}`,
@@ -209,15 +226,16 @@ export async function notifyStay(sejour) {
     <tr><td style="padding:6px 0;color:#8a7a72">Client</td><td style="padding:6px 0;font-weight:600">${esc(g.name) || '—'}</td></tr>
     <tr><td style="padding:6px 0;color:#8a7a72">E-mail</td><td style="padding:6px 0">${esc(g.email) || '—'}</td></tr>
     ${g.phone ? `<tr><td style="padding:6px 0;color:#8a7a72">Téléphone</td><td style="padding:6px 0">${esc(g.phone)}</td></tr>` : ''}
+    ${sejour.promo ? `<tr><td style="padding:6px 0;color:#8a7a72">De la part de</td><td style="padding:6px 0;font-weight:600">${esc(libellePromo(sejour.promo))}</td></tr>` : ''}
     <tr><td style="padding:12px 0;color:#8a7a72">Total payé</td><td style="padding:12px 0;font-weight:600">${esc(euro(sejour.total))}</td></tr>
   </table>
 
   <p style="margin:0 0 8px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8a7a72">À préparer dans la suite</p>
   <table style="width:100%;border-collapse:collapse;font-size:15px;margin-bottom:22px">
-    ${(sejour.lines || []).map((l) => `
+    ${[...(sejour.lines || []), ...ligneCadeau(sejour.cadeau)].map((l) => `
     <tr>
       <td style="padding:10px 0;border-bottom:1px solid #ece3da">${esc(l.name)}${l.qty > 1 ? ` <strong>× ${l.qty}</strong>` : ''}</td>
-      <td style="padding:10px 0;border-bottom:1px solid #ece3da;text-align:right;white-space:nowrap">${esc(euro(l.total))}</td>
+      <td style="padding:10px 0;border-bottom:1px solid #ece3da;text-align:right;white-space:nowrap">${l.offert ? 'offert' : esc(euro(l.total))}</td>
     </tr>`).join('')}
     <tr>
       <td style="padding:10px 0;border-bottom:1px solid #ece3da">${esc(SOFTS_OFFERTS)}</td>
@@ -248,16 +266,6 @@ export async function notifyStay(sejour) {
    formulaire ne la demande pas) et du formulaire pour les nuits.
    ------------------------------------------------------------ */
 
-/* Coordonnees du LIEU, citees dans la confirmation au client.
-   Seul endroit du code qui les porte : un demenagement ou un
-   changement de numero se corrige ici, et nulle part ailleurs.
-   Le code de la boite a cles n'y figure PAS volontairement : il
-   est communique plus tard, de la main de l'hote. */
-const LIEU = {
-  adresse: '1 bis rue Jeanne d’Arc, 72000 Le Mans',
-  tel: process.env.CONTACT_TEL || '06 40 08 10 45',
-  telLien: 'tel:+33640081045'
-};
 
 function coordonnees() {
   return {
@@ -280,7 +288,7 @@ export async function confirmerAuClient(sejour) {
   if (!g.email) throw new Error('Adresse du client inconnue');
 
   const aValider = sejour.status === 'a-confirmer';
-  const lignes = sejour.lines || [];
+  const lignes = [...(sejour.lines || []), ...ligneCadeau(sejour.cadeau)];
 
   const subject = aValider
     ? `Nous confirmons votre nuit du ${jour(sejour.checkin)} très vite`
@@ -297,6 +305,7 @@ export async function confirmerAuClient(sejour) {
     `Adresse      ${LIEU.adresse}`,
     '',
     lignes.length ? 'PRÉPARÉ POUR VOUS\n' + lignes.map((l) => `  · ${l.name}${l.qty > 1 ? ` × ${l.qty}` : ''}`).join('\n') + '\n' : null,
+    sejour.promo && sejour.promo.montant ? `Code ${sejour.promo.code}  −${euro(sejour.promo.montant)}` : null,
     `Total payé   ${euro(sejour.total)}`,
     `Référence    ${sejour.ref}`,
     '',
@@ -326,6 +335,7 @@ export async function confirmerAuClient(sejour) {
     <tr><td style="padding:6px 0;color:#8a7a72;width:120px">Arrivée</td><td style="padding:6px 0;font-weight:600">${esc(jour(sejour.checkin))}, à partir de 16 h</td></tr>
     <tr><td style="padding:6px 0;color:#8a7a72">Départ</td><td style="padding:6px 0;font-weight:600">${esc(jour(sejour.checkout))}, avant 11 h</td></tr>
     <tr><td style="padding:6px 0;color:#8a7a72">Adresse</td><td style="padding:6px 0;font-weight:600">${esc(LIEU.adresse)}</td></tr>
+    ${sejour.promo && sejour.promo.montant ? `<tr><td style="padding:6px 0;color:#8a7a72">Code ${esc(sejour.promo.code)}</td><td style="padding:6px 0">−${esc(euro(sejour.promo.montant))}</td></tr>` : ''}
     <tr><td style="padding:12px 0;color:#8a7a72">Total payé</td><td style="padding:12px 0;font-weight:600">${esc(euro(sejour.total))}</td></tr>
   </table>
 
@@ -361,7 +371,7 @@ export async function confirmerAuClient(sejour) {
    l'adresse vient de Stripe. */
 export async function confirmerCommandeAuClient(order, email) {
   if (!email) throw new Error('Adresse du client inconnue');
-  const lignes = order.lines || [];
+  const lignes = [...(order.lines || []), ...ligneCadeau(order.cadeau)];
 
   const texte = [
     'VOS ATTENTIONS SONT COMMANDÉES',
@@ -385,7 +395,7 @@ export async function confirmerCommandeAuClient(order, email) {
     ${lignes.map((l) => `
     <tr>
       <td style="padding:9px 0;border-bottom:1px solid #ece3da">${esc(l.name)}${l.qty > 1 ? ` <strong>× ${l.qty}</strong>` : ''}</td>
-      <td style="padding:9px 0;border-bottom:1px solid #ece3da;text-align:right;white-space:nowrap">${esc(euro(l.total))}</td>
+      <td style="padding:9px 0;border-bottom:1px solid #ece3da;text-align:right;white-space:nowrap">${l.offert ? 'offert' : esc(euro(l.total))}</td>
     </tr>`).join('')}
     <tr><td style="padding:12px 0;font-weight:600">Total payé</td><td style="padding:12px 0;text-align:right;font-weight:600">${esc(euro(order.total))}</td></tr>
   </table>

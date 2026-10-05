@@ -28,7 +28,7 @@ window.IMCalendrier = (() => {
   ));
 
   const euro = (n) => new Intl.NumberFormat('fr-FR', {
-    style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 2
+    style: 'currency', currency: 'EUR', minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2
   }).format(n);
 
   const iso = (d) => [

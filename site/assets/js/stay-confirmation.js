@@ -21,7 +21,7 @@
   ));
 
   const euro = (n) => new Intl.NumberFormat('fr-FR', {
-    style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 2
+    style: 'currency', currency: 'EUR', minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2
   }).format(n);
 
   const longue = (isoStr) => {
@@ -51,6 +51,33 @@
   }
 
   const aValider = sejour && sejour.needsConfirmation;
+
+  /* Copie de site/api/_lib/lieu.js (le navigateur ne lit pas le
+     serveur). Cette page est la seule chose que le client voit à coup
+     sûr : le 3 octobre, aucun mail n'est arrivé, et il n'avait aucun
+     numéro pour joindre l'hôte. */
+  const LIEU = {
+    adresse: '1 bis rue Jeanne d’Arc, 72000 Le Mans',
+    tel: '06 40 08 10 45',
+    telLien: 'tel:+33640081045'
+  };
+
+  const contact = `
+      <div class="im-summary" style="position:static;max-width:620px;margin:22px auto 0">
+        <div class="im-summary__row">
+          <span class="im-quiet">Adresse</span>
+          <span>${esc(LIEU.adresse)}</span>
+        </div>
+        <div class="im-summary__row">
+          <span class="im-quiet">Votre hôte</span>
+          <span>Lenny · <a href="${LIEU.telLien}">${esc(LIEU.tel)}</a></span>
+        </div>
+        <p class="im-summary__legal">
+          Une question d’ici là : appelez Lenny directement. Le détail de
+          votre réservation vous est aussi envoyé par e-mail ; pensez à
+          garder cette page.
+        </p>
+      </div>`;
 
   const detail = sejour ? `
       <div class="im-summary" style="position:static;max-width:620px;margin-inline:auto">
@@ -87,11 +114,16 @@
         : 'À très bientôt <span aria-hidden="true">❤︎</span>'}</h1>
       <div class="im-flourish im-flourish--center"><span aria-hidden="true">❤︎</span></div>
       <p class="im-lead">${aValider
-        ? 'Votre arrivée est proche : nous vérifions une dernière fois nos disponibilités et vous confirmons par e-mail dans les prochaines heures. En cas d’imprévu, vous seriez intégralement remboursé.'
-        : 'Votre nuit à la Love Room INTENSÉ’MANS est réservée. Vous recevez le détail par e-mail.'}</p>
+        ? 'Votre arrivée est proche : nous vérifions une dernière fois nos disponibilités.'
+        : 'Votre nuit à la Love Room INTENSÉ’MANS est réservée.'}
+        <strong>Lenny va prendre contact avec vous${sejour && sejour.phone ? ` au ${esc(sejour.phone)}` : ''}</strong>
+        ${aValider
+          ? 'dans les prochaines heures pour vous confirmer votre nuit. En cas d’imprévu, vous seriez intégralement remboursé.'
+          : 'avant votre arrivée, pour vous indiquer l’accès et vous communiquer les codes.'}</p>
     </div>
 
     ${detail}
+    ${contact}
 
     <div class="im-head im-head--center" style="margin-top:clamp(48px,6vw,80px)">
       <span class="im-eyebrow">Et pour rendre la soirée mémorable</span>
