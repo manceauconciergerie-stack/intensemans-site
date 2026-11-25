@@ -794,7 +794,7 @@ Dans le code :
 - [x] Tests 26/26 ; formulaire et pages de confirmation vérifiés dans le navigateur
 - [ ] Après publication : une réservation test jusqu'à la page Stripe (sans payer) pour vérifier que
       Stripe accepte payment_intent_data et custom_text — non testables sans clé
-- [ ] Faille notée : le LOT de la roue est envoyé par le navigateur (roue.js) ; un client peut
+- [x] (25/11, corrigé) Faille : le LOT de la roue était envoyé par le navigateur (roue.js) ; un client pouvait
       enregistrer un lot qu'il n'a pas gagné. À tirer côté serveur.
 
 Hors code (Tom / Lenny, je ne peux pas le faire) :
@@ -818,3 +818,14 @@ Hors code (Tom / Lenny, je ne peux pas le faire) :
         société ; donner son nom, adresse et site → je l'ajoute aux mentions légales et aux CGV
       · Numéro d'enregistrement du meublé de tourisme, si la mairie du Mans en a délivré un
       · TVA (franchise art. 293 B + exonération 261 D 4°) à faire confirmer par le comptable
+
+## 2026-11-25 — Roue : une planche apéritive par mois au plus
+Constat : deux planches gagnées d'affilée. Le tirage se faisait DANS LE NAVIGATEUR (Math.random), le serveur
+enregistrait le lot qu'on lui annonçait : aucun plafond possible, et n'importe qui pouvait s'attribuer un lot.
+Au passage : la case « accord » n'était jamais transmise → consentement toujours stocké à false.
+- [x] Tirage côté serveur (api/roue.js + _lib/lots.js), le navigateur n'anime plus que le résultat
+- [x] Plafond mensuel atomique (INCR Redis, mois de Paris), amorcé avec les planches déjà données ce mois
+- [x] Poids planche 15 → 5 (départ retardé 40 → 50) ; tables serveur/navigateur vérifiées identiques par test
+- [x] Une adresse = une participation (même code renvoyé)
+- [x] Consentement réellement enregistré ; écran « code envoyé » seulement si le mail est parti
+- [x] Tests 33/33 (dont 400 tours → 1 planche) ; roue vérifiée dans le navigateur (s'arrête sur le lot du serveur)

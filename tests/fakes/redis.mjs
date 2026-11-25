@@ -22,6 +22,18 @@ const client = {
   async zrange(k) {
     return [...(zs.get(k) || new Map()).entries()].sort((a, b) => a[1] - b[1]).map(([m]) => m);
   },
+  async incr(k) {
+    const n = (kv.has(k) ? Number(JSON.parse(kv.get(k))) : 0) + 1;
+    kv.set(k, JSON.stringify(n));
+    return n;
+  },
+  async sadd(k, ...ms) {
+    const set = new Set(kv.has(k) ? JSON.parse(kv.get(k)) : []);
+    ms.forEach((m) => set.add(m));
+    kv.set(k, JSON.stringify([...set]));
+    return ms.length;
+  },
+  async smembers(k) { return kv.has(k) ? JSON.parse(kv.get(k)) : []; },
   async zrem(k, ...ms) { const z = zs.get(k); ms.forEach((m) => z && z.delete(m)); return ms.length; }
 };
 

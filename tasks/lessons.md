@@ -304,3 +304,11 @@
   le document en entier à la recherche de contradictions et de règles citées
   sans valeur ; les faire trancher AVANT d'écrire une ligne, et ne jamais
   inventer le chiffre manquant.**
+
+- **2026-11-25** | « Réduire la chance de gagner la planche, une par mois au
+  plus » : impossible tel quel, le tirage se faisait dans le navigateur et le
+  serveur enregistrait le lot qu'on lui annonçait. Baisser un poids côté client
+  n'aurait rien garanti. Même relecture : la case de consentement n'était jamais
+  transmise, toutes les adresses étaient stockées « sans accord ».
+  **Règle : toute règle métier qui coûte de l'argent (plafond, prix, lot,
+  remise) se décide côté serveur. Le navigateur affiche, il ne décide jamais.**

@@ -69,12 +69,17 @@
      Le disque est désormais dessiné AU PRORATA des poids (voir BORNES),
      défaut corrigé. Une roue qui montre quatre quarts égaux alors qu'un
      lot sort une fois sur sept ment au joueur. Poids et dessin ne
-     doivent plus jamais être modifiés l'un sans l'autre. */
+     doivent plus jamais être modifiés l'un sans l'autre.
+
+     DEPUIS LE 25/11/2026, LE TIRAGE SE FAIT SUR LE SERVEUR
+     (site/api/_lib/lots.js), qui plafonne aussi la planche à une par
+     mois. Cette table ne sert plus qu'au dessin : elle doit rester
+     identique à celle du serveur (vérifié par tests/roue.test.mjs). */
   const LOTS = [
     { court: 'Boule effervescente', gain: 'Une boule effervescente parfumée, à faire fondre dans le bain', cout: 2,  poids: 38 },
-    { court: 'Planche apéritive',   gain: 'Une planche apéritive, dressée pour votre arrivée',             cout: 12, poids: 15 },
+    { court: 'Planche apéritive',   gain: 'Une planche apéritive, dressée pour votre arrivée',             cout: 12, poids: 5 },
     { court: 'Mignardises',         gain: 'Quelques mignardises, déposées dans la suite',                  cout: 3,  poids: 7 },
-    { court: 'Départ retardé',      gain: 'Le départ retardé : 12 h au lieu de 11 h',                      cout: 0,  poids: 40 }
+    { court: 'Départ retardé',      gain: 'Le départ retardé : 12 h au lieu de 11 h',                      cout: 0,  poids: 50 }
   ];
 
   /* Bornes angulaires de chaque tranche, calculées une fois depuis les
@@ -101,17 +106,6 @@
     try { localStorage.setItem(CLE, JSON.stringify(donnee)); } catch (e) { /* mode privé */ }
   }
 
-  function tirer() {
-    const total = LOTS.reduce((s, l) => s + l.poids, 0);
-    let n = Math.random() * total;
-    for (let i = 0; i < LOTS.length; i++) {
-      n -= LOTS[i].poids;
-      if (n <= 0) return i;
-    }
-    return 0;
-  }
-
-  const codeCadeau = () => 'IM-' + Math.random().toString(36).slice(2, 7).toUpperCase();
 
   /* ----------------------------------------------------------
      Rendu
@@ -199,13 +193,14 @@
     return dlg;
   }
 
-  function vueGagne(lot, code, email) {
+  function vueGagne(lot, code, email, envoye = true) {
     return `
       <div>
         <h2 class="im-roue__titre">C’est à vous.</h2>
         <p class="im-roue__texte">
-          Nous avons envoyé votre code à ${esc(email)}. Indiquez-le au moment de
-          composer votre séjour, ou mentionnez-le simplement dans votre message.
+          ${envoye ? `Nous avons envoyé votre code à ${esc(email)}.` : 'Notez bien votre code.'}
+          Indiquez-le au moment de composer votre séjour, ou mentionnez-le
+          simplement dans votre message.
         </p>
       </div>
       <div class="im-roue__jeu">
@@ -222,10 +217,29 @@
      Enchaînement
      ---------------------------------------------------------- */
 
-  function lancer(email) {
-    const index = tirer();
-    const lot = LOTS[index];
-    const code = codeCadeau();
+  /* Le serveur tire le lot (et tient le plafond mensuel de la
+     planche) ; la roue ne fait que tourner jusqu'à son résultat. */
+  async function lancer(email, accord, dire, bouton) {
+    let r = null;
+    bouton.disabled = true;
+    try {
+      const rep = await fetch('/api/roue', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email, accord })
+      });
+      r = await rep.json().catch(() => null);
+      if (!rep.ok || !r || !r.ok) throw new Error((r && r.error) || '');
+    } catch (e) {
+      bouton.disabled = false;
+      dire(e.message || 'La roue ne peut pas tourner pour l’instant. Réessayez dans un moment.');
+      return;
+    }
+
+    const index = Math.max(0, LOTS.findIndex((l) => l.court === r.lot));
+    const lot = { ...LOTS[index], gain: r.gain || LOTS[index].gain };
+    const code = r.code;
+    const envoye = r.envoye === true;
 
     const dlg = fenetre();
     const corps = $('[data-mcorps]', dlg);
@@ -252,7 +266,9 @@
 
     setTimeout(() => {
       titre.textContent = 'C’est à vous.';
-      note.textContent = `Votre code part à ${email}.`;
+      note.textContent = r.deja
+        ? 'Vous avez déjà tourné la roue avec cette adresse : voici votre cadeau.'
+        : envoye ? `Votre code part à ${email}.` : 'Notez votre code : il vous sera demandé pour votre séjour.';
       $('[data-resultat]', dlg).innerHTML = `
         <p class="im-roue__gain">${esc(lot.gain)}</p>
         <span class="im-roue__code">${esc(code)}</span>
@@ -264,26 +280,10 @@
 
     /* Une fois la fenêtre fermée, la carte affiche le cadeau obtenu. */
     dlg.addEventListener('close', () => {
-      hote.innerHTML = vueGagne(lot, code, email);
+      hote.innerHTML = vueGagne(lot, code, email, envoye);
     }, { once: true });
 
-    retenir({ email, lot: lot.court, gain: lot.gain, code, date: new Date().toISOString() });
-    enregistrer({ email, lot: lot.court, code });
-  }
-
-  /* L'e-mail part vers le serveur s'il existe un point d'entrée.
-     Sinon on n'invente rien : le cadeau reste valable côté client
-     et il restera à brancher l'envoi. */
-  async function enregistrer(donnee) {
-    try {
-      await fetch('/api/roue', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(donnee)
-      });
-    } catch (e) {
-      /* Point d'entrée absent : rien à signaler au client. */
-    }
+    retenir({ email, lot: lot.court, gain: lot.gain, code, envoye, date: new Date().toISOString() });
   }
 
   function brancher() {
@@ -300,7 +300,7 @@
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return dire('Indiquez une adresse e-mail valide.');
       if (!accord) return dire('Cochez la case pour recevoir votre cadeau.');
       dire('');
-      lancer(email);
+      lancer(email, accord, dire, form.querySelector('button[type="submit"]'));
     });
   }
 
@@ -313,7 +313,7 @@
     const passe = dejaJoue();
     if (passe && passe.code) {
       const lot = LOTS.find((l) => l.court === passe.lot) || { gain: passe.gain };
-      hote.innerHTML = vueGagne(lot, passe.code, passe.email);
+      hote.innerHTML = vueGagne(lot, passe.code, passe.email, passe.envoye !== false);
       return;
     }
 
