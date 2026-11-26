@@ -829,3 +829,10 @@ Au passage : la case « accord » n'était jamais transmise → consentement tou
 - [x] Une adresse = une participation (même code renvoyé)
 - [x] Consentement réellement enregistré ; écran « code envoyé » seulement si le mail est parti
 - [x] Tests 33/33 (dont 400 tours → 1 planche) ; roue vérifiée dans le navigateur (s'arrête sur le lot du serveur)
+
+## 2026-11-26 — Avis clients sur l'accueil
+- [x] Bandeau qui défile (avis.css, CSS seul) entre les atouts et la roue : 3 avis Google fournis par Tom,
+      initiale du prénom + mois du séjour, fautes de frappe corrigées sans changer le sens, pas d'étoiles
+      (note non fournie), source indiquée (« Extraits d'avis publiés sur Google »)
+- [x] Pause au survol/clavier ; mouvement réduit → rangée fixe parcourable ; vérifié ordinateur et mobile
+- [ ] Avis Airbnb : à coller par Lenny (espace hôte → Avis) ; pas d'extraction automatique (CGU Airbnb)

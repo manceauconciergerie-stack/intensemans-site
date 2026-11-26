@@ -1,0 +1,89 @@
+/* ============================================================
+   INTENSÉ'MANS — Avis clients, bandeau qui défile
+   ------------------------------------------------------------
+   Défilement continu, en CSS seul : la piste contient le même jeu
+   d'avis plusieurs fois, et glisse de la moitié de sa largeur avant
+   de reprendre, sans à-coup. S'arrête au survol et au clavier.
+
+   Mouvement réduit demandé par le système : pas d'animation, une
+   seule copie, et la rangée se fait défiler à la main.
+   ============================================================ */
+
+.im-avis { overflow: clip; }
+
+.im-avis__piste {
+  position: relative;
+  /* Fondu sur les bords : les cartes entrent et sortent sans être
+     coupées net par l'écran. */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.im-avis__rang {
+  display: flex;
+  gap: clamp(14px, 2vw, 24px);
+  width: max-content;
+  margin: 0;
+  padding: 6px 0;
+  list-style: none;
+  animation: im-avis-defile 60s linear infinite;
+}
+
+.im-avis__piste:hover .im-avis__rang,
+.im-avis__piste:focus-within .im-avis__rang { animation-play-state: paused; }
+
+@keyframes im-avis-defile {
+  to { transform: translateX(-50%); }
+}
+
+.im-avis__carte {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  width: min(78vw, 360px);
+  padding: clamp(20px, 2.4vw, 28px);
+  border: 1px solid var(--im-rule);
+  border-radius: 14px;
+  background: var(--im-bg-2);
+}
+
+.im-avis__carte blockquote { margin: 0; }
+
+.im-avis__carte blockquote p {
+  margin: 0;
+  font-family: var(--im-display);
+  font-style: italic;
+  font-size: 1.14rem;
+  line-height: 1.5;
+  color: var(--im-fg);
+}
+
+.im-avis__carte blockquote p::before { content: '« '; color: var(--im-rose); }
+.im-avis__carte blockquote p::after  { content: ' »'; color: var(--im-rose); }
+
+.im-avis__qui {
+  margin: 0;
+  font-size: 0.86rem;
+  letter-spacing: 0.04em;
+  color: var(--im-fg-muted);
+}
+
+.im-avis__qui strong { color: var(--im-rose-ink); font-weight: 500; }
+
+.im-avis__source {
+  margin: clamp(18px, 2.4vw, 26px) 0 0;
+  font-size: 0.8rem;
+  color: var(--im-fg-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .im-avis__rang { animation: none; }
+  .im-avis__rang [aria-hidden="true"] { display: none; }
+  .im-avis__piste {
+    overflow-x: auto;
+    -webkit-mask-image: none;
+            mask-image: none;
+    padding-inline: 16px;
+  }
+}
