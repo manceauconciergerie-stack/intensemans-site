@@ -22,25 +22,6 @@
 
 .im-avis__intro .im-head { margin-bottom: 0; }
 
-.im-avis__sources {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.im-avis__sources li {
-  padding: 8px 14px;
-  border: 1px solid var(--im-rule-2);
-  border-radius: 999px;
-  font-size: 0.82rem;
-  color: var(--im-fg-soft);
-}
-
-.im-avis__sources strong { color: var(--im-fg); font-weight: 600; }
-
 .im-avis__pistes {
   display: grid;
   gap: clamp(14px, 2vw, 22px);
@@ -69,8 +50,19 @@
   animation-duration: 100s;
 }
 
-.im-avis__pistes:hover .im-avis__rang,
-.im-avis__pistes:focus-within .im-avis__rang { animation-play-state: paused; }
+/* Pas de pause au survol : choix de l'exploitant (26/11/2026), le
+   bandeau doit vivre en continu. Qui a demandé moins d'animations
+   sur son appareil a la version fixe (voir plus bas). */
+
+/* Téléphone : une seule rangée, qui porte tous les avis. Masquer la
+   seconde rangée en ferait disparaître la moitié. */
+.im-avis__piste--mobile { display: none; }
+.im-avis__piste--mobile .im-avis__rang { animation-duration: 80s; }
+
+@media (max-width: 700px) {
+  .im-avis__piste--large { display: none; }
+  .im-avis__piste--mobile { display: block; }
+}
 
 @keyframes im-avis-defile {
   to { transform: translateX(-50%); }
